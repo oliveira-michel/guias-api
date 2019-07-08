@@ -435,7 +435,7 @@ Se o analista de sistemas que cuida do [Gateway](#) resolver colocar [caches](#)
 
 ###  Request > Headers > Verbs > GET
 ---
-Este verbo é o mais utilizado e serve para buscar dados nas APIs. Você utiliza em conjunto com uma URL com seus [URI Parameters](#uri-parameters) e/ou [Query Strings](#query-strings) definidos para enviar uma consulta e o servidor retorna os dados em caso de sucesso.
+Este verbo é o mais utilizado e serve para buscar dados nas APIs. Você utiliza em conjunto com uma URL com seus [URI Parameters](#uri-parameters) e/ou [Query Strings](#query-strings) definidos para enviar uma consulta e o servidor retorna os dados em caso de sucesso. Em requisições do tipo GET, não se envia [Body](#).
 
 Exemplo utilizando o verbo GET para fazer uma consulta por cidades:
 _referência: http://api.exemplo.com/estados/{id-estado}/cidades_
@@ -444,6 +444,7 @@ _referência: http://api.exemplo.com/estados/{id-estado}/cidades_
 Exemplo utilizando o verbo GET para fazer uma consulta por uma cidade específica:
 _referência: http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
 **GET** http://api.exemplo.com/estados/sp/cidades/santos
+
 
 ### Request > Headers > Verbs > POST
 ---
@@ -461,6 +462,8 @@ _referência: http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
 }
 ```
 Dando tudo certo, uma nova cidade será criada na coleção de cidades.
+
+Obs: O POST também pode ser usado em casos especiais onde se faz necessário proteger as informações que seriam usadas na consulta (como em um GET), pois como uso de POST, podemos enviar [Body](#) e o body pode ser encriptado. Por exemplo, no login. 
 
 ### Request > Headers > Verbs > PUT
 ---
@@ -616,8 +619,87 @@ Header Content-Location no Response
 "populacao": 355542
 }
 ```
+### Response > Body
+---
+Quando é feita uma requisição na API, na maioria das vezes, espera-se uma resposta com informações. Colocamos estas informações no Body. Assim como no Body do [request](#), deve-se utilizar lowerCamelCase para definir os atributos e JSON como padrão de notação.
 
-### Body
+### Envelope "Data"
+Quando nos referimos ao body de request, apenas passamos os atributos sem nenhum tipo de envelope. Ex:
+```json
+{
+	"id": 123,
+	"nome": "Carlos",
+	"data": "2019-06-04"
+}
+```
+No body de response, colocamos a informação do recurso dentro de um envelope "data". Chamamos de envelope alguns atributos que separam conteúdos importantes na resposta. Esse separação é necessária porque no response podemos ter pagination, warnings, links, summary, etc. Exemplo de Body de response:
+```json
+"data": {
+    {
+		"id": 123,
+		"nome": "Carlos",
+		"data": "2019-06-04"
+	}
+},
+"pagination": {
+	"page": 1,
+	"page-size": 10,
+	...
+}
+"_links": {
+	...
+}
+```
+### Elemento unitário, array ou nenhum
+
+Quando se faz uma requisição por um elemento com um ID especificado no [URI Parameter](#), por exemplo, GET .../pessoa/{id-pessoa}, o retorno da resposta será um único elemento. Assim, coloca-se o recurso diretamente no envelope "data". Ex:
+
+Request:
+GET .../pessoas/456
+
+Response:
+``HTTP-CODE 200``
+``content-location: .../pessoas/456``
+```json
+"data": {
+    {
+		"id": 456,
+		"nome": "José",
+		"data": "2019-06-09"
+	}
+}
+```
+
+Quando se faz uma requisição sem o ID, filtrando apenas com [query strings](#), pode-se ter como retorno um ou mais elementos. Neste cenário, retornamos com um array do referido recurso. Ex:
+
+Request:
+GET .../pessoas?from-data=2019-06-01
+
+Response:
+``HTTP-CODE 200``
+``content-location: .../pessoas/456``
+```json
+"data": [{
+    {
+		"id": 123,
+		"nome": "Carlos",
+		"data": "2019-06-04"
+	},
+    {
+		"id": 456,
+		"nome": "José",
+		"data": "2019-06-09"
+	},
+	{
+		"id": 789,
+		"nome": "Maria",
+		"data": "2019-07-12"
+	}
+}]
+```
+
+Também é possível se obter resposta vazia quando a busca não retorna nenhum resultado ou nos casos de gravação (POST, PUT, PATCH e DELETE) em que o desenvolvedor da API opta por não trazer um retorno. Neste caso não se traz nada na resposta e, exceto no GET, o [código de resposta HTTP](#) é o 204.
+
 #### Paginação
 ##### - Cursor
 ##### - Page e Page Size
@@ -625,6 +707,75 @@ Header Content-Location no Response
 ##### - Ordenação
 ##### Fields
 ### HTTP Status Codes
+---
+No HTTP existem os [códigos de status](#[https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status)). Eles de forma padronizada reportam se a requisição foi processada com sucesso ou não. Existem muitos códigos e nem todos são adotados pelo REST. A adoção veio com o uso do do mercado e alguns códigos são amplamente usados e outros nem tanto.
+
+Abaixo, coloco os que adoto como padrão nas empresas onde trabalho.
+
+Basicamente, os códigos de resposta são agrupados: 1xx, 2xx, 3xx, 4xx e 5xx. 
+
+**Grupo 1xx**
+
+Este é o grupo de status que dá respostas informativas. Respostas com este status são raramente utilizadas.
+
+**Grupo 2xx**
+
+Os códigos deste grupo são usado em caso de sucesso na requisição. Os mais utilizados são:
+
+- **200 OK**:  Código mais utilizado e que indica que a requisição foi processada com sucesso. Esta resposta pode ser usada em todos os verbos. Os dados solicitados serão retornados no Body.
+
+- **201 Created**:  Indica que a requisição foi bem sucedida e que um novo recursos foi criado como resultado. Esta resposta é utilizada em requisições do método POST.
+
+- **204 No Content**: A requisição aconteceu com sucesso, no entanto, não há body na resposta. O 204 não é utilizado para o verbo GET. Nos casos de GET cujos critérios na requisição provocaram uma resposta vazia, utilizamos o HTTP code 200 com o envelope "data" vazio.
+
+- **206 Partial Content**: O servidor encontrou uma uma grande quantidade de registros na respostas e devolveu de forma paginada. A resposta inclui um envelope "pagination" com informações sobre a paginação.
+
+
+**Grupo 3xx**
+
+Este grupo define respostas de redirecionamento. Servem para informar o cliente sobre mudanças na requisição e redirecionamento para uma nova URL. Para saber mais sobre estes status codes, veja [requisições assíncronas](#). Os mais utilizados são:
+
+TODO: exemplificar melhor isso aqui!
+
+- **301 Moved Permanently**: Informa que o recurso A agora é o recurso B, de forma que quando o cliente solicitar o recurso A ele será automaticamente encaminhado ao recurso B.
+
+- **303 See Other**: A resposta para a requisição encontra-se em outra URL definida no header **Location**. Veja [Tarefas Assíncronas](#) para mais informações.
+
+- **304 Not Modified**:  Resposta utilizada quando o recurso está em [cache](#), informando ao cliente que a resposta não foi modificada, e que o cliente pode usar a mesma versão em cache da resposta.
+
+- **307 Temporary redirect**:  Se trata de um redirecionamento de uma página para outro endereço, porém que é com caráter temporário, e não permanente. Provavelmente por conta de alguma manutenção no sistema.
+
+**Grupo 4xx**
+
+Esse grupo informa os erros cometidos pelo cliente durante o request. São eles:
+
+- **400 Bad Request**: Significa que o servidor não consegue entender a requisição, pois existe uma sintaxe ou estrutura inválida, pode ser caracteres não permitidos na URL, falta de cabeçalhos obrigatórios, cabeçalhos mal formados, falta de query strings obrigatórias, falta de atributos obrigatórios, body com estrutura inválida, etc.
+
+- **401 Unauthorized**: A camada de segurança do recurso solicitado ao servidor, apontou que não está sendo utilizada as credenciais corretas nessa requisição (token, por exemplo). É um erro de autenticação.
+
+- **403 Forbidden**: As credenciais (token) estão corretos, mas o usuário não tem permissão para acessar aquele recurso.
+
+- **404 Not Found**: O servidor não encontrou o recurso solicitado pelo cliente. Provavelmente a URL está mau formada ou está sendo feita a busca com um [Path Parameter](#) inválido.
+
+- **405 Method Not Allowed**: O recurso (URL) existe mas o verbo usado não foi definido para ela.
+
+- **422 Unprocessable Entity**:	Quando a requisição está correta ao nível sintático, mas existem erros de negócio na requisição. Por exemplo, se existe regra que o uso de um query parameter está condicionado a outro e eles não foram preenchidos, ou uma data informada é inválida, ou uma requisição de transferência de dinheiro é feita e a conta não tem fundo, etc.
+
+- **428 Precondition Required**: TODO estudar esse aqui.
+
+- **429 Too Many Requests**: Informa ao cliente que ele excedeu o limite permitido de requisições. Veja [throttling](#) para entender mais sobre este código de retorno.
+
+**Grupo 5xx**
+
+São códigos que retornam erros que aconteceram por culpa do servidor. Ou seja, a requisição foi feita corretamente pelo cliente, porém ocorreu um erro no servidor. São eles:
+
+- **500 Internal Server Error**: Erro mais genérico para informar que o servidor encontrou um cenário inesperado de erro que não soube tratar, e por isso não conseguiu retornar uma resposta na requisição do cliente.
+
+- **501 Not Implemented**: O verbo HTTP não foi disponibilizado na API em nenhum dos recursos.
+
+- **503 Service Unavailable**: O servidor não está respondendo por que está fora do ar, em manutenção ou sobrecarregado.
+
+
 ## Processamento Assíncrono
 ## Segurança
 
