@@ -390,9 +390,9 @@ https://www.uuidgenerator.net/
 
 O Correlation ID também é útil para ser lançado na tela de erro. Por exemplo, nesta tela do  Office 365:
 
-TODO: print aqui.
+![Imagem exibindo um erro no Office 365 com o Correlation ID](https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/resources/office365errorscreen.png?raw=true)
 
-Com o Correlation Id, é possível buscar nas bases de log a exata transação que estava acontecendo no momento do erro.
+_Com o Correlation Id, é possível buscar nas bases de log a exata transação que estava acontecendo no momento do erro._
 
 ###  Request > Verbs
 
