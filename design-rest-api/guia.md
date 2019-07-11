@@ -50,7 +50,7 @@ TODO
 		- [Range](#response--body--pagina%C3%A7%C3%A3o--range)
 		- [Page e Page Size](#response--body--pagina%C3%A7%C3%A3o--page-e-page-size)
 		- [Limit](#response--body--pagina%C3%A7%C3%A3o--limit)
-	- [Ordenação](#response--body--pagina%C3%A7%C3%A3o--ordena%C3%A7%C3%A3o)
+	- [Ordenação](#response--body--ordena%C3%A7%C3%A3o)
 	- [Fields](#response--body--fields)
 	- [Views](#response--body--views)
 <!-- /TOC -->
