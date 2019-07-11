@@ -13,37 +13,42 @@ TODO
 ## Table of Content
 
 <!-- TOC -->
-- [Introdução](#introdução-e-conceitos-básicos)
-- [Request](#)
-	- [URL](#)
-		- [Base](#) 
-		- [Resources](#)
-			- [Domínios Funcionais](#domínios-funcionais)
-			- [URI Parameters](#uri-parameters)
-		- [Query String](#)
-			- [Paginação](#)
-				- [Range](#ranges)
-				- [Page e Page Size](#)
-				- [Offset e Limit](#)
-			- [Filtros](#)
-			- [Ordenação](#)
-	- [Headers](#)
-	- [Verbs](#)
-	- [Body](#)
-- [Response](#response)
- 	- [Headers](#)
-	 	- [Throttling, Rate Limiting e Quotas](#)
-	- [Body](#)
-		- [Paginação](#)
-			- [Cursor](#)
-			- [Page e Page Size](#)
-			- [Offset e Limit](#)
-		- [Ordenação](#)
-		- [Fields](#)
-	- [HTTP Status Codes](#)
-- [Segurança](#)
-- [Versionamento](#)
-- [Performance, Cache e compressão](#)
+
+[Introdução e conceitos básicos](#introdução-e-conceitos-básicos)
+[Request](#request)
+[Request > URL](#request--url)
+[Request > URL > Base](#request--url--base)
+[Request > URL > Resources](#request--url--resources)
+[Request > URL > Resources > Funções que não são CRUD](#request--url--resources--fun%C3%A7%C3%B5es-que-n%C3%A3o-s%C3%A3o-crud)
+[Request > URL > Resources > Domínios Funcionais](#request--url--resources--dom%C3%ADnios-funcionais)
+[Request > URL > Resources > Path Parameters](#request--url--resources--path-parameters)
+[Request > URL > Query Strings](#request--url--query-strings)
+[Request > URL > Query Strings > Paginação](#request--url--query-strings--pagina%C3%A7%C3%A3o)
+[Request > URL > Query Strings > Paginação > Range](#request--url--query-strings--pagina%C3%A7%C3%A3o--range)
+[Request > URL > Query Strings > Paginação > Page e Page Size](#request--url--query-strings--pagina%C3%A7%C3%A3o--page-e-page-size)
+[Request > URL > Query Strings > Paginação > Limit](#request--url--query-strings--pagina%C3%A7%C3%A3o--limit)
+[Request > URL > Query Strings > Ordenação](#request--url--query-strings--ordena%C3%A7%C3%A3o)
+[Request > URL > Query Strings > Fields](#request--url--query-strings--fields)
+[Request > Headers](#request--headers)
+[Request > Headers > Content-Type](#request--headers--content-type)
+[Request > Headers > Accept](#request--headers--accept)
+[Request > Headers > Correlation ID](#request--headers--correlation-id)
+[Request > Verbs](#request--verbs)
+[Request > Verbs > GET](#request--verbs--get)
+[Request > Verbs > POST](#request--verbs--post)
+[Request > Verbs > PUT](#request--verbs--put)
+[Request > Verbs > PATCH](#request--verbs--patch)
+[Request > Verbs > DELETE](#request--verbs--delete)
+[Request > Body](#request--body)
+[Response](#response)
+[Response > Headers](#response--headers)
+[Response > Headers > Content-Type](#response--headers--content-type)
+[Response > Headers > Content-Location](#response--headers--content-location)
+[Response > Body](#response--body)
+[Response > Body > Envelope "Data"](#response--body--envelope-data)
+[Response > Body > Recurso unitário, array ou nenhum](#response--body--recurso-unit%C3%A1rio-array-ou-nenhum)
+[Response > Body > Paginação](#response--body--pagina%C3%A7%C3%A3o)
+
 <!-- /TOC -->
 
 ## Introdução e conceitos básicos
@@ -290,9 +295,9 @@ https://api.classificados/veiculos?page=3&page-size=30
 O  **limit** permite limitar a quantidade de registros que a API retorna.
 
 Ex:
-https://api.lojaexemplo.com/ofertas-noturnas/?limit=10
+https://api.lojaexemplo.com/ofertas-noturnas?limit=10
 
-### Request > URL > Query Strings > Paginação > Ordenação
+### Request > URL > Query Strings > Ordenação
 ---
 Em APIs que retornem conjuntos de registros, é interessante permitir alguma ordenação básica.
 A ordenação pode ser especificada através das query strings:
@@ -306,13 +311,13 @@ No entanto, neste modelo fica difícil definir mais de um campo para ordenação
 
 Outra forma de fazer é utilizando o padrão **sort=[{atributo}:{asc|desc}]**.
 Ex:
-.../pedidos?sort=dataPagamento;desc,dataPedido
+.../pedidos?sort=dataPagamento:desc,dataPedido
 
 No exemplo acima, desejo que a lista de pedidos venha ordenada de forma decrescente pela dataPagamento e de forma crescente - valor default - pela dataPedido.
 
 Importante: Quando se define o contrato da API, é importante definir a lista de atributos disponíveis para ordenação, já quem nem sempre todos eles estarão disponíveis para definir ordem.
 
-### Request > URL > Query Strings > Paginação > Fields
+### Request > URL > Query Strings > Fields
 ---
 Existem situações onde o cliente deseja obter apenas alguns dos atributos de um recurso. Para estas situações pode-se utilizar o query string **fields[atributo.sub-atributo]** para selecionar apenas aqueles atributos do recurso que o cliente deseja receber.
 Para "sub-atributos",  utiliza-se o "." para separá-los.
@@ -431,7 +436,7 @@ Tabela de resumo onde se relaciona o Verbo/Método HTTP e os conceitos de Idempo
 Se ao codificar a API, o desenvolvedor da API codificar um GET que não seja seguro ou idempotente, o cliente não terá o comportamento esperado.
 Se o analista de sistemas que cuida do [Gateway](#) resolver colocar [caches](#) nas chamadas com GET, o cache não terá o comportamento esperado. E assim por diante.
 
-###  Request > Headers > Verbs > GET
+###  Request > Verbs > GET
 ---
 Este verbo é o mais utilizado e serve para buscar dados nas APIs. Você utiliza em conjunto com uma URL com seus [URI Parameters](#uri-parameters) e/ou [Query Strings](#query-strings) definidos para enviar uma consulta e o servidor retorna os dados em caso de sucesso. Em requisições do tipo GET, não se envia [Body](#).
 
@@ -444,7 +449,7 @@ _referência: http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
 **GET** http://api.exemplo.com/estados/sp/cidades/santos
 
 
-### Request > Headers > Verbs > POST
+### Request > Verbs > POST
 ---
 O **POST** é usado para criar novos recursos. Você utiliza em conjunto com uma URL com seus [URI Parameters](#uri-parameters) e um [Body](#body) para enviar um conjunto de atributos que represente o estado do novo recurso no momento que você está criando ele.
 
@@ -463,7 +468,7 @@ Dando tudo certo, uma nova cidade será criada na coleção de cidades.
 
 Obs: O POST também pode ser usado em casos especiais onde se faz necessário proteger as informações que seriam usadas na consulta (como em um GET), pois como uso de POST, podemos enviar [Body](#) e o body pode ser encriptado. Por exemplo, no login. 
 
-### Request > Headers > Verbs > PUT
+### Request > Verbs > PUT
 ---
 O verbo  **PUT** atualiza ou cria um recurso, ou seja, se eu utilizasse o PUT para enviar novamente a cidade de São Vicente (como no exemplo do PUT), o servidor iria sobrepor o recurso com os dados definidos no Body. Caso seja utilizado um PUT e o recurso não exista, a API deveria criá-lo.
 Quando usamos **PUT** normalmente estamos atualizando um recurso existente, por isso é importante definir qual é especificamente o recurso através do ID no [URI Parameter](#uri-parameters).
@@ -480,7 +485,7 @@ _referência: http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
 ```
 No exemplo, passamos dois URI Parameters, o {id-estado} com o valor "sp" e o {id-cidade} com o valor "santos".
 
-### Request > Headers > Verbs > PATCH
+### Request > Verbs > PATCH
 ---
 O verbo **PATCH**  serve para fazer atualizações parciais no recurso. Neste caso, ele se comporta de forma semelhante ao PUT, no entanto, define-se no Body apenas os parâmetros que serão alterados.
 
@@ -494,7 +499,7 @@ _referência: http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
 ```
 No exemplo, a API atualizará apenas o atributo "populacao". Em uma nova chamada usando GET, o valor em "populacao" deverá ser 500000.
 
-### Request > Headers > Verbs > DELETE
+### Request > Verbs > DELETE
 ---
 O verbo DELETE é o responsável por deletar os registros. Semelhante ao GET, você utiliza em conjunto com uma URL com seus [URI Parameters](#uri-parameters) e/ou [Query Strings](#query-strings) definidos para enviar uma consulta e o servidor retorna os dados em caso de sucesso.
 
@@ -706,36 +711,65 @@ Sempre que se retorna um resultado paginado, utiliza-se o HTTP Status Code **206
 
 Existem algumas técnicas diferentes para fazer a paginação. Serão explicadas abaixo.
 
-#### Cursor
-#### Page e Page Size
+#### Response > Body > Paginação > Range
 
-Quando se utiliza a abordagem de page e page size, a requisição pode ser feita informando a página e o tamanho dela como query string (GET .../...?page=10&page-size=50). A API deve recortar do total de respostas apenas as páginas solicitadas conforme solicitação do cliente ou, caso não tenha sido informado, à partir de valores padrões. Por exemplo, em uma requisição GET .../...?page=2&page-size=3, possuindo o banco de dados uma coleção de 8 registros, o retorno devem ser os registros 4, 5 e 6:
-- ~~registro 1 (página 1)~~
-- ~~registro 2 (página 1)~~
-- ~~registro 3 (página 1)~~
-- **registro 4 (página 2)**
-- **registro 5 (página 2)**
-- **registro 6 (página 2)**
-- ~~registro 7 (página 3)~~
-- ~~registro 8 (página 3)~~
-
-No body de retorno, devemos ter um envelope "data" com o array de recursos e um envelope "pagination" com seguinte estrutura:
+Uma das formas de se limitar a quantidade de registros retornados é através de um filtro em algum atributo que represente um intervalo. Assim, quando se recebe um [filtro](#) nas query strings, deve-se retornar o resultado respeitando os critérios do filtro.
+Por exemplo, em uma requisição GET .../...?from-id=3&to-id=6, possuindo o banco de dados uma coleção de 8 registros, o retorno devem ser os registros 3, 4, 5 e 6:
 ```json
 {
-	"data": [{
-		...
-	}],
+	"data": [
+		{
+			"id": 3,
+			...
+		},
+		{
+			"id": 4,
+			...
+		},
+		{
+			"id": 5,
+			...
+		},
+		{
+			"id": 6,
+			...
+		}	
+	]
+}
+```
+
+#### Response > Body > Paginação > Page e Page Size
+
+Quando se utiliza a abordagem de page e page size, a requisição pode ser feita informando a página e o tamanho dela como query string (GET .../...?page=10&page-size=50). A API deve recortar do total de respostas apenas as páginas solicitadas conforme solicitação do cliente ou, caso não tenha sido informado, à partir de valores padrões. Por exemplo, em uma requisição GET .../...?page=2&page-size=3, possuindo o banco de dados uma coleção de 8 registros, o retorno devem ser os registros 4, 5 e 6 mais o envelope "pagination" com seguinte estrutura:
+
+```json
+{
+	"data": [
+		{
+			"id": 3,
+			...
+		},
+		{
+			"id": 4,
+			...
+		},
+		{
+			"id": 5,
+			...
+		}
+	],
 	"pagination":{
-		"first": "/cartoes",
-		"last": "/cartoes?page=3",
-		"previous": "/cartoes?page=1",
-		"next": "/cartoes?page=3",
+		"first": "/exemplo",
+		"last": "/exemplo?page=3",
+		"previous": "/exemplo?page=1",
+		"next": "/exemplo?page=3",
 		"page": 2,
 		"totalPages": 3,
 		"totalElements": 8
 	}
 }
 ```
+
 Os campos são auto-explicativos, só é preciso atenção especial para definição do que é considerado a página inicial, se 0 ou 1. Por convenção, adotar o 1 vai fazer com que a paginação coincida com o dado que normalmente é exibido na tela para o usuário.
 
 No caso do exemplo, para obtenção da página seguinte, o cliente faria a chamada GET .../...?page=3&page-size=3, conforme informado no atributo "next".
@@ -749,9 +783,69 @@ Muitas vezes, criamos APIs para sistemas legados e com isso, precisamos nos ajus
 	- Ex: GET .../...?page=fgg12d8bfb4567820c46
 - O sistema pode não ter a informação da quantidade total de registros (ex: totalElements e totalPages),  dessa forma, não temos como devolver todas as propriedades. Neste caso, devolvemos apenas as que são possível de serem informadas.
 
-##### - Offset e Limit
-##### - Ordenação
-##### Fields
+#### Response > Body > Paginação > Limit
+
+Quando se usa o query string [limit](#) para limitar a quantidade de registros, o retorno deve trazer apenas a quantidade de registros definida no query string. Ex:
+GET .../...?limit=3
+```json
+{
+	"data": [
+		{
+			"id": 1,
+			...
+		},
+		{
+			"id": 2,
+			...
+		},
+		{
+			"id": 3,
+			...
+		}
+	]
+}
+```
+No caso do exemplo, a API deve retornar apenas os 3 primeiros registros (recursos) da coleção.
+
+### Response > Body > Paginação > Ordenação
+
+Quando se recebe uma solicitação contendo query strings de ordenação, deve-se retornar os resultados respeitando os critérios da query.
+Ex:
+GET .../pedidos?sort=dataPagamento:desc,dataPedido
+Response
+```json
+{
+	"data":[
+		{
+			"id": 456985,
+			"dataPagamento": "2019-06-05",
+			"dataPedido": "2019-06-02",
+			...
+		},
+		{
+			"id": 457231,
+			"dataPagamento": "2019-06-05",
+			"dataPedido": "2019-06-03",
+			...
+		},
+		{
+			"id": 455125,
+			"dataPagamento": "2019-06-01",
+			"dataPedido": "2019-05-29",
+			...
+		}
+	]
+}
+```
+No exemplo acima, o retorno está ordenado primeiramente de forma decrescente pela dataPagamento, seguido de dataPedido de forma ascendente.
+Ordernar de forma ascendente é o comportamento padrão quando a forma de ordenação não for declarada.
+
+### Response > Body > Fields
+
+### Response > Body > Views
+
+(o uso torna a documentação mais complexa)
+
 ### HTTP Status Codes
 ---
 No HTTP existem os [códigos de status](#[https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status)). Eles de forma padronizada reportam se a requisição foi processada com sucesso ou não. Existem muitos códigos e nem todos são adotados pelo REST. A adoção veio com o uso do do mercado e alguns códigos são amplamente usados e outros nem tanto.
