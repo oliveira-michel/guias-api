@@ -13,7 +13,6 @@ TODO
 ## Table of Content
 
 <!-- TOC -->
-
 [Introdução e conceitos básicos](#introdução-e-conceitos-básicos)
 [Request](#request)
 [Request > URL](#request--url)
@@ -48,7 +47,12 @@ TODO
 [Response > Body > Envelope "Data"](#response--body--envelope-data)
 [Response > Body > Recurso unitário, array ou nenhum](#response--body--recurso-unit%C3%A1rio-array-ou-nenhum)
 [Response > Body > Paginação](#response--body--pagina%C3%A7%C3%A3o)
-
+[Response > Body > Paginação > Range](#response--body--pagina%C3%A7%C3%A3o--range)
+[Response > Body > Paginação > Page e Page Size](#response--body--pagina%C3%A7%C3%A3o--page-e-page-size)
+[Response > Body > Paginação > Limit](#response--body--pagina%C3%A7%C3%A3o--limit)
+[Response > Body > Ordenação](#response--body--pagina%C3%A7%C3%A3o--ordena%C3%A7%C3%A3o)
+[Response > Body > Fields](#response--body--fields)
+[Response > Body > Views](#response--body--views)
 <!-- /TOC -->
 
 ## Introdução e conceitos básicos
@@ -807,7 +811,7 @@ GET .../...?limit=3
 ```
 No caso do exemplo, a API deve retornar apenas os 3 primeiros registros (recursos) da coleção.
 
-### Response > Body > Paginação > Ordenação
+### Response > Body > Ordenação
 
 Quando se recebe uma solicitação contendo query strings de ordenação, deve-se retornar os resultados respeitando os critérios da query.
 Ex:
@@ -846,7 +850,7 @@ Ordernar de forma ascendente é o comportamento padrão quando a forma de ordena
 
 (o uso torna a documentação mais complexa)
 
-### HTTP Status Codes
+### Response > HTTP Status Codes
 ---
 No HTTP existem os [códigos de status](#[https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status)). Eles de forma padronizada reportam se a requisição foi processada com sucesso ou não. Existem muitos códigos e nem todos são adotados pelo REST. A adoção veio com o uso do do mercado e alguns códigos são amplamente usados e outros nem tanto.
 
