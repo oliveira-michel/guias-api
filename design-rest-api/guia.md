@@ -7,7 +7,8 @@ TODO
 
 ## Status of this Document
 
-TODO
+TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de serviços no Itaú e inspirações em artigos que fui lendo durante este período.
+
 
 
 ## Table of Content
@@ -28,6 +29,8 @@ TODO
 				- [Limit](#request--url--query-strings--pagina%C3%A7%C3%A3o--limit)
 			- [Ordenação](#request--url--query-strings--ordena%C3%A7%C3%A3o)
 			- [Fields](#request--url--query-strings--fields)
+			- [Views]
+			- [Expand]
 	- [Headers](#request--headers)
 		- [Content-Type](#request--headers--content-type)
 		- [Accept](#request--headers--accept)
@@ -53,6 +56,7 @@ TODO
 	- [Ordenação](#response--body--ordena%C3%A7%C3%A3o)
 	- [Fields](#response--body--fields)
 	- [Views](#response--body--views)
+	- [Expand]
 <!-- /TOC -->
 
 ## Introdução e conceitos básicos
@@ -304,22 +308,14 @@ https://api.lojaexemplo.com/ofertas-noturnas?limit=10
 ### Request > URL > Query Strings > Ordenação
 ---
 Em APIs que retornem conjuntos de registros, é interessante permitir alguma ordenação básica.
-A ordenação pode ser especificada através das query strings:
--	**order-by**: especifica o atributo pelo qual de deseja ordenar.
--	**order**: especifica o tipo de ordem ascendente ou descendente mediante as palavras reservadas **asc** ou **desc**. No caso de não ser especificada uma ordem concreta, será utilizada a crescente como padrão.
-
+A ordenação pode ser especificada através das query strings **sort=[{atributo}:{asc|desc}]**.
 Ex:
-https://api.lojaexemplo.com/pedidos?order-by=dataPagamento&order=asc
-
-No entanto, neste modelo fica difícil definir mais de um campo para ordenação.
-
-Outra forma de fazer é utilizando o padrão **sort=[{atributo}:{asc|desc}]**.
-Ex:
-.../pedidos?sort=dataPagamento:desc,dataPedido
-
+GET .../pedidos?sort=dataPagamento:desc,dataPedido
 No exemplo acima, desejo que a lista de pedidos venha ordenada de forma decrescente pela dataPagamento e de forma crescente - valor default - pela dataPedido.
 
-Importante: Quando se define o contrato da API, é importante definir a lista de atributos disponíveis para ordenação, já quem nem sempre todos eles estarão disponíveis para definir ordem.
+No caso de não ser especificada uma ordem {asc|desc}, será utilizada a crescente como padrão.
+
+Importante: Quando se define o contrato da API, é importante definir a lista de quais atributos estão disponíveis para ordenação, já quem nem sempre todos eles estarão disponíveis para definir ordem.
 
 ### Request > URL > Query Strings > Fields
 ---
@@ -332,6 +328,40 @@ https://api.lojaexemplo.com/clientes/jose-da-silva123/endereços/residencial-1?f
 Com a chamada acima, não terei como retorno qualquer outro atributo de endereço senão os definidos no fields: _nome_, _situacao_, _logradouro.rua_ e _logradouro.numero_
 
 O uso desta opção nos permite otimizar o uso da banda de rede em toda a cadeia de comunicação, reduzir a quantidade de logs gerados e tamanho das respostas a serem processadas, melhorando a experiência final do usuário.
+
+### Request > URL > Query Strings > Views
+
+Existem situações em que é comum um recurso ter vários atributos e ter um conjunto deles que é de uso muito comum entre os clientes daquela API. 
+
+Ao invés de fazer com que esses clientes filtrem os atributos pela query string [fields](#), fazendo com que a URL da requisição fique muito grande, pode-se criar conjuntos pré defindos de "visões" que retornam apenas alguns sub conjuntos de atributos.
+Ex:
+- GET .../cartoes/a7834dcG456?view=basico
+para retornar o conjunto de atributos relacionados a alguma consulta frequente de dados básicos.
+- GET .../pessoas/a7834dcG456?view=limites
+para retornar todos os atributos relacionados a alguma consulta frequente de limites.
+- GET .../pessoas/a7834dcG456
+para retornar todos os atributos.
+
+Dependendo da complexidade do recurso, as visões podem ser combinadas na mesma requisição e ela pode ser usada em conjunto com o [fields](#) e [expand](#).
+
+### Request > URL > Query Strings > Expand
+
+Quando é necessário em uma única chamada retornar um determinado recurso mais os recursos relacionados com ele, pode-se utilizar um query string expand. Este mecanismo permite reduzir a quantidade de chamadas à API e volume de informações trafegadas.
+
+Ex:
+> referência
+GET .../cartoes/{id-cartao}
+GET .../cartoes/{id-cartao}/faturas/{id-fatura}
+
+Para retornar os dados do cartão com id = a7834dcG456 mais o recurso de faturas associado a ele, especificamente a de agosto de 2018, faz-se a seguinte chamada.
+GET .../cartoes/a7834dcG456?expand=faturas&faturas.id=ago18
+Observe que há a definição do recurso a ser expandido (expand=faturas) e também um filtro (faturas.id=ago18), sendo que no filtro, utilizou-se um padrão de recurso+"."+atributo.
+
+Caso vários recursos precisem ser expandidos, define-se separando-os por vírgulas.
+Ex: GET .../cartoes/a7834dcG456?expand=faturas,adicionais,ofertas-upgrade
+
+Caso seja necessário especificar paginação em um recurso expandido, deve-se definir estes query strings assim como se definem filtros. Ex:
+GET .../cartoes/a7834dcG456?expand=faturas&faturas.limit=5&faturas.sort=dataVencimento:desc
 
 ### Request > Headers
 ---
@@ -848,7 +878,93 @@ Ordernar de forma ascendente é o comportamento padrão quando a forma de ordena
 
 ### Response > Body > Views
 
-(o uso torna a documentação mais complexa)
+Quando a requisição recebe o query string [view](#), o response deve devolver apenas os atributos convencionados (e documentados) como pertencentes àquela view.
+Ex:
+- GET .../cartoes/a7834dcG456?view=basico
+Retorno:
+```json
+{
+  "id": "a7834dcG456",
+  "status": "válido",
+  "produto": "Platinum",
+  "bandeira": "mastercard",
+  "numero": "5461********7965"
+}
+```
+- GET .../cartoes/a7834dcG456?view=limites
+Retorno:
+```json
+{
+  "id": "a7834dcG456",
+  "status": "válido",
+  "limites": {
+	  "contratado": 8000,
+	  "usado": 2500,
+	  "disponivel": 5500
+  }
+}
+```
+- GET .../cartoes/a7834dcG456
+Retorno:
+```json
+{
+  "id": "a7834dcG456",
+  "status": "válido",
+  "produto": "Platinum",
+  "bandeira": "mastercard",
+  "numero": "5461********7965",
+  "dataMelhorCompra": {
+    "data": "2016-02-28",
+    "quantidadeDiasParaPagar": 12
+  },
+  "limites": {
+	  "contratado": 8000,
+	  "usado": 2500,
+	  "disponivel": 5500
+  }  
+}
+```
+
+### Response > Body > Expand
+
+Quando a requisição traz um query string [expand](#), o body deverá retornar o recurso definido na URL mais os recursos definidos no expand aninhados no recurso principal.
+
+Ex:
+> referência
+GET .../cartoes/{id-cartao}
+GET .../cartoes/{id-cartao}/faturas/{id-fatura}
+
+GET .../cartoes/a7834dcG456?expand=faturas&faturas.id=ago18
+Retorno
+```json
+{
+	"data": {
+	  "id": "a7834dcG456",
+	  "status": "válido",
+	  "produto": "Platinum",
+	  "bandeira": "mastercard",
+	  "numero": "5461********7965",
+	  "dataMelhorCompra": {
+	    "data": "2016-02-28",
+	    "quantidadeDiasParaPagar": 12
+	  },
+	  "limites": {
+		  "contratado": 8000,
+		  "usado": 2500,
+		  "disponivel": 5500
+	  },
+	  "faturas": [
+		  {
+			  "id": "ago18",
+			  "valorMinimo": 178.96,
+			  "valorTotal": 726.31,
+			  "dataVencimento": "2019-07-17"
+		  }
+	  ]
+	}
+}
+```
+Observe que até o atributo limites são atributos do recurso cartão, no atributo faturas, é retornado o array de faturas como se tivesse havido uma chamada ao recurso .../cartoes/a7834dcG456/faturas/ago18.
 
 ### Response > HTTP Status Codes
 ---
