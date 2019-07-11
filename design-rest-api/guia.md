@@ -1,6 +1,4 @@
 
-# ATENÇÃO, MATERIAL EM DRAFT AINDA
-
 # Guia de Design REST
 
 ## Abstract
@@ -623,7 +621,7 @@ Header Content-Location no Response
 ---
 Quando é feita uma requisição na API, na maioria das vezes, espera-se uma resposta com informações. Colocamos estas informações no Body. Assim como no Body do [request](#), deve-se utilizar lowerCamelCase para definir os atributos e JSON como padrão de notação.
 
-### Envelope "Data"
+### Response > Body > Envelope "Data"
 Quando nos referimos ao body de request, apenas passamos os atributos sem nenhum tipo de envelope. Ex:
 ```json
 {
@@ -634,13 +632,13 @@ Quando nos referimos ao body de request, apenas passamos os atributos sem nenhum
 ```
 No body de response, colocamos a informação do recurso dentro de um envelope "data". Chamamos de envelope alguns atributos que separam conteúdos importantes na resposta. Esse separação é necessária porque no response podemos ter pagination, warnings, links, summary, etc. Exemplo de Body de response:
 ```json
-"data": {
+"data": [{
     {
 		"id": 123,
 		"nome": "Carlos",
 		"data": "2019-06-04"
 	}
-},
+}],
 "pagination": {
 	"page": 1,
 	"page-size": 10,
@@ -650,7 +648,7 @@ No body de response, colocamos a informação do recurso dentro de um envelope "
 	...
 }
 ```
-### Elemento unitário, array ou nenhum
+### Response > Body > Recurso unitário, array ou nenhum
 
 Quando se faz uma requisição por um elemento com um ID especificado no [URI Parameter](#), por exemplo, GET .../pessoa/{id-pessoa}, o retorno da resposta será um único elemento. Assim, coloca-se o recurso diretamente no envelope "data". Ex:
 
@@ -700,9 +698,57 @@ Response:
 
 Também é possível se obter resposta vazia quando a busca não retorna nenhum resultado ou nos casos de gravação (POST, PUT, PATCH e DELETE) em que o desenvolvedor da API opta por não trazer um retorno. Neste caso não se traz nada na resposta e, exceto no GET, o [código de resposta HTTP](#) é o 204.
 
-#### Paginação
-##### - Cursor
-##### - Page e Page Size
+### Response > Body > Paginação
+
+Toda REST API que retorne muitos registros deveria suportar paginação. A paginação reduz o tráfego de dados na rede e o tempo de processamento da API entregando listas menores de resultados por vez. Ainda porque, as interfaces que exibem as informações para os usuários costumam ter um espaço limitado, preenchendo gradativamente conforme o usuário "rola" o conteúdo ou "avança a página".
+
+Sempre que se retorna um resultado paginado, utiliza-se o HTTP Status Code **206 Partial Content**. Além do envelope "data" com o resultado da requisição, deve-se criar um envelope "pagination" com as informações necessárias para permitir que o cliente se movimente entre as páginas.
+
+Existem algumas técnicas diferentes para fazer a paginação. Serão explicadas abaixo.
+
+#### Cursor
+#### Page e Page Size
+
+Quando se utiliza a abordagem de page e page size, a requisição pode ser feita informando a página e o tamanho dela como query string (GET .../...?page=10&page-size=50). A API deve recortar do total de respostas apenas as páginas solicitadas conforme solicitação do cliente ou, caso não tenha sido informado, à partir de valores padrões. Por exemplo, em uma requisição GET .../...?page=2&page-size=3, possuindo o banco de dados uma coleção de 8 registros, o retorno devem ser os registros 4, 5 e 6:
+- ~~registro 1 (página 1)~~
+- ~~registro 2 (página 1)~~
+- ~~registro 3 (página 1)~~
+- **registro 4 (página 2)**
+- **registro 5 (página 2)**
+- **registro 6 (página 2)**
+- ~~registro 7 (página 3)~~
+- ~~registro 8 (página 3)~~
+
+No body de retorno, devemos ter um envelope "data" com o array de recursos e um envelope "pagination" com seguinte estrutura:
+```json
+{
+	"data": [{
+		...
+	}],
+	"pagination":{
+		"first": "/cartoes",
+		"last": "/cartoes?page=3",
+		"previous": "/cartoes?page=1",
+		"next": "/cartoes?page=3",
+		"page": 2,
+		"totalPages": 3,
+		"totalElements": 8
+	}
+}
+```
+Os campos são auto-explicativos, só é preciso atenção especial para definição do que é considerado a página inicial, se 0 ou 1. Por convenção, adotar o 1 vai fazer com que a paginação coincida com o dado que normalmente é exibido na tela para o usuário.
+
+No caso do exemplo, para obtenção da página seguinte, o cliente faria a chamada GET .../...?page=3&page-size=3, conforme informado no atributo "next".
+
+Também devem ser mantidos (repetidos) os query strings (filtros, ordenação, etc..) que o cliente passar na requisição, ainda porque, caso o cliente altere o filtro, toda o envelope de páginação pode ter seus valores alterados.
+
+Quando se está na primeira página ou na última, os atributos "previous"e "next" devem ficar vazios.
+
+Muitas vezes, criamos APIs para sistemas legados e com isso, precisamos nos ajustar a comportamentos  já existentes, por conta disso, a paginação pode ter alguns variantes, por exemplo:
+- O sistema pode informar a página, não por número, mas através de um ID, nestes casos, basta substituir a informação numérica do  "previous"e "next" por string.
+	- Ex: GET .../...?page=fgg12d8bfb4567820c46
+- O sistema pode não ter a informação da quantidade total de registros (ex: totalElements e totalPages),  dessa forma, não temos como devolver todas as propriedades. Neste caso, devolvemos apenas as que são possível de serem informadas.
+
 ##### - Offset e Limit
 ##### - Ordenação
 ##### Fields
