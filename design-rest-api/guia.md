@@ -43,10 +43,11 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 		- [DELETE](#request--verbs--delete)
 	- [Body](#request--body)
 - [Response](#response)
-	- [Response > Headers](#response--headers)
+	- [Headers](#response--headers)
 		- [Content-Type](#response--headers--content-type)
 		- [Content-Location](#response--headers--content-location)
-- [Response > Body](#response--body)
+		- [Location]
+- [Body](#response--body)
 	- [Envelope "Data"](#response--body--envelope-data)
 	- [Recurso unitário, array ou nenhum](#response--body--recurso-unit%C3%A1rio-array-ou-nenhum)
 	- [Paginação](#response--body--pagina%C3%A7%C3%A3o)
@@ -57,6 +58,7 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 	- [Fields](#response--body--fields)
 	- [Views](#response--body--views)
 	- [Expand]
+- [HTTP Status Code]
 <!-- /TOC -->
 
 ## Introdução e conceitos básicos
@@ -388,6 +390,8 @@ O Content-Type é um header que define qual o formato da estrutura de dados pres
 Ex:
 **Content-Type**: application/json
 
+Obs: Não utilizado no DELETE, pois o DELETE não tem Body.
+
 ### Request > Headers > Accept
 ---
 O cliente da REST API pode expressar qual o tipo de informação que ele deseja receber a resposta através do hearder **Accept** .
@@ -504,7 +508,7 @@ Obs: O POST também pode ser usado em casos especiais onde se faz necessário pr
 
 ### Request > Verbs > PUT
 ---
-O verbo  **PUT** atualiza ou cria um recurso, ou seja, se eu utilizasse o PUT para enviar novamente a cidade de São Vicente (como no exemplo do PUT), o servidor iria sobrepor o recurso com os dados definidos no Body. Caso seja utilizado um PUT e o recurso não exista, a API deveria criá-lo.
+O verbo  **PUT** atualiza ou cria um recurso, ou seja, se eu utilizasse o PUT para enviar novamente a cidade de São Vicente (como no exemplo do POST), o servidor iria sobrepor completamente o recurso com os dados definidos no Body. Portanto, caso algum campo não seja informado, o valor dele será apagado. Caso seja utilizado um PUT e o recurso não exista, a API deveria criá-lo.
 Quando usamos **PUT** normalmente estamos atualizando um recurso existente, por isso é importante definir qual é especificamente o recurso através do ID no [URI Parameter](#uri-parameters).
 Ex:
 _referência: http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
@@ -628,6 +632,8 @@ Assim como na requisição, o header Content-Type define qual é o formato da es
 Ex:
 **Content-Type**: application/json
 
+Obs: Não utilizado no DELETE, quando não é enviado body de retorno (HTTP Status Code 204).
+
 ### Response > Headers > Content-Location
 ---
 O header Content-Location expõe a URL relativa (somente dos recursos para frente) ou absoluta (desde o início incluindo o Base Path) que expõe um determinado recurso.
@@ -656,9 +662,25 @@ Header Content-Location no Response
 "populacao": 355542
 }
 ```
+Obs: Não utilizado no DELETE, pois depois de um DELETE com sucesso, não existe mais o conteúdo.
+
+### Response > Headers > Location 
+
+(assíncrono)
+
 ### Response > Body
 ---
 Quando é feita uma requisição na API, na maioria das vezes, espera-se uma resposta com informações. Colocamos estas informações no Body. Assim como no Body do [request](#), deve-se utilizar lowerCamelCase para definir os atributos e JSON como padrão de notação.
+
+A resposta de uma requisição de gravação (POST, PUT, PATCH) não precisa necessariamente retornar o body com o recurso gravado. O critério para a decisão de retorná-lo ou não fica em ponderar se:
+- Existe transformação da informação no momento da gravação e o cliente precisa saber, então devolve-se o recurso e gasta-se banda, log, etc.
+- Se não existe transformação da informação, então pode-se não enviar um body de retorno e economizar banda, log, etc.
+
+Para DELETE, não se utiliza Body.
+
+Quando não se retorna nada no body em uma requisição que foi processada com sucesso, é importante atentar-se em usar o HTTP Status Code correto. Para GET, utiliza-se 200 sempre, para POST 204, PUT, PATCH ou DELETE 204. Leia mais sobre o [HTTP Status Code 204](#) para mais informações.
+ 
+Quanto são usados verbos que enviam body no request (POST, PUT e PATCH), é importante notar que o body de request e o de response não precisam ser idênticos. Há casos em que a criação de um recurso implica que se populem atributos do mesmo em tempo de criação. Um exemplo muito recorrente é o identificador (id) que normalmente é gerado pelo servidor e não precisa estar definido no body de request.
 
 ### Response > Body > Envelope "Data"
 Quando nos referimos ao body de request, apenas passamos os atributos sem nenhum tipo de envelope. Ex:
@@ -687,6 +709,7 @@ No body de response, colocamos a informação do recurso dentro de um envelope "
 	...
 }
 ```
+
 ### Response > Body > Recurso unitário, array ou nenhum
 
 Quando se faz uma requisição por um elemento com um ID especificado no [URI Parameter](#), por exemplo, GET .../pessoa/{id-pessoa}, o retorno da resposta será um único elemento. Assim, coloca-se o recurso diretamente no envelope "data". Ex:
@@ -735,7 +758,7 @@ Response:
 }]
 ```
 
-Também é possível se obter resposta vazia quando a busca não retorna nenhum resultado ou nos casos de gravação (POST, PUT, PATCH e DELETE) em que o desenvolvedor da API opta por não trazer um retorno. Neste caso não se traz nada na resposta e, exceto no GET, o [código de resposta HTTP](#) é o 204.
+Também é possível se obter resposta vazia quando a busca não retorna nenhum resultado. No caso do GET, retorna-se um envelope "data" vazio. Veja mais sobre o [código de resposta HTTP](#)  204 para mais informações. 
 
 ### Response > Body > Paginação
 
@@ -876,6 +899,8 @@ Ordernar de forma ascendente é o comportamento padrão quando a forma de ordena
 
 ### Response > Body > Fields
 
+
+
 ### Response > Body > Views
 
 Quando a requisição recebe o query string [view](#), o response deve devolver apenas os atributos convencionados (e documentados) como pertencentes àquela view.
@@ -986,10 +1011,11 @@ Os códigos deste grupo são usado em caso de sucesso na requisição. Os mais u
 
 - **201 Created**:  Indica que a requisição foi bem sucedida e que um novo recursos foi criado como resultado. Esta resposta é utilizada em requisições do método POST.
 
+- **202 Accepted**:	O recurso será atualizado/criado de forma assíncrona. Veja [processamento assíncrono] para mais detalhes.
+
 - **204 No Content**: A requisição aconteceu com sucesso, no entanto, não há body na resposta. O 204 não é utilizado para o verbo GET. Nos casos de GET cujos critérios na requisição provocaram uma resposta vazia, utilizamos o HTTP code 200 com o envelope "data" vazio.
 
 - **206 Partial Content**: O servidor encontrou uma uma grande quantidade de registros na respostas e devolveu de forma paginada. A resposta inclui um envelope "pagination" com informações sobre a paginação.
-
 
 **Grupo 3xx**
 
@@ -1016,12 +1042,15 @@ Esse grupo informa os erros cometidos pelo cliente durante o request. São eles:
 - **403 Forbidden**: As credenciais (token) estão corretos, mas o usuário não tem permissão para acessar aquele recurso.
 
 - **404 Not Found**: O servidor não encontrou o recurso solicitado pelo cliente. Provavelmente a URL está mau formada ou está sendo feita a busca com um [Path Parameter](#) inválido.
-
+Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não exista.
+ 
 - **405 Method Not Allowed**: O recurso (URL) existe mas o verbo usado não foi definido para ela.
+
+- **418 I'm a teapot**: Descubra o significado desse status code [aqui](https://sitesdoneright.com/blog/2013/03/what-is-418-im-a-teapot-status-code-error). #momentodescontracao
 
 - **422 Unprocessable Entity**:	Quando a requisição está correta ao nível sintático, mas existem erros de negócio na requisição. Por exemplo, se existe regra que o uso de um query parameter está condicionado a outro e eles não foram preenchidos, ou uma data informada é inválida, ou uma requisição de transferência de dinheiro é feita e a conta não tem fundo, etc.
 
-- **428 Precondition Required**: TODO estudar esse aqui.
+- **428 Precondition Required**: O recurso faz parte de um processo composto de vários passos. Foi feita uma tentativa de acessar um passo sem antes ter passado pelo passo anterior.
 
 - **429 Too Many Requests**: Informa ao cliente que ele excedeu o limite permitido de requisições. Veja [throttling](#) para entender mais sobre este código de retorno.
 
@@ -1031,7 +1060,7 @@ São códigos que retornam erros que aconteceram por culpa do servidor. Ou seja,
 
 - **500 Internal Server Error**: Erro mais genérico para informar que o servidor encontrou um cenário inesperado de erro que não soube tratar, e por isso não conseguiu retornar uma resposta na requisição do cliente.
 
-- **501 Not Implemented**: O verbo HTTP não foi disponibilizado na API em nenhum dos recursos.
+- **501 Not Implemented**: O verbo HTTP não foi disponibilizado na API ou a URL informada não existe, não por conta de [URI Parameters](#) inválidos, mas por conta de ter um recurso ainda não implementado. Normalmente isto acontece quando existe a previsão de se fazer a implementação em breve, mas versão atual ainda não suporta.
 
 - **503 Service Unavailable**: O servidor não está respondendo por que está fora do ar, em manutenção ou sobrecarregado.
 
