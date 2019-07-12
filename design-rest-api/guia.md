@@ -1,4 +1,3 @@
-
 # Guia de Design REST
 
 ## Abstract
@@ -59,6 +58,7 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 	- [Fields](#response--body--fields)
 	- [Views](#response--body--views)
 	- [Expand]
+	- [Errors e Warnings]
 	- [HATEOAS]
 - [HTTP Status Code]
 <!-- /TOC -->
@@ -104,7 +104,7 @@ Assim como no protocolo HTTP, um cliente (consumidor da API) deve enviar uma men
 Na requisição, existem alguns padrões a serem seguidos e eles serão explicados um a um a seguir. Alguns são obrigatórios para o funcionamento da REST API, outros são boas práticas que adotadas pelo mercado.
 
 ### Request > URL
----
+
 A URL (Universal Resource Location) é endereço onde o cliente vai fazer a requisição. Cada URL identifica um recurso diferente na API. Como no navegador, quando digitamos um endereço de um site e ele nos responde com a página, no REST é enviada uma solicitação para o endereço e ele nos responde com informações sobre o recurso.
 
 A URL é formada por basicamente 3 partes Base Path, Resources ou Path e Query Strings. Os capítulos a seguir detalharão cada uma delas.
@@ -123,7 +123,7 @@ Quando na URL existirem palavras compostas, é indicado o uso de hífen para sep
 > [https://stackoverflow.com/questions/10302179/hyphen-underscore-or-camelcase-as-word-delimiter-in-uris](https://stackoverflow.com/questions/10302179/hyphen-underscore-or-camelcase-as-word-delimiter-in-uris)
 
 ### Request > URL > Base
----
+
 O Base Path é a parte inicial da URL, nela você tem o protocolo (http:// ou https://, por exemplo) e o endereço do servidor na web. O Base Path se repetirá em todas as requisições.
 Ex:
 - https://maps.googleapis.com
@@ -144,7 +144,7 @@ Identificar ambientes de homologação e produção no Base Path também é inte
 - Produção: https://api.empresaexemplo.com
 
 ### Request > URL > Resources
----
+
 No REST, a letra R significa "Representação ". Representação é a forma de apresentar os recursos ("coisas") que existem no sistema. Recursos no REST são batizados usando substantivos. Eles são as entidades que serão expostas para outros sistemas. Cada um desses recursos têm um endereço (URL) diferente e são representados por textos separados por barras após o Base Path. É muito importante que os nomes dos recursos sejam estruturados de forma que cumpram uma hierarquia que proporcione sentido próprio à URL. Os nomes escolhidos para os recursos devem ser de fácil entendimento, de modo que ao ler a URL se obtenha rapidamente a informação sobre qual recurso ela representa.
 
 Ex:
@@ -175,7 +175,7 @@ Quando definir os recursos a serem expostos, deve-se **evitar**:
 - Expor representações de detalhes do backend na entidade, por exemplo: <s>servico-</s>transferencias. O termo "servico" neste caso está representando, por exemplo, o serviço do sistema que processa uma transferência. Este tipo de informação deve ser abstraída no nome da entidade.
 
 ### Request > URL > Resources > Funções que não são CRUD
----
+
 Uma das restrições do REST é que ele se aplica a recursos que representam as "entidades" de um [Domínio Funcional](#). Para alterar o estado dessas entidades, usamos os [verbos](#) GET, POST, PATCH, PUT e DELETE, que basicamente fazem o CRUD.
  
 No entanto, existem alguns cenários em que não temos "entidades" de um domínio, mas sim, ações e que não fazem parte do conjunto restrito de verbos do HTTP. Aqui estão alguns exemplos:
@@ -205,7 +205,7 @@ E há casos em que a chamada não é segura, nem idempotente. Por exemplo, em um
 Para saber mais sobre idempotência, leia sobre os [verbos HTTP](#) .
 
 ###  Request > URL > Resources > Domínios Funcionais
----
+
 Em algumas empresas, pode ser que não exista um Base Path para cada produto e uma mesma empresa forneça Recursos de vários produtos diferentes através de API. Neste caso, pode-se criar um recurso que serve para agrupar os recursos de cada produto.
 Ex:
 - https://apis.bbva.com/customers/v1
@@ -229,7 +229,7 @@ Em alguns lugares esses grandes assuntos são conhecidos como domínios funciona
 Também é interessante manter os contratos de cada domínio separados para dar independência para os times que cuidam de cada um deles, além de gerir o ciclo de vida de cada um deles de forma separada.
 
 ###  Request > URL > Resources > Path Parameters
----
+
 Nos exemplos acima, alguns dos recursos estavam com a notação {}. Eles são Path Parameteres, ou seja, são parâmetros que podem variar conforme a consulta. Por exemplo, na API do Spotify https://api.spotify.com/v1/albums/{id}/tracks, no lugar do {id}, em tempo de execução, o sistema deverá colocar o Id de um álbum específico para poder listar as faixas do respectivo álbum. 
 Ex:
 - https://api.spotify.com/v1/albums/0sNOF9WDwhWunNAHPD3Baj/tracks
@@ -245,7 +245,7 @@ Desta forma, quando a aplicação recuperar a coleção de parâmetros, terá a 
 *id-cartao*, *id-fatura* e *id-lancamento*, cada uma com um nome que a identifica unicamente na coleção.
 
 ###  Request > URL > Query Strings
----
+
 Além dos [URI Parameters](#uri-parameters), Query Strings também permite passar parâmetros na URL da chamada. Query Strings são usadas para filtrar resultados em consultas. São definidas após os [Resources](#resources), iniciando com uma **?** e separando cada par de chave e valor  (**chave=valor**) com um **&**:
 
 ***.../...?chave1=valor1&chave2=valor2&chaveA=valorA***
@@ -275,7 +275,7 @@ As query string não são utilizadas somente para filtros, ela pode ser utilizad
 >Existem padrões de mercado para filtrar os recursos via query string como [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), [OData](https://www.odata.org/getting-started/basic-tutorial/), [GraphQL](https://graphql.org/) e a adoção de uma delas significa agregar mais uma especificação sobre o REST. Assim, em um primeiro momento, utilizar um conjunto padrão, mas reduzido, de query strings para fazer filtros mais básicos vai permitir trazer uma grande flexibilidade às REST APIs e ao mesmo tempo entregar uma curva de aprendizado mais rápida àqueles que estão embarcando no padrão. Com a maturidade do time de TI neste assunto, a adoção futura de um desses frameworks ajudará a entregar APIs ainda mais flexíveis.
 
 ### Request > URL > Query Strings > Paginação
----
+
 Quando uma API retorna uma lista de resultados, pode ser que esses resultados cheguem a dezenas ou milhares de registros. Na maioria das vezes, as telas das aplicações não exibem todos ao mesmo tempo e quando se trata de API, espera-se respostas rápidas. Por conta disso, é uma boa prática dividir os resultados em blocos. Este processo chamamos de paginação.
 
 Paginando as respostas, a mensagem trafegada fica menor, e por isso, o cliente recebe o resultado da requisição muito mais rápido, além de permitir um uso mais racional e otimizado dos recursos do servidor.
@@ -283,7 +283,7 @@ Paginando as respostas, a mensagem trafegada fica menor, e por isso, o cliente r
 Existem algumas formas de definir exatamente qual "bloco de informação" consultar. Estas formas estão descritas à seguir.
 
 ### Request > URL > Query Strings > Paginação > Range
----
+
 Podemos delimitar a quantidade de resultados à partir da filtragem de um determinado parâmetro, por exemplo, se o parâmetro for **data-nascimento**, a chamada à uma API ficaria assim:
 ```
 http://api.empresarh.com/candidatos?from-data-nascimento=1985-01-01&to-data-nascimento=2001-12-31
@@ -297,7 +297,7 @@ http://api.empresarh.com/candidatos?from-id-candidato=1000&to-id-candidato=1099
 - **"to-" + nome-do-atributo**
 
 ### Request > URL > Query Strings > Paginação > Page e Page Size
----
+
 A paginação baseada em  **page**  e  **page-size,**  como o próprio nome já diz, é utilizada através dos parâmetros de número da página a ser navegada e o seu respectivo tamanho (em número de registros).
 
 Ambos são opcionais e caso não sejam definidos na URL, é esperado que a API retorne todos os registros ou retorne na página e tamanho padrão dela.
@@ -306,14 +306,14 @@ Ex:
 https://api.classificados/veiculos?page=3&page-size=30
 ```
 ### Request > URL > Query Strings > Paginação > Limit
----
+
 O  **limit** permite limitar a quantidade de registros que a API retorna.
 
 Ex:
 https://api.lojaexemplo.com/ofertas-noturnas?limit=10
 
 ### Request > URL > Query Strings > Ordenação
----
+
 Em APIs que retornem conjuntos de registros, é interessante permitir alguma ordenação básica.
 A ordenação pode ser especificada através das query strings **sort=[{atributo}:{asc|desc}]**.
 Ex:
@@ -325,7 +325,7 @@ No caso de não ser especificada uma ordem {asc|desc}, será utilizada a crescen
 Importante: Quando se define o contrato da API, é importante definir a lista de quais atributos estão disponíveis para ordenação, já quem nem sempre todos eles estarão disponíveis para definir ordem.
 
 ### Request > URL > Query Strings > Fields
----
+
 Existem situações onde o cliente deseja obter apenas alguns dos atributos de um recurso. Para estas situações pode-se utilizar o query string **fields[atributo.sub-atributo]** para selecionar apenas aqueles atributos do recurso que o cliente deseja receber.
 Para "sub-atributos",  utiliza-se o "." para separá-los.
 Veja o exemplo:
@@ -383,7 +383,7 @@ Em um segundo momento, novos recursos surgiram e com o amadurecimento, entendera
 Ambas implementam a mesma busca, apesar das diferentes abordagens de modelagem.
 
 ### Request > Headers
----
+
 O header é um dos componentes que fazem parte do protocolo HTTP. Como o REST é baseado neste protocolo, as REST APIs trafegam headers como parte da comunicação. O header basicamente é um conjunto de chaves/valor.
 
 Por padrão, passamos nos headers informações não relacionadas aos recursos  (que representam as entidades de negócio) expostos nas URLs. De forma análoga, não colocamos atributos que não representem o negócio dentro dos recursos.
@@ -401,7 +401,7 @@ Para mais informações sobre headers, veja: [Segurança](#segurança) e [Cache]
 A seguir, alguns dos principais headers serão explicados.
 
 ### Request > Headers > Content-Type
----
+
 O Content-Type é um header que define qual o formato da estrutura de dados presente no Body. Existem muitos tipos de dados, como "text/plain", "application/xml", "text/html", "application/json", "image/gif", "image/jpeg", etc. Quando falamos de REST API, na maior parte das implementações é disponibilizado apenas o "application/json".
 
 Ex:
@@ -410,14 +410,14 @@ Ex:
 Obs: Não utilizado no DELETE, pois o DELETE não tem Body.
 
 ### Request > Headers > Accept
----
+
 O cliente da REST API pode expressar qual o tipo de informação que ele deseja receber a resposta através do hearder **Accept** .
 
 Ex:
 **Accept**: application/json
 
 ###  Request > Headers > Correlation ID
----
+
 Não há um header padronizado para Correlation ID, mas é de grande valor que todas as chamadas tenham um Correlation Id. 
 
 Correlation ID é um dado geralmente gerado randomicamente (UUIDs é um bom formato para isso) que deve ser repassado em cada camada de software pelo qual a comunicação trafega. Como cada camada gera o seu próprio log e muitas vezes em banco de dados diferentes, através do Correlation ID, é possível identificar uma chamada específica entre estes diferentes banco de dados, permitindo um mapeamento da chamada de ponta-a-ponta.
@@ -454,7 +454,7 @@ O Correlation ID também é útil para ser lançado na tela de erro. Por exemplo
 _Com o Correlation Id, é possível buscar nas bases de log a exata transação que estava acontecendo no momento do erro._
 
 ###  Request > Verbs
----
+
 Os **métodos** (ou verbos do protocolo HTTP) são basicamente as ações permitidas dentro de uma API. Para cada URL, associamos um verbo. Estas ações solicitam que seja processado CRUD (Create, Read, Update e Delete) nos recursos, alterando os seus estados.
 
 Existem vários verbos HTTP ([rfc2616](https://tools.ietf.org/html/rfc2616)) , mas 5 são os principais e em muitos casos, os únicos adotados nas APIs. Cada verbo HTTP tem um objetido bem definido dentro do contexto de REST API. São eles:
@@ -492,7 +492,7 @@ Se ao codificar a API, o desenvolvedor da API codificar um GET que não seja seg
 Se o analista de sistemas que cuida do [Gateway](#) resolver colocar [caches](#) nas chamadas com GET, o cache não terá o comportamento esperado. E assim por diante.
 
 ###  Request > Verbs > GET
----
+
 Este verbo é o mais utilizado e serve para buscar dados nas APIs. Você utiliza em conjunto com uma URL com seus [URI Parameters](#uri-parameters) e/ou [Query Strings](#query-strings) definidos para enviar uma consulta e o servidor retorna os dados em caso de sucesso. Em requisições do tipo GET, não se envia [Body](#).
 
 Exemplo utilizando o verbo GET para fazer uma consulta por cidades:
@@ -503,9 +503,8 @@ Exemplo utilizando o verbo GET para fazer uma consulta por uma cidade específic
 _referência: http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
 **GET** http://api.exemplo.com/estados/sp/cidades/santos
 
-
 ### Request > Verbs > POST
----
+
 O **POST** é usado para criar novos recursos. Você utiliza em conjunto com uma URL com seus [URI Parameters](#uri-parameters) e um [Body](#body) para enviar um conjunto de atributos que represente o estado do novo recurso no momento que você está criando ele.
 
 Exemplo utilizando o verbo POST para criar uma nova cidade:
@@ -524,7 +523,7 @@ Dando tudo certo, uma nova cidade será criada na coleção de cidades.
 Obs: O POST também pode ser usado em casos especiais onde se faz necessário proteger as informações que seriam usadas na consulta (como em um GET), pois como uso de POST, podemos enviar [Body](#) e o body pode ser encriptado. Por exemplo, no login. 
 
 ### Request > Verbs > PUT
----
+
 O verbo  **PUT** atualiza ou cria um recurso, ou seja, se eu utilizasse o PUT para enviar novamente a cidade de São Vicente (como no exemplo do POST), o servidor iria sobrepor completamente o recurso com os dados definidos no Body. Portanto, caso algum campo não seja informado, o valor dele será apagado. Caso seja utilizado um PUT e o recurso não exista, a API deveria criá-lo.
 Quando usamos **PUT** normalmente estamos atualizando um recurso existente, por isso é importante definir qual é especificamente o recurso através do ID no [URI Parameter](#uri-parameters).
 Ex:
@@ -541,7 +540,7 @@ _referência: http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
 No exemplo, passamos dois URI Parameters, o {id-estado} com o valor "sp" e o {id-cidade} com o valor "santos".
 
 ### Request > Verbs > PATCH
----
+
 O verbo **PATCH**  serve para fazer atualizações parciais no recurso. Neste caso, ele se comporta de forma semelhante ao PUT, no entanto, define-se no Body apenas os parâmetros que serão alterados.
 
 Ex:
@@ -555,7 +554,7 @@ _referência: http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
 No exemplo, a API atualizará apenas o atributo "populacao". Em uma nova chamada usando GET, o valor em "populacao" deverá ser 500000.
 
 ### Request > Verbs > DELETE
----
+
 O verbo DELETE é o responsável por deletar os registros. Semelhante ao GET, você utiliza em conjunto com uma URL com seus [URI Parameters](#uri-parameters) e/ou [Query Strings](#query-strings) definidos para enviar uma consulta e o servidor retorna os dados em caso de sucesso.
 
 Caso a requisição seja em um recurso específico, o recurso será deletado, caso seja em uma coleção de recursos, toda a coleção será deletada, caso seja em um filtro (com query strings), todos os registros que retornarem no resultado serão apagados.
@@ -570,7 +569,7 @@ Apaga todas as cidades do estado de São Paulo.
 Apaga a cidade de Sorocaba.
 
 ### Request > Body
----
+
 O envio de informações com o objetivo de filtrar informações existentes, se dá via URI Parameters e/ou query parametes.
 
 Quando se utiliza os verbos POST, PUT ou PATCH, estamos enviando informações para serem persistidas no servidor via REST API. Neste caso, enviamos as informações no Body.
@@ -640,11 +639,11 @@ Após o envio de uma requisição à partir de um cliente, o servidor onde a API
 No response, existem alguns padrões a serem seguidos e eles serão explicados um a um a seguir. Alguns são obrigatórios para o funcionamento da REST API, outros são boas práticas que adotadas pelo mercado.
 
 ### Response > Headers
----
+
 Assim como na requisição, no retorno da resposta pode trazer definir um conjunto de chaves/valor que são metadados ou informações técnicas sobre a comunicação que está sendo feita através daquela API.
 
 ### Response > Headers > Content-Type
----
+
 Assim como na requisição, o header Content-Type define qual é o formato da estrutura de dados presente no Body.
 Ex:
 **Content-Type**: application/json
@@ -652,7 +651,7 @@ Ex:
 Obs: Não utilizado no DELETE, quando não é enviado body de retorno (HTTP Status Code 204).
 
 ### Response > Headers > Content-Location
----
+
 O header Content-Location expõe a URL relativa (somente dos recursos para frente) ou absoluta (desde o início incluindo o Base Path) que expõe um determinado recurso.
 
 Quando uma requisição é feita com o verbo POST, por exemplo, o cliente ainda não sabe o Id do recurso que ele está criando: muitas vezes são identificadores gerados no momento da gravação. Assim, quando o servidor retorna a resposta, além de preencher a propriedade id no body da requisição, deve-se preencher o header Content-Location.
@@ -686,7 +685,7 @@ Obs: Não utilizado no DELETE, pois depois de um DELETE com sucesso, não existe
 (assíncrono)
 
 ### Response > Body
----
+
 Quando é feita uma requisição na API, na maioria das vezes, espera-se uma resposta com informações. Colocamos estas informações no Body. Assim como no Body do [request](#), deve-se utilizar lowerCamelCase para definir os atributos e JSON como padrão de notação.
 
 A resposta de uma requisição de gravação (POST, PUT, PATCH) não precisa necessariamente retornar o body com o recurso gravado. O critério para a decisão de retorná-lo ou não fica em ponderar se:
@@ -1008,6 +1007,74 @@ Retorno
 ```
 Observe que até o atributo limites são atributos do recurso cartão, no atributo faturas, é retornado o array de faturas como se tivesse havido uma chamada ao recurso .../cartoes/a7834dcG456/faturas/ago18.
 
+### Response > Body > Errors e Warnings
+
+#### Errors
+Quando ocorrem requisições cujo retorno seja um erro (HTTP Status Code 5xx e 4xx), o body deve retornar o detalhamento do erro. Neste caso, não são retornados os envelopes relacionados às requisições bem sucedidas como "data", "pagination", "links", etc.
+O detalhamento do erro, é algo mais do que simplesmente o que o HTTP Status Code já expressa por si, mesmo. Ele deve ser suficiente para que o cliente entenda o que aconteceu e saiba o que fazer diante daquele problema.
+Ex:
+HTTP Status Code 422
+```json
+	{
+	   "codigo": "ER0059",
+	   "mensagem": "Operação não permitida fora do horário comercial.",
+	   "detalhes": "https://developer.empresa.com/apis/cartoes/erros/ER0059"
+	}
+```
+HTTP Status Code 428
+```json
+	{
+	   "codigo": "err-pto-A320",
+	   "mensagem": "Não é possível fazer o lançamento de horas extras sem pré-aprovação do gerente.",
+	   "detalhes": "https://developer.empresa.com/apis/rh/erros/err-pto-A320"
+	}
+```
+Quando a API retorna HTTP Status Code 400 e 422, muito provavelmente o erro foi causado por algum atributo específico. Nestes casos, deve-se especificar as informações sobre cada um dos atributos envolvidos no erro.
+
+HTTP Status Code 400
+```json
+	{
+	   "codigo": "10023",
+	   "mensagem": "Alguns campos estão preenchidos incorretamente.",
+	   "detalhes": "https://developer.empresa.com/apis/erros/10023",
+	   "atributos":[
+            {
+               "nome":"dataPedido",
+               "mensagem":"O formato de data é inválido. Utilize data no padrão yyyy-MM-DD.",
+               "valor":"01-05-2019",
+               "detalhes": "https://developer.empresa.com/apis/erros/err-gen-086"
+            },
+            {
+               "nome":"valorPagamento",
+               "mensagem":"Valor não é number.",
+               "valor":"R$ 27.568,90",
+               "detalhes": "https://developer.empresa.com/apis/erros/err-gen-073"
+            }
+         ]
+	}
+```
+
+#### Warnings
+Durante requisições com retorno de sucesso (HTTP Status Code 2xx e 3xx) pode haver situações que um alerta deve ser enviado ao cliente ser emitido. Por exemplo, alertar que uma transação no cartão de crédito atingiu o 80% do limite disponível no cartão ou até mesmo, tendo atingido o limite do cartão, alertar que será cobrada uma taxa pelo uso do limite emergencial.
+
+O alerta se dá através de um envelope **messages** com a mesma estrutura do envelope de [erro](#).
+Ex:
+HTTP Status Code 201
+```json
+{
+   "data":{
+      ...
+   },
+   "messages":[
+      {
+         "codigo":"CT0056",
+         "mensagem":"Limite do cartão ultrapassou 80%."
+      }
+   ]
+}
+```
+O atributo "atributos" não é obrigatório e neste cenário, no entanto, nos casos que fizer sentido, informá-los pode ajudar o cliente a entender mais especificamente o que provocou o alerta.
+
 ### Response > Body > HATEOAS
 
 **H**ypermedia **A**s **T**he **E**ngine **O**f **A**pplication **S**tate (HATEOAS) é uma dos pilares da arquitetura REST pela qual um cliente pode interagir com a API através de links informados pelo servidor. Assim, simplesmente fazendo requisições aos recursos, o cliente vai "descobrindo" as opções disponíveis sem ter de estudar uma documentação, proporcionando uma maneira de fazer os protocolos auto-documentados.
@@ -1059,7 +1126,7 @@ Com o uso de HATEOAS, o cliente pode implementar funcionalidades na tela, confor
 A adoção do HATEOAS atinge o nível mais alto no [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html).
 
 ### Response > HTTP Status Codes
----
+
 No HTTP existem os [códigos de status](#[https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status)). Eles de forma padronizada reportam se a requisição foi processada com sucesso ou não. Existem muitos códigos e nem todos são adotados pelo REST. A adoção veio com o uso do do mercado e alguns códigos são amplamente usados e outros nem tanto.
 
 Abaixo, coloco os que adoto como padrão nas empresas onde trabalho.
@@ -1140,7 +1207,7 @@ São códigos que retornam erros que aconteceram por culpa do servidor. Ou seja,
 Sua API pode perger o engajamento da comunidade, caso a implementação de segurança seja muito complicada. Assim, busque a simplicidade e utilização de padrões conhecidos de mercado.
 
 ### Segurança > Autenticação e Autorização
----
+
 Autenticação é o processo de garantir que um consumidor da API é quem ele diz que é. De forma simplificada isto se dá através do envio de "login" e "senha".
 
 Autorização acontece após a autenticação e serve para verificar se o consumidor da API tem acesso a um determinado recurso.
@@ -1148,7 +1215,7 @@ Autorização acontece após a autenticação e serve para verificar se o consum
 Fazendo uma analogia à vida real, ao ir a um show, você passa pela bilheteria e recebe a pulseira (autenticação), passa pela catraca (autorização) e tenta entrar na pista VIP (sendo que você comprou pista comum), neste caso, você não terá acesso a este espaço (autorização).
 
 ### Segurança > Autenticação > Basic Authentication
----
+
 **Basic authentication** é um meios de autenticação mais simples especificado no protocolo HTTP.
 
 O cliente envia uma requisição com o header **"Authorization: "Basic"** + **usuário** + **":"** + senha, sendo "usuário:senha" em base64.
@@ -1160,7 +1227,7 @@ Por exemplo, para autorizar o usuário  **michel** com senha  **abc123**, o clie
 Como essa é uma das formas menos segura de autenticação, normalmente é usada apenas em APIs internas, cujo escopo de acesso é limitado pela rede.
 
 ### Segurança > Autenticação > API Keys
----
+
 Quando se usa API Keys, ao invés de enviar usuário e senha, o servidor fornece uma única chave de acesso e o cliente usa esta chave de acesso em todas as requisições.
 
 A API Key é passada em um header customizado (varia de acordo com a empresa), assim para eu me autenticar na API - supondo que a empresa se chame "Amarelo" - eu faria uma requisição com o seguinte header:
@@ -1170,11 +1237,11 @@ A API Key é passada em um header customizado (varia de acordo com a empresa), a
 Assim como o Basic Authentication, essa é uma forma pouco segura, devendo ser usada no pior dos casos, apenas na rede interna.
 
 ### Segurança > HTTPS
----
+
 A utilização do HTTPS mantém as mensagens seguras e criptografadas, dificultando a interceptação da requisição. Busque configurar suas aplicações para utilizar as versões mais recentes dos protocolos do HTTPS (como o [TLS](https://pt.wikipedia.org/wiki/Transport_Layer_Security)).
 
 ### Segurança > OAuth
----
+
 TODO: ARRUMAR
 ```
 O OAuth está na sua versão 2.0, e não é apenas um método de autenticação, e sim um protocolo completo com diversas especificações de segurança.
@@ -1207,7 +1274,7 @@ Outros assuntos acerca da especificação do oAuth e que são interessantes para
 ```
 
 ### Segurança > Dados sensíveis na URL
----
+
 A URL é uma informação que trafega entre as diversas camadas de comunicação sem nenhum tipo de encriptação e normalmente, é gravada em logs ou caches por todas as camadas. Assim, nunca se coloca dados sensíveis como informações pessoais ou de credenciais na URL.
 
 Ex:
@@ -1217,7 +1284,7 @@ GET https://api.exemploempresa.com/pedidos?login=joao&senha=1234
 (material do magnani!!!!)
 
 ### Segurança > Throttling, Rate Limiting e Quotas
----
+
 Excesso de requisições podem deixar a API indisponível, sejam por conta de ataques ou até mesmo por excesso de  chamadas vindas naturalmente dos clientes. É interessante implementar travas para evitar que as requisições ultrapassem a capacidade de processamento da sua API.
 
 Com o uso de alguns headers, você consegue limitar a quantidade de requisições e informar o cliente sobre o uso dela:
@@ -1244,13 +1311,13 @@ E nos casos em que o cliene casos que o client ultrapasse o limite de requisiç�
 > Exemplo de uso de Rate Limit no GitHub:[https://developer.github.com/v3/#rate-limiting](https://developer.github.com/v3/#rate-limiting)
 
 ### Segurança > Validações
----
+
 Sempre valide a estrutura e tipos de dados recebidos em [URI Parameters](#), [Query Strings](#) e [Body](#) da mensagem antes de executar qualquer lógica dentro da API.
 
 Parâmetros não especificados no contrato, podem ser indício de um ataque malicioso. 
 
 ### Segurança > API Gateway
----
+
 Quando utilizamos um API Gateway, criamos uma camada especializada entre o cliente e as APIs. Um API gateway centraliza e implementa os padrões de autenticação, segurança, validações, throtlling, roteamento, tradução de protocolo, logs, auditoria, cache, etc. barrando acessos indevidos antes mesmo da requisição atingir a API.
 
 ```mermaid
