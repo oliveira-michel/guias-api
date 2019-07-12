@@ -31,6 +31,7 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 			- [Fields](#request--url--query-strings--fields)
 			- [Views]
 			- [Expand]
+		- [Alias]
 	- [Headers](#request--headers)
 		- [Content-Type](#request--headers--content-type)
 		- [Accept](#request--headers--accept)
@@ -58,6 +59,7 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 	- [Fields](#response--body--fields)
 	- [Views](#response--body--views)
 	- [Expand]
+	- [HATEOAS]
 - [HTTP Status Code]
 <!-- /TOC -->
 
@@ -85,6 +87,7 @@ O REST enfatiza simplicidade, extensibilidade, confiabilidade e performance:
 - **Confiabilidade** porque existe uma separação clara das ações que podem ser feitas e dos seus efeitos colaterais.
 - **Performance** porque faz parte dos principais pilares do REST o uso de cache através de uma semântica bem definida, além de uma arquitetura baseada em separação de camadas, permitindo que partes diferentes do sistema possam ser escaladas de forma independente e isolada. 
 
+TODO: definir RESTful
 
 O **HTTP** (HyperText Transfer Protocol) - ou HTTPS na sua variante com encriptação - é o protocolo da internet, no qual acontece a grande maioria da comunicação. Basicamente, ele trata requisições entre um cliente e um servidor através de uma mensagem que contém um Header e um Body. Se fizer uma analogia a uma carta, eu tenho informações de entrega no envelope (header) e um conteúdo (carta dentro do envelope). E o ciclo de vida contempla um envio (request que parte do cliente) e um retorno (response que parte do servidor). Na maioria das implementações, a comunicação no é stateless, ou seja, ao término do ciclo "request/response", as conexões com o servidor são encerradas. Além da mensagem, o HTTP define verbos para tratar as mensagens, códigos de retorno para indicar sucesso ou insucesso no processamento, padrões de endereço do servidor, entre outros.
 
@@ -269,6 +272,8 @@ Geralmente, query strings não são utilizadas nos casos em que se busca um recu
 
 As query string não são utilizadas somente para filtros, ela pode ser utilizada como parâmetros para paginação, versionamento, ordenação, etc. 
 
+>Existem padrões de mercado para filtrar os recursos via query string como [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), [OData](https://www.odata.org/getting-started/basic-tutorial/), [GraphQL](https://graphql.org/) e a adoção de uma delas significa agregar mais uma especificação sobre o REST. Assim, em um primeiro momento, utilizar um conjunto padrão, mas reduzido, de query strings para fazer filtros mais básicos vai permitir trazer uma grande flexibilidade às REST APIs e ao mesmo tempo entregar uma curva de aprendizado mais rápida àqueles que estão embarcando no padrão. Com a maturidade do time de TI neste assunto, a adoção futura de um desses frameworks ajudará a entregar APIs ainda mais flexíveis.
+
 ### Request > URL > Query Strings > Paginação
 ---
 Quando uma API retorna uma lista de resultados, pode ser que esses resultados cheguem a dezenas ou milhares de registros. Na maioria das vezes, as telas das aplicações não exibem todos ao mesmo tempo e quando se trata de API, espera-se respostas rápidas. Por conta disso, é uma boa prática dividir os resultados em blocos. Este processo chamamos de paginação.
@@ -364,6 +369,18 @@ Ex: GET .../cartoes/a7834dcG456?expand=faturas,adicionais,ofertas-upgrade
 
 Caso seja necessário especificar paginação em um recurso expandido, deve-se definir estes query strings assim como se definem filtros. Ex:
 GET .../cartoes/a7834dcG456?expand=faturas&faturas.limit=5&faturas.sort=dataVencimento:desc
+
+### Request > URL > Alias
+
+Alias é o conceito de que é possível ter mais de um caminho para fazer a mesma tarefa. Não é ideal, no entanto, muitas APIs nascem com alguns poucos recursos e conforme demandas de negócio, novos vão sendo adicionados. Por falta de visão do todo no início da criação da API, por vezes, é necessário criar outras formas de fazer a mesma tarefa.
+No entanto, é importante buscar que uma entidade de negócio (recurso) se mantenha a mesma, independente da forma com que a consulta é feita.
+ 
+Por exemplo, em uma APIs de cartões, o time da TI cria o recurso de busca de transações da seguinte forma:
+<pre>	GET .../transacoes?id-cartao=123</pre>
+Em um segundo momento, novos recursos surgiram e com o amadurecimento, entenderam que a estrutura mais adequada seria essa:
+<pre>	GET .../cartoes/123/transacoes</pre>
+
+Ambas implementam a mesma busca, apesar das diferentes abordagens de modelagem.
 
 ### Request > Headers
 ---
@@ -991,6 +1008,56 @@ Retorno
 ```
 Observe que até o atributo limites são atributos do recurso cartão, no atributo faturas, é retornado o array de faturas como se tivesse havido uma chamada ao recurso .../cartoes/a7834dcG456/faturas/ago18.
 
+### Response > Body > HATEOAS
+
+**H**ypermedia **A**s **T**he **E**ngine **O**f **A**pplication **S**tate (HATEOAS) é uma dos pilares da arquitetura REST pela qual um cliente pode interagir com a API através de links informados pelo servidor. Assim, simplesmente fazendo requisições aos recursos, o cliente vai "descobrindo" as opções disponíveis sem ter de estudar uma documentação, proporcionando uma maneira de fazer os protocolos auto-documentados.
+
+A implementação é a disponibilização de um envelope **links** na resposta de um recurso.
+
+Por exemplo, em um serviço de consulta de cartões, podemos informar ao cliente que ele também pode consultar as transações, faturas e contratar novos adicionais.
+
+Ex:
+```json
+{
+"data": {
+  "id": "a7834dcG456",
+  "status": "válido",
+  "produto": "Platinum",
+  "bandeira": "mastercard",
+  "numero": "5461********7965",
+  "dataMelhorCompra": {
+    "data": "2016-02-28",
+    "quantidadeDiasParaPagar": 12
+  }
+},
+"links":[
+   {
+    "rel": "faturas",
+    "href": "/cartoes/a7834dcG456/faturas",
+    "title": "Retorna todas as faturas",
+    "method": "GET"
+  },
+  {
+    "rel": "adicionais",
+    "href": "/cartoes/a7834dcG456/adicionais",
+    "title": "Retorna a lista de cartões adicionais",
+    "method": "GET"
+  },
+  {
+    "rel": "upgrade",
+    "href": "/cartoes/a7834dcG456/ofertas-upgrade",
+    "title": "Retorna a lista de ofertas para fazer upgrade do cartão.",
+    "method": "GET"
+  }
+]
+}
+```
+Apesar de existir propostas para o formato da declaração dos hyperlinks como o [HAL](https://en.wikipedia.org/wiki/Hypertext_Application_Language), não há uma rigidez quanto à adoção do padrão. Por simplicidade de facilidade de entendimento, o padrão do exemplo expõe bem os links relacionados.
+
+Com o uso de HATEOAS, o cliente pode implementar funcionalidades na tela, conforme resposta do servidor, por exemplo, associando exibição ou não de itens de menu ao retorno ou não de links no HATEOAS. Assim, como, permite que o servidor altere o caminho das URLs de forma dinâmica, sem impactar o cliente.
+
+A adoção do HATEOAS atinge o nível mais alto no [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html).
+
 ### Response > HTTP Status Codes
 ---
 No HTTP existem os [códigos de status](#[https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status)). Eles de forma padronizada reportam se a requisição foi processada com sucesso ou não. Existem muitos códigos e nem todos são adotados pelo REST. A adoção veio com o uso do do mercado e alguns códigos são amplamente usados e outros nem tanto.
@@ -1198,3 +1265,8 @@ D[Gateway] --> G[API Cartões]
 
 ## Versionamento
 ## Performance, Cache e compressão
+
+## Palavras finais
+
+Pragmatic REST 
+[https://nordicapis.com/a-pragmatic-take-on-rest-anti-patterns/](https://nordicapis.com/a-pragmatic-take-on-rest-anti-patterns/)
