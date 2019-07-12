@@ -1,3 +1,4 @@
+
 # Guia de Design REST
 
 ## Abstract
@@ -47,20 +48,21 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 		- [Content-Type](#response--headers--content-type)
 		- [Content-Location](#response--headers--content-location)
 		- [Location]
-- [Body](#response--body)
-	- [Envelope "Data"](#response--body--envelope-data)
-	- [Recurso unitário, array ou nenhum](#response--body--recurso-unit%C3%A1rio-array-ou-nenhum)
-	- [Paginação](#response--body--pagina%C3%A7%C3%A3o)
-		- [Range](#response--body--pagina%C3%A7%C3%A3o--range)
-		- [Page e Page Size](#response--body--pagina%C3%A7%C3%A3o--page-e-page-size)
-		- [Limit](#response--body--pagina%C3%A7%C3%A3o--limit)
-	- [Ordenação](#response--body--ordena%C3%A7%C3%A3o)
-	- [Fields](#response--body--fields)
-	- [Views](#response--body--views)
-	- [Expand]
-	- [Errors e Warnings]
-	- [HATEOAS]
-- [HTTP Status Code]
+	- [Body](#response--body)
+		- [Envelope "Data"](#response--body--envelope-data)
+		- [Recurso unitário, array ou nenhum](#response--body--recurso-unit%C3%A1rio-array-ou-nenhum)
+		- [Paginação](#response--body--pagina%C3%A7%C3%A3o)
+			- [Range](#response--body--pagina%C3%A7%C3%A3o--range)
+			- [Page e Page Size](#response--body--pagina%C3%A7%C3%A3o--page-e-page-size)
+			- [Limit](#response--body--pagina%C3%A7%C3%A3o--limit)
+		- [Ordenação](#response--body--ordena%C3%A7%C3%A3o)
+		- [Fields](#response--body--fields)
+		- [Views](#response--body--views)
+		- [Expand]
+		- [Errors e Warnings]
+		- [HATEOAS]
+	- [HTTP Status Code]
+- Processamento assíncrono
 <!-- /TOC -->
 
 ## Introdução e conceitos básicos
@@ -682,7 +684,10 @@ Obs: Não utilizado no DELETE, pois depois de um DELETE com sucesso, não existe
 
 ### Response > Headers > Location 
 
-(assíncrono)
+O header Location expõe a URL relativa (somente dos recursos para frente) ou absoluta (desde o início incluindo o Base Path) que expõe outra localização para um determinado recurso. Normalmente é utilizado em [fluxos de processamento assíncrono](#).
+
+Ex:
+**Location**: http://api.exemplo.com/contas/v1/tarefas/1
 
 ### Response > Body
 
@@ -1180,7 +1185,9 @@ Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não ex
  
 - **405 Method Not Allowed**: O recurso (URL) existe mas o verbo usado não foi definido para ela.
 
-- **418 I'm a teapot**: Descubra o significado desse status code [aqui](https://sitesdoneright.com/blog/2013/03/what-is-418-im-a-teapot-status-code-error). #momentodescontracao
+- **410 Gone**: O recurso (URL) não existe mais e esta condição é permanente. Este status é usado quando um recurso que um dia existiu não existe mais. Ao contrário do 404 que em que o recurso pode nunca ter existido ou ele está temporariamente indisponível.
+
+- **418 I'm a teapot**: Descubra o significado desse status code [aqui](https://sitesdoneright.com/blog/2013/03/what-is-418-im-a-teapot-status-code-error). #momentodescontracao :-)
 
 - **422 Unprocessable Entity**:	Quando a requisição está correta ao nível sintático, mas existem erros de negócio na requisição. Por exemplo, se existe regra que o uso de um query parameter está condicionado a outro e eles não foram preenchidos, ou uma data informada é inválida, ou uma requisição de transferência de dinheiro é feita e a conta não tem fundo, etc.
 
@@ -1200,6 +1207,159 @@ São códigos que retornam erros que aconteceram por culpa do servidor. Ou seja,
 
 
 ## Processamento Assíncrono
+
+O HTTP é um protocolo síncrono, logo, quando um cliente faz uma requisição, ele recebe uma resposta e encerra-se o ciclo. 
+
+No entanto, em determinadas situações os servidores não processam as requisições de forma imediata, seja porque o processamento necessita de mais tempo do que o habitual, ou porque estará esperando que chegue a sua vez para ser executado, ou ainda porque depende de um agendamento batch para completar a operação.
+
+Assim, quando sistemas deste tipo são expostos via API, o processamento segue alguns passos a mais:
+1. Na primeira requisição, o cliente receberá como resposta um HTTP Status Code **202 - Accepted**. Ou seja, a requisição foi aceita, mas ainda não foi processada. E será informado no header [Location](#) uma URL onde é possível consultar o andamento deste processamento.
+
+Ex:
+Request
+POST  http://api.exemplo.com/contas/v1/contas
+```json
+{
+	"agencia": 2153,
+	"cliente": "José da Silva",
+	...
+}
+```
+Response
+HTTP 202 Accepted
+Location: http://api.exemplo.com/contas/v1/contas-processamento/1
+
+2. Na segunda requisição, o cliente deverá consultar a URL informada no Location para acompanhar o andamento da requisição.
+Ex:
+Request
+GET http://api.exemplo.com/contas/v1/contas-processamento/1
+Response
+HTTP 200 Ok
+```json
+{
+	"data":{
+	  "id":"1",
+	  "situacao": "processando",
+	  "TTC": "2019-07-16T19:20:30.00-03:00"
+      "mensagens":[
+		 {
+		   "codigo": "103",
+		   "mensagem" : "Sua requisicao está esperando pela verificação de um operador.",
+		   "tipo": "info"
+		  }
+		]
+	}
+}
+```
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sendo:
+- **id**: o identificador do processamento;
+- **situacao**: [processando, sucesso, falha] indica qual é a situação do processamento;
+- **TTC**: **T**ime **t**o **c**ompletion indica quando é estimado que o processamento termine. Nesta hora, é o momento de fazer uma nova requisição para checar a situação do processamento.
+- **mensagens**: um array de mensagens com detalhes sobre o processamento;
+- **mensagens.codigo**: identificador sistêmico da mensagem;
+- **mensagens.mensagem**: mensagem para descrevendo detalhes do processamento;
+- **mensagens.tipo**: [info, aviso, erro] o tipo de informação na mensagem.
+
+3. Em algum momento, o processamento estará completo, seja com erro ou não. Em caso de sucesso, a resposta será um HTTP Status Code 303 See Other que indicará que o recurso foi criado e está na URL indicada no Location.
+Request
+GET http://api.exemplo.com/contas/v1/contas-processamento/1
+Response
+HTTP 303 See Other
+Location: http://api.exemplo.com/contas/v1/contas/21531234567
+Content-Location: http://api.exemplo.com/contas/v1/contas-processamento/1
+```json
+{
+	"data":{
+	  "id":"1",
+	  "situacao": "sucesso",
+	  "TTC": null
+      "mensagens":[
+		 {
+		   "codigo": "001",
+		   "mensagem" : "A conta foi criada com sucesso.",
+		   "tipo": "info"
+		  }
+		]
+	}
+}
+```
+4. Agora já é possível fazer a requisição no endereço do Location http://api.exemplo.com/contas/v1/contas/21531234567 e consultar o recurso criado.
+Ex:
+Request
+GET http://api.exemplo.com/contas/v1/contas/21531234567
+Response
+HTTP 200 Ok
+```json
+{
+	"id": 21531234567,
+	"agencia": 2153,
+	"conta": 123456,
+	"dac": 7,
+	"segmento": "premium",
+	"cliente": "José da Silva",
+	...
+}
+```
+
+Caso a situação no retorno no passo 2 seja falha,  deve-se retornar o motivo e o processamento é encerrado.
+Ex:
+Request
+GET http://api.exemplo.com/contas/v1/contas-processamento/1
+Response
+HTTP 200 Ok
+Content-Location: http://api.exemplo.com/contas/v1/contas-processamento/1
+```json
+{
+	"data":{
+	  "id":"1",
+	  "situacao": "falha",
+	  "TTC": null
+      "mensagens":[
+		 {
+		   "codigo": "ERR135",
+		   "mensagem" : "A conta não foi criada por conta de restrição de crédito.",
+		   "tipo": "erro"
+		  }
+		]
+	}
+}
+```
+
+Ao término do processamento:
+- o cliente poderia fazer um DELETE na URL de processamento;
+- e/ou o servidor pode remover automaticamente os dados de processamento após um determinado tempo e retornar um HTTP Status Code 410 Gone para quem chamar novamente a URL do processamento;
+- ou o servidor pode não implementar DELETE e manter para sempre as informações sobre o processamento.
+
+#### Callbacks
+
+Além da possibilidade do cliente fazer consultas recorrentes no passo 2 para verificar o andamento do processamento, pode-se optar por fazer callback do servidor para o cliente quando a requisição estiver terminada. Neste caso, o cliente deverá chamar o recurso cujo processamento se dá assincronament informando o header **Empresa-Callback**.
+
+Ex:
+Request
+POST  http://api.exemplo.com/contas/v1/contas
+EmpresaExemplo-Callback: http://api.clienteexemplo.com/contas-callback
+Response
+HTTP 200 OK
+Location:  http://api.exemplo.com/contas/v1/contas-processamento/1
+```json
+{
+	"data":{
+	  "id":"1",
+	  "situacao": "processando",
+	  "TTC": "2019-07-16T19:20:30.00-03:00"
+      "mensagens":[
+		 {
+		   "codigo": "103",
+		   "mensagem" : "Sua requisicao está esperando pela verificação de um operador.",
+		   "tipo": "info"
+		  }
+		]
+	}
+}
+```
+
+Neste caso, o cliente pode optar por não chamar mais a API de processamento para verificar o andamento, pois o servidor enviará a resposta via POST para a URL informada pelo cliente (http://api.clienteexemplo.com/contas-callback) ao término do processamento. No Body enviado para o cliente, deverá conter todas informações referentes ao processamento.
+
 ## Segurança
 
 (o conjunto das implementações garante a segurança)
@@ -1334,6 +1494,3 @@ D[Gateway] --> G[API Cartões]
 ## Performance, Cache e compressão
 
 ## Palavras finais
-
-Pragmatic REST 
-[https://nordicapis.com/a-pragmatic-take-on-rest-anti-patterns/](https://nordicapis.com/a-pragmatic-take-on-rest-anti-patterns/)
