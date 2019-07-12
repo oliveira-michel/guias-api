@@ -23,6 +23,7 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 		- [Domínios Funcionais](#request--url--resources--dom%C3%ADnios-funcionais)
 		- [Path Parameters](#request--url--resources--path-parameters)
 		- [Query Strings](#request--url--query-strings)
+			- [Full text search]
 			- [Paginação](#request--url--query-strings--pagina%C3%A7%C3%A3o)
 				- [Range](#request--url--query-strings--pagina%C3%A7%C3%A3o--range)
 				- [Page e Page Size](#request--url--query-strings--pagina%C3%A7%C3%A3o--page-e-page-size)
@@ -51,6 +52,7 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 	- [Body](#response--body)
 		- [Envelope "Data"](#response--body--envelope-data)
 		- [Recurso unitário, array ou nenhum](#response--body--recurso-unit%C3%A1rio-array-ou-nenhum)
+		- [Full text search]
 		- [Paginação](#response--body--pagina%C3%A7%C3%A3o)
 			- [Range](#response--body--pagina%C3%A7%C3%A3o--range)
 			- [Page e Page Size](#response--body--pagina%C3%A7%C3%A3o--page-e-page-size)
@@ -62,7 +64,9 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 		- [Errors e Warnings](#response--body--errors-e-warnings)
 		- [HATEOAS](#response--body--hateoas)
 	- [HTTP Status Code](#response--http-status-codes)
+- [Tipos de dados]
 - [Processamento assíncrono]
+- [Versionamento]
 <!-- /TOC -->
 
 ## Introdução e conceitos básicos
@@ -189,7 +193,7 @@ Para estes casos, tratamos essas funções como recursos e para facilitar a iden
 Ex:
 - GET .../**calcular-distancia**?from-latitude=48,8584&from-longitude=2,2945&to-latitude=-22.951916&to-longitude=-43.2104872
 - POST .../**validar-cartao**
-```
+```json
 {
 	"numero": "5346931596124410",
 	"nome-titular": "JOSE A OLIVEIRA",
@@ -275,6 +279,13 @@ Geralmente, query strings não são utilizadas nos casos em que se busca um recu
 As query string não são utilizadas somente para filtros, ela pode ser utilizada como parâmetros para paginação, versionamento, ordenação, etc. 
 
 >Existem padrões de mercado para filtrar os recursos via query string como [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), [OData](https://www.odata.org/getting-started/basic-tutorial/), [GraphQL](https://graphql.org/) e a adoção de uma delas significa agregar mais uma especificação sobre o REST. Assim, em um primeiro momento, utilizar um conjunto padrão, mas reduzido, de query strings para fazer filtros mais básicos vai permitir trazer uma grande flexibilidade às REST APIs e ao mesmo tempo entregar uma curva de aprendizado mais rápida àqueles que estão embarcando no padrão. Com a maturidade do time de TI neste assunto, a adoção futura de um desses frameworks ajudará a entregar APIs ainda mais flexíveis.
+
+### Request > URL > Query Strings > Full text search
+
+Algumas APIs podem implementar a capacidade de buscar em vários atributos ao mesmo tempo. Quando se tem essa capacidade, utiliza-se o query string **q** (de query) com o termo a ser pesquisado.
+Ex:
+GET http://api.empresarh.com/candidatos?q=Paulo
+No caso, o resultado tratá todos os recursos candidatos onde algum atributo pesquisável contém o texto Paulo.
 
 ### Request > URL > Query Strings > Paginação
 
@@ -730,6 +741,9 @@ No body de response, colocamos a informação do recurso dentro de um envelope "
 	...
 }
 ```
+### Response > Body > Full text search
+
+----------TODO; Continuar aqui ----------------------
 
 ### Response > Body > Recurso unitário, array ou nenhum
 
@@ -1205,6 +1219,25 @@ São códigos que retornam erros que aconteceram por culpa do servidor. Ou seja,
 
 - **503 Service Unavailable**: O servidor não está respondendo por que está fora do ar, em manutenção ou sobrecarregado.
 
+## Tipos de dados
+
+No [JSON](#), são definidos os seguintes tipos de dados: string, number, object, array, boolean, null. Datas, por exemplo, são trafegadas strings, logo é necessário adotar alguns padrões para o formato delas, geralmente respeitando ISOs.
+
+Abaixo, seguem algumas formatações padrões para os tipos de dados:
+
+| Tipo de dado	| Descrição	 | Exemplos |
+| --- | --- | --- |
+| Date | String com formato ISO 8601.<br> - ano (YYYY),<br>- ano e mês (YYYY-MM)<br>- ano, mês e dia (YYYY-MM-DD) | 2016<br>2016-02<br>2016-02-26|
+| Timestamp | String com formato [ISO 8601](https://www.w3.org/TR/NOTE-datetime)<br>(YYYY-MM-DDThh:mm:ss.sTZD)|2019-02-21T19:00:00Z (para UTC)<br>2019-02-21T19:21:32.285Z (com milissegundos)<br>2019-02-21T19:00:00-03:00 (para UTC-3)<br>ou 2019-02-21T19:00:00+01:00 (para UTC+1)<br>|
+| Object | Objetos que definem conjuntos de atributos | {<br>&nbsp;"documento": {<br>&nbsp;&nbsp;"tipo": "rg",<br>&nbsp;&nbsp;"numero": "443335556"<br>&nbsp;}<br>}|
+| String | Cadeia de texto |“texto de exemplo”|
+| Number | Valores numéricos inteiros e decimais com separação de decimal usando "." (ponto) | 1.25 |
+| Boolean | Define os valores true ou false | true |
+| Array | Lista de objetos de um dos tipos anteriores | ["a", "b", "c"]
+| null	| Valores nulos | null |
+| Moeda | String com formato [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217) | EUR (Euro Member Countries)<br>USD (United State Dollar)<br>BRL (Brazillian Real)|
+| Idiomas | String com o formato [ISO 693(https://en.wikipedia.org/wiki/Lists_of_ISO_639_codes) |por (Portuguese)<br>eng (English)<br>spa (Spanish) |
+| Países | String com o formato [ISO 3166-2](https://en.wikipedia.org/wiki/ISO_3166)|BR (Brasil)<br>PT (Portugal)
 
 ## Processamento Assíncrono
 
@@ -1491,6 +1524,81 @@ D[Gateway] --> G[API Cartões]
 ```
 
 ## Versionamento
+
+TODO: pesquisar melhor as vantagens e desvantagens de cada abordagem.
+
+Versionamento acontece quanto ocorrem alterações no contrato da API. Contrato é a definição de todo o conjunto de verbos, códigos de resposta, recursos, etc. feita em uma notação padrão para isso como o RAML, Swagger, etc. O ideal é que estes documentos sejam armazenados em um repositório de código fonte e a cada alteração, versionados.
+Assim, existirão dois tipos de versão: aquela do contrato no repositório e aquela que repassamos para o cliente (consumidor da API).
+
+Para realizar o versionamento dos contratos das APIs podemos fazer uso do [Semantic Versioning 2.0.0](https://semver.org/). Esta definição utiliza a seguinte estrutura **MAJOR.MINOR.PATCH**. Onde se incrementa os valores conforme a seguinte regra:
+- **MAJOR**: implica mudanças incompatíveis para a API. Ou seja, que faz com que os consumidores atuais não consigam mais utilizar a API sem ter de alterar seus softwares.
+Ex (era **1**.0.0 e vira **2**.0.0):
+	- remoção de qualquer item que faz parte do HTTP e do REST (Status Code, Verbo, Recursos, Parâmetros, Atributos, etc);
+	- tornar campos já existentes - antes não obrigatórios - como obrigatórios;
+	- alteração de tipos de dados.
+- **MINOR**: implica adicionar funcionalidades que mantém compatibilidade com a versão atual. Ou seja, os consumidores atuais não terão que alterar seu software para continuar usando a API. 
+Ex (era 2.**0**.0 e vira 2.**1**.0):
+	- adição de novos recursos;
+	- em recursos já existentes, adição de novos atributos ou parâmetros não obrigatórios na requisição;
+	- adição de novos atributos no response;
+	- adição de novos verbos;
+	- adição de novos status codes;
+- **PATCH**: implica em mudanças que não alteram a API.
+Ex (era 2.0.**0** e vira 2.1.**1**):
+	- alteração nas descrições dos campos;
+	- alterações nos exemplos;
+	- alterações em arquivos extras ao contrato que contém metadados usados por governança ou deploy.
+
+A versão incial do contrato da API será a 1.0.0. O valor definido no MAJOR, no caso **1** é o valor que mostramos para o cliente, dado que é a alteração no MAJOR que obriga-o a alterar o seu software.
+
+Existem algumas formas diferentes de se versionar a API para o cliente. Nenhuma é totalmente certa, nem errada e a especificação do REST não define este item. O que existe são tendências maiores ou menores de adoção de alguns padrões por conta dos prós e contras que cada um oferece.
+
+Do ponto de vista do cliente, também é interessante alguns cuidados. Para minimizar os impactos de qualquer alteração, mesmo aquelas que não quebram o contrato, os clientes destas APIs devem evitar consumir mais campos do que o necessário ao chamar uma API. Eles devem usar apenas aqueles campos que o cliente realmente precisa e deve ignorar os que não precisa. Este conceito é abordado em [Tolerant Reader (Martin Fowler)](https://martinfowler.com/bliki/TolerantReader.html).
+
+
+#### Versionamento pelo host
+
+Na estrutura de host da URL, coloca-se a versão como parte dele. Por exemplo:
+https://api-v2.empresaexemplo.com/clientes
+Observe o "-v2", que específica que esta é a versão 2 da API.
+
+O ponto negativo desta abordagem é que do ponto de vista de deploy, é mais difícil criar um novo nome do host do que outras abordagens.
+
+#### Versionamento pela query string
+
+Define-se a versão a versão via  **query string**, por exemplo:
+
+https://api.empresaexemplo.com/clientes?version=2.0
+Observe o version=2.0, que especifica que essa é a versão 2.0 dessa API.
+
+O ponto negativo dessa abordagem é que prejudica a definição de contrato para outras versões, e prejudica a legibilidade da URL em cenários de muitos parâmetros. Além de facilitar com que o cliente esqueça de definir a versão ao chamar a API e talvez tome erro por estar chamando a versão default.
+
+#### Versionamento pelo Content-Type (com o header Accept)
+
+Define-se um tipo customizado de conteúdo com a versão dele. Por exemplo:
+GET https://api.empresaexemplo.com/clientes
+Accept: application/vnd.clientes.v2+json
+
+O ponto positivo é que a URL fica mais clena, no entanto não é dev-friendly, pois a requisição tem que ser feita com muito mais cuidado, dada a passagens de mais parâmetros.
+
+#### Versionamento por header customizado
+
+Define-se um header customizado para requisitar a versão da API. Por exemplo:
+GET https://api.empresaexemplo.com/clientes
+api-version: 2
+
+O ponto positivo é que a URL fica mais clena, no entanto não é dev-friendly, pois a requisição tem que ser feita com muito mais cuidado, dada a passagens de mais parâmetros.
+
+#### Versionamento pelo Path (Resources)
+
+Define-se a versão no Path como se fosse um recurso, por exemplo:
+https://api.empresaexemplo.com/v1/clientes
+
+Esta é a minha forma preferencial de versionar pois, fazendo parte da URL você força sempre o cliente a informá-la. A versão está sempre visível. Em processo de deploy, é muito mais simples criar uma pasta do que definir um novo [host](#). Mantém um visual clean na URL e facilita na definição de contratos para versões novas.
+
 ## Performance, Cache e compressão
 
 ## Palavras finais
+
+Pragmatic REST 
+[https://nordicapis.com/a-pragmatic-take-on-rest-anti-patterns/](https://nordicapis.com/a-pragmatic-take-on-rest-anti-patterns/)
