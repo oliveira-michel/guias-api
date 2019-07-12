@@ -29,9 +29,9 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 				- [Limit](#request--url--query-strings--pagina%C3%A7%C3%A3o--limit)
 			- [Ordenação](#request--url--query-strings--ordena%C3%A7%C3%A3o)
 			- [Fields](#request--url--query-strings--fields)
-			- [Views]
-			- [Expand]
-		- [Alias]
+			- [Views](#request--url--query-strings--views)
+			- [Expand](#request--url--query-strings--expand)
+		- [Alias](#request--url--alias)
 	- [Headers](#request--headers)
 		- [Content-Type](#request--headers--content-type)
 		- [Accept](#request--headers--accept)
@@ -47,7 +47,7 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 	- [Headers](#response--headers)
 		- [Content-Type](#response--headers--content-type)
 		- [Content-Location](#response--headers--content-location)
-		- [Location]
+		- [Location](#response--headers--location)
 	- [Body](#response--body)
 		- [Envelope "Data"](#response--body--envelope-data)
 		- [Recurso unitário, array ou nenhum](#response--body--recurso-unit%C3%A1rio-array-ou-nenhum)
@@ -58,11 +58,11 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 		- [Ordenação](#response--body--ordena%C3%A7%C3%A3o)
 		- [Fields](#response--body--fields)
 		- [Views](#response--body--views)
-		- [Expand]
-		- [Errors e Warnings]
-		- [HATEOAS]
-	- [HTTP Status Code]
-- Processamento assíncrono
+		- [Expand](#response--body--expand)
+		- [Errors e Warnings](#response--body--errors-e-warnings)
+		- [HATEOAS](#response--body--hateoas)
+	- [HTTP Status Code](#response--http-status-codes)
+- [Processamento assíncrono]
 <!-- /TOC -->
 
 ## Introdução e conceitos básicos
