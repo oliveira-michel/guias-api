@@ -66,7 +66,10 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 	- [HTTP Status Code](#response--http-status-codes)
 - [Tipos de dados]
 - [Processamento assíncrono]
+- [Processamento em lotes]
+- [Recursividade]
 - [Versionamento]
+- [Segurança]
 <!-- /TOC -->
 
 ## Introdução e conceitos básicos
@@ -101,7 +104,7 @@ O REST surgiu à partir da dissertação de Roy Thomas Fielding - um dos criador
 
 O ponto mais importante quando se fala em boas práticas é que seja adotado um padrão, pois à partir do momento que se tem um padrão, a curva de aprendizado para novas soluções é mais rápida e podem ser utilizados frameworks e automações para reduzir o tempo de desenvolvimento dos sistemas.
 
-Neste guia, busco compartilhar os padrões que implemento nas empresas onde já trabalhei e que costumo adotá-los quando os vejo em livros, artigos ou até mesmo APIs de mercado e entendo fazer sentido para a empresa.
+Neste guia, busco compartilhar os padrões que implemento nas empresas onde já trabalhei ou boas práticas definidas em livros, artigos ou até mesmo APIs de mercado.
  
 ## Request
 
@@ -743,7 +746,37 @@ No body de response, colocamos a informação do recurso dentro de um envelope "
 ```
 ### Response > Body > Full text search
 
-----------TODO; Continuar aqui ----------------------
+Quando é definido um query string para buscas gerais, o termo defindo na busca deve ser aplicado como filtro em todos os campos pesquisáveis daquele recurso. Por exemplo, uma requisição com a seguinte estrutura GET http://api.empresarh.com/candidatos?q=Paulo deveria retornar um array de resultados como este:
+```json
+{
+	"data": [
+		{
+			"id": "87426",
+			"nome": "Paulo Ferreira de Araújo",
+			"pai": "José de Araújo",
+			"mãe": "Patrícia Silva Ferreira",
+			"cidade": "Santos"
+			...
+		},
+		{
+			"id": "87426",
+			"nome": "Américo Guedes Oliveira",
+			"pai": "Roberto Carvalho de Oliveira",
+			"mãe": "Maria José Oliveira",
+			"cidade": "São Paulo"
+			...
+		},
+		{
+			"id": "87426",
+			"nome": "Carla Mendes Pinheiros",
+			"pai": "Carlos Gosmes de Pinheiros",
+			"mãe": "Lívia de Paulo Pinheiros",
+			"cidade": "Vitória"
+			...
+		}
+	]
+}
+```
 
 ### Response > Body > Recurso unitário, array ou nenhum
 
@@ -1393,6 +1426,283 @@ Location:  http://api.exemplo.com/contas/v1/contas-processamento/1
 
 Neste caso, o cliente pode optar por não chamar mais a API de processamento para verificar o andamento, pois o servidor enviará a resposta via POST para a URL informada pelo cliente (http://api.clienteexemplo.com/contas-callback) ao término do processamento. No Body enviado para o cliente, deverá conter todas informações referentes ao processamento.
 
+## Processamento em lotes
+
+Hoje existem ferramentas que permitem grande performance para atender grandes volumes de requisições online, sem a necessidade de precisar acumular requisições para processar de uma só vez. Quando se fala em REST API, normalmente busca-se este cenário de processamento em tempo real. No entanto, principalmente em REST APIs de uso interno, existem situações onde o processamento é feito em lotes. Neste cenário, pode-se seguir o seguinte padrão:
+
+1.	O cliente define um array de objetos, sendo cada deles um request HTTP declarado com todos os seus componentes (incluindo URI, verbos e headers);
+2.	O cliente submete o array mensagem para o servidor usando o verbo POST para um recurso de API preparado para receber a requisição do passo 1;
+
+POST .../batch
+Content-Type: application/xml
+```json
+{
+"requests":[
+		{
+			"method": "PUT",
+			"url": "http://api.exemplo.com/recurso/123"
+			"headers":[
+				{"name": "Content-Type", "value": "application/json"}
+			],
+			"body": {
+				...
+			}
+		},
+		{
+			"method": "POST",
+			"url": "http://api.exemplo.com/recurso"
+			"headers":[
+				{"name": "Content-Type", "value": "application/json"}
+			],
+			"body": {
+				...
+			}
+		}
+	]
+}
+```
+3.	O servidor quando receber a requisição, deve processar o array separando cada item do array e despachando-os para as respectivas APIs que fazem o processamento individual de cada item.
+	- Alternativamente, o servidor pode ignorar o envio para cada API e processar diretamente a lista de requests;
+4. O servidor coleta a resposta de cada request e devolve para o cliente através de um array respeitando a sequência da requisição. 
+
+Response:
+200 OK
+Content-Type: application/json
+```json
+{
+"responses":[
+		{
+			"httpStatus": "200",
+			"message": "OK",
+			"headers":[
+				{"name": "Content-Type", "value": "application/json"},
+				{"name": "Content-Location", "value": "http://api.exemplo.com/recurso/123"}
+			],
+			"body": {
+				...
+			}
+		},
+		{
+			"httpStatus": "412",
+			"message": "Precondition Failed",
+			"headers":[
+				{"name": "Content-Type", "value": "application/json"},
+				{"name": "Content-Location", "value": "http://api.exemplo.com/recurso"}
+			],
+			"body": {
+				...
+			}
+		}
+	]
+}
+```
+## Recursividade
+
+Existem casos em que os recursos da API podem se aninhar recursivamente.
+Por exemplo, uma cadeia societária:
+
+- **JOSÉ** é sócio de:
+	- Maria que é sócia de:
+		- Empresas Azul que tem como sócios:
+			-  Carlos
+             - João
+			 - Empresas Amarelas que tem como sócios:
+				- Empresas Verdes que tem como sócios:
+				- **JOSÉ**
+				- Lisa
+				- Renata
+
+Analisando este cenário simples, já podemos concluir que se criarmos uma estrutura com os sócios "aninhados" entre eles, não temos como saber de forma genérica qual é a profundidade das ramificações possíveis, logo, fica difícil definir em um contrato de REST APIs esses objetos aninhados.
+
+Por exemplo, estruturando os sócios em URLs como recursos, teríamos o cenário:
+.../empresas/abc123Xyz/**socios**/JOSÉ/**socios**/Maria/**socios**/EmpresasAzul/**socios**/...
+
+Esta abordagem traz as seguintes dificuldades:
+•	todos os sócios da rota é a entidade sócio, então ao tentar acessar os URI parameters, teremos vários com o mesmo identificador "id-socio", ficando menos óbvia a recuperação destas informações no servidor.
+•	não é possível definir previamente a quantidade de aninhamentos (recursos do tipo sócio)
+•	um mesmo recurso (o sócio número JOSÉ) poderia estar representado em duas rotas diferentes, ora como sócio da empresa "abc123Xyz", ora como sócio do sócio "Empresas Verdes". O ideal no REST é que o recurso seja acessado apenas em uma rota.
+
+Caso a opção fosse definir estes sócios não como recursos, mas como estruturas aninhadas dentro de um único recurso "sócio", teríamos algo assim:
+GET .../empresas/abc123Xyz/**socios**/JOSE e o retorno ficaria algo:
+```json
+{
+	"data":[
+		{ 
+			"id": "JOSE", 
+			"outrosDados": "...",
+			"socios": [
+				{
+					"id": "MARIA", 
+					"outrosDados": "..."
+					"socios": [
+						{
+	  						"id": "EMPRESASAZUL", 
+	  						"outrosDados": "..."
+	  						"socios": [
+	  							{
+	  								"id": "CARLOS", 
+	  								"outrosDados": "..."
+	  								"socios": [
+	  									"outrosSocios": "..."
+	  								]
+	  							},
+	  							{
+	  								"id": "JOAO", 
+	  								"socios": [
+		  								"outrosSocios": "..."
+	  								]
+	  							}
+	  						]
+						}
+	  				]
+				}
+			]
+		}
+	]
+} 
+```
+
+Esta abordagem traz as seguintes dificuldades:
+•	Caso eu queira trocar o telefone do sócio Maria, por exemplo, eu não teria uma rota para fazer um PATCH diretamente no recurso. Seria necessário enviar o .../socios/JOSE completo com todos os seus aninhamentos para alterar uma informação pequena.
+•	Não temos como saber previamente a quantidade de sócios para aninhar e definir no contrato do recurso (json) que representa a sociedade.
+
+### Solução
+
+Para contornar os problemas explicados acima, podemos separar o recurso sócio do relacionamento entre eles. Ex:
+Recurso **sócio**:
+GET .../empresas/abc123Xyz/**socios**/JOSE
+Response:
+```json
+{
+	"data": {
+		"id": "JOSE",
+		"nome": "José"
+		"cpf": "11122233344",
+		"...": "..."
+	}
+}
+```
+Recurso **associacoes** (unitário):
+GET .../empresas/abc123Xyz/**associacoes**/123
+Response:
+```json
+{
+	"data": {
+		"id": 123,
+		"idSocio": "MARIA",
+		"associacaoPai": "JOSE"
+	}
+}
+```
+
+Recurso **associacoes** (array):
+GET .../empresas/abc123Xyz/**associacoes**
+Response:
+```json
+{
+	"data": [
+		{
+		"id": 123,
+		"idSocio": "MARIA",
+		"associacaoPai": "JOSE"
+		},
+		{
+		"id": 124,
+		"idSocio": "EMPRESAAZUL",
+		"associacaoPai": "MARIA"
+		},
+	]
+}
+```
+
+Dessa forma, separando a associação do recurso em uma rota separada, a implementação fica em um nível de granularidade que reduz problemas de concorrência, pois cada associação pode ser adicionada ou removida independentemente das outras associações do mesmo sócio.
+E as buscas nestas rotas seguiriam as práticas já utilizadas pela modelagem. Ex:
+- GET .../empresas/abc123Xyz/socios
+(traria um array com todos os sócios da empresa abc123Xyz) 
+- GET .../empresas/abc123Xyz/associacoes/123
+(traria uma associação específica em que já conhecemos o ID)  
+- GET .../empresas/abc123Xyz/associacoes?id_socio=CARLOS
+(traria as associações do sócio CARLOS)
+- GET .../empresas/abc123Xyz/associacoes?associacaoPai=MARIA
+(traria as associações de sócios cujo "sócio pai" seja o sócio MARIA)
+- DELETE .../empresas/abc123Xyz/associacoes/123
+(apagaria a associação com o id 123)
+- DELETE .../empresas/abc123Xyz/associacoes?associacaoPai=MARIA
+(apagaria a associação cujo pai é o sócio MARIA)
+
+## Versionamento
+
+TODO: pesquisar melhor as vantagens e desvantagens de cada abordagem.
+
+Versionamento acontece quanto ocorrem alterações no contrato da API. Contrato é a definição de todo o conjunto de verbos, códigos de resposta, recursos, etc. feita em uma notação padrão para isso como o RAML, Swagger, etc. O ideal é que estes documentos sejam armazenados em um repositório de código fonte e a cada alteração, versionados.
+Assim, existirão dois tipos de versão: aquela do contrato no repositório e aquela que repassamos para o cliente (consumidor da API).
+
+Para realizar o versionamento dos contratos das APIs podemos fazer uso do [Semantic Versioning 2.0.0](https://semver.org/). Esta definição utiliza a seguinte estrutura **MAJOR.MINOR.PATCH**. Onde se incrementa os valores conforme a seguinte regra:
+- **MAJOR**: implica mudanças incompatíveis para a API. Ou seja, que faz com que os consumidores atuais não consigam mais utilizar a API sem ter de alterar seus softwares.
+Ex (era **1**.0.0 e vira **2**.0.0):
+	- remoção de qualquer item que faz parte do HTTP e do REST (Status Code, Verbo, Recursos, Parâmetros, Atributos, etc);
+	- tornar campos já existentes - antes não obrigatórios - como obrigatórios;
+	- alteração de tipos de dados.
+- **MINOR**: implica adicionar funcionalidades que mantém compatibilidade com a versão atual. Ou seja, os consumidores atuais não terão que alterar seu software para continuar usando a API. 
+Ex (era 2.**0**.0 e vira 2.**1**.0):
+	- adição de novos recursos;
+	- em recursos já existentes, adição de novos atributos ou parâmetros não obrigatórios na requisição;
+	- adição de novos atributos no response;
+	- adição de novos verbos;
+	- adição de novos status codes;
+- **PATCH**: implica em mudanças que não alteram a API.
+Ex (era 2.0.**0** e vira 2.1.**1**):
+	- alteração nas descrições dos campos;
+	- alterações nos exemplos;
+	- alterações em arquivos extras ao contrato que contém metadados usados por governança ou deploy.
+
+A versão incial do contrato da API será a 1.0.0. O valor definido no MAJOR, no caso **1** é o valor que mostramos para o cliente, dado que é a alteração no MAJOR que obriga-o a alterar o seu software.
+
+Existem algumas formas diferentes de se versionar a API para o cliente. Nenhuma é totalmente certa, nem errada e a especificação do REST não define este item. O que existe são tendências maiores ou menores de adoção de alguns padrões por conta dos prós e contras que cada um oferece.
+
+Do ponto de vista do cliente, também é interessante alguns cuidados. Para minimizar os impactos de qualquer alteração, mesmo aquelas que não quebram o contrato, os clientes destas APIs devem evitar consumir mais campos do que o necessário ao chamar uma API. Eles devem usar apenas aqueles campos que o cliente realmente precisa e deve ignorar os que não precisa. Este conceito é abordado em [Tolerant Reader (Martin Fowler)](https://martinfowler.com/bliki/TolerantReader.html).
+
+
+#### Versionamento pelo host
+
+Na estrutura de host da URL, coloca-se a versão como parte dele. Por exemplo:
+https://api-v2.empresaexemplo.com/clientes
+Observe o "-v2", que específica que esta é a versão 2 da API.
+
+O ponto negativo desta abordagem é que do ponto de vista de deploy, é mais difícil criar um novo nome do host do que outras abordagens.
+
+#### Versionamento pela query string
+
+Define-se a versão a versão via  **query string**, por exemplo:
+
+https://api.empresaexemplo.com/clientes?version=2.0
+Observe o version=2.0, que especifica que essa é a versão 2.0 dessa API.
+
+O ponto negativo dessa abordagem é que prejudica a definição de contrato para outras versões, e prejudica a legibilidade da URL em cenários de muitos parâmetros. Além de facilitar com que o cliente esqueça de definir a versão ao chamar a API e talvez tome erro por estar chamando a versão default.
+
+#### Versionamento pelo Content-Type (com o header Accept)
+
+Define-se um tipo customizado de conteúdo com a versão dele. Por exemplo:
+GET https://api.empresaexemplo.com/clientes
+Accept: application/vnd.clientes.v2+json
+
+O ponto positivo é que a URL fica mais clena, no entanto não é dev-friendly, pois a requisição tem que ser feita com muito mais cuidado, dada a passagens de mais parâmetros.
+
+#### Versionamento por header customizado
+
+Define-se um header customizado para requisitar a versão da API. Por exemplo:
+GET https://api.empresaexemplo.com/clientes
+api-version: 2
+
+O ponto positivo é que a URL fica mais clena, no entanto não é dev-friendly, pois a requisição tem que ser feita com muito mais cuidado, dada a passagens de mais parâmetros.
+
+#### Versionamento pelo Path (Resources)
+
+Define-se a versão no Path como se fosse um recurso, por exemplo:
+https://api.empresaexemplo.com/v1/clientes
+
+Esta é a minha forma preferencial de versionar pois, fazendo parte da URL você força sempre o cliente a informá-la. A versão está sempre visível. Em processo de deploy, é muito mais simples criar uma pasta do que definir um novo [host](#). Mantém um visual clean na URL e facilita na definição de contratos para versões novas.
+
 ## Segurança
 
 (o conjunto das implementações garante a segurança)
@@ -1523,80 +1833,9 @@ D[GatGateway] --> F[API Seguros]
 D[Gateway] --> G[API Cartões]
 ```
 
-## Versionamento
-
-TODO: pesquisar melhor as vantagens e desvantagens de cada abordagem.
-
-Versionamento acontece quanto ocorrem alterações no contrato da API. Contrato é a definição de todo o conjunto de verbos, códigos de resposta, recursos, etc. feita em uma notação padrão para isso como o RAML, Swagger, etc. O ideal é que estes documentos sejam armazenados em um repositório de código fonte e a cada alteração, versionados.
-Assim, existirão dois tipos de versão: aquela do contrato no repositório e aquela que repassamos para o cliente (consumidor da API).
-
-Para realizar o versionamento dos contratos das APIs podemos fazer uso do [Semantic Versioning 2.0.0](https://semver.org/). Esta definição utiliza a seguinte estrutura **MAJOR.MINOR.PATCH**. Onde se incrementa os valores conforme a seguinte regra:
-- **MAJOR**: implica mudanças incompatíveis para a API. Ou seja, que faz com que os consumidores atuais não consigam mais utilizar a API sem ter de alterar seus softwares.
-Ex (era **1**.0.0 e vira **2**.0.0):
-	- remoção de qualquer item que faz parte do HTTP e do REST (Status Code, Verbo, Recursos, Parâmetros, Atributos, etc);
-	- tornar campos já existentes - antes não obrigatórios - como obrigatórios;
-	- alteração de tipos de dados.
-- **MINOR**: implica adicionar funcionalidades que mantém compatibilidade com a versão atual. Ou seja, os consumidores atuais não terão que alterar seu software para continuar usando a API. 
-Ex (era 2.**0**.0 e vira 2.**1**.0):
-	- adição de novos recursos;
-	- em recursos já existentes, adição de novos atributos ou parâmetros não obrigatórios na requisição;
-	- adição de novos atributos no response;
-	- adição de novos verbos;
-	- adição de novos status codes;
-- **PATCH**: implica em mudanças que não alteram a API.
-Ex (era 2.0.**0** e vira 2.1.**1**):
-	- alteração nas descrições dos campos;
-	- alterações nos exemplos;
-	- alterações em arquivos extras ao contrato que contém metadados usados por governança ou deploy.
-
-A versão incial do contrato da API será a 1.0.0. O valor definido no MAJOR, no caso **1** é o valor que mostramos para o cliente, dado que é a alteração no MAJOR que obriga-o a alterar o seu software.
-
-Existem algumas formas diferentes de se versionar a API para o cliente. Nenhuma é totalmente certa, nem errada e a especificação do REST não define este item. O que existe são tendências maiores ou menores de adoção de alguns padrões por conta dos prós e contras que cada um oferece.
-
-Do ponto de vista do cliente, também é interessante alguns cuidados. Para minimizar os impactos de qualquer alteração, mesmo aquelas que não quebram o contrato, os clientes destas APIs devem evitar consumir mais campos do que o necessário ao chamar uma API. Eles devem usar apenas aqueles campos que o cliente realmente precisa e deve ignorar os que não precisa. Este conceito é abordado em [Tolerant Reader (Martin Fowler)](https://martinfowler.com/bliki/TolerantReader.html).
-
-
-#### Versionamento pelo host
-
-Na estrutura de host da URL, coloca-se a versão como parte dele. Por exemplo:
-https://api-v2.empresaexemplo.com/clientes
-Observe o "-v2", que específica que esta é a versão 2 da API.
-
-O ponto negativo desta abordagem é que do ponto de vista de deploy, é mais difícil criar um novo nome do host do que outras abordagens.
-
-#### Versionamento pela query string
-
-Define-se a versão a versão via  **query string**, por exemplo:
-
-https://api.empresaexemplo.com/clientes?version=2.0
-Observe o version=2.0, que especifica que essa é a versão 2.0 dessa API.
-
-O ponto negativo dessa abordagem é que prejudica a definição de contrato para outras versões, e prejudica a legibilidade da URL em cenários de muitos parâmetros. Além de facilitar com que o cliente esqueça de definir a versão ao chamar a API e talvez tome erro por estar chamando a versão default.
-
-#### Versionamento pelo Content-Type (com o header Accept)
-
-Define-se um tipo customizado de conteúdo com a versão dele. Por exemplo:
-GET https://api.empresaexemplo.com/clientes
-Accept: application/vnd.clientes.v2+json
-
-O ponto positivo é que a URL fica mais clena, no entanto não é dev-friendly, pois a requisição tem que ser feita com muito mais cuidado, dada a passagens de mais parâmetros.
-
-#### Versionamento por header customizado
-
-Define-se um header customizado para requisitar a versão da API. Por exemplo:
-GET https://api.empresaexemplo.com/clientes
-api-version: 2
-
-O ponto positivo é que a URL fica mais clena, no entanto não é dev-friendly, pois a requisição tem que ser feita com muito mais cuidado, dada a passagens de mais parâmetros.
-
-#### Versionamento pelo Path (Resources)
-
-Define-se a versão no Path como se fosse um recurso, por exemplo:
-https://api.empresaexemplo.com/v1/clientes
-
-Esta é a minha forma preferencial de versionar pois, fazendo parte da URL você força sempre o cliente a informá-la. A versão está sempre visível. Em processo de deploy, é muito mais simples criar uma pasta do que definir um novo [host](#). Mantém um visual clean na URL e facilita na definição de contratos para versões novas.
-
 ## Performance, Cache e compressão
+
+TODO: Aguarde! Este capítulo será escrito em breve. :-)
 
 ## Palavras finais
 
