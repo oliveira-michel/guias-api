@@ -1,17 +1,18 @@
-
 # Guia de Design REST
 
-## Abstract
+## _Abstract_
 
-TODO
+_This document is a guideline for REST API designing based on the best practices and experiences from author who headed some REST API service governance projects in the banking environment. REST API is an architectural style used to expose services on the web._
 
-## Status of this Document
+Este documento é guia para design de REST API com base em melhores práticas e experiências do autor que liderou alguns projetos de governança de serviços com REST API em ambiente bancário. REST API é um estilo arquitetural usado para expor serviços na web.
 
-TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de serviços no Itaú e inspirações em artigos que fui lendo durante este período.
+## _Status of this document_
 
+_This is an "alive" document where the author is updating with day-by-day experience. Therefore, it may never arrive in its final version. However, the published content already accumulates project experiences that totaled a few hundred REST APIs._
 
+Este é um documento "vivo" em que o autor está atualizando com a experiência do dia a dia. Portanto, nunca pode chegar em sua versão final. No entanto, o conteúdo publicado já acumula experiências de projetos que totalizaram algumas centenas de REST APIs.
 
-## Table of Content
+## Conteúdo
 
 <!-- TOC -->
 - [Introdução e conceitos básicos](#introdução-e-conceitos-básicos)
@@ -77,31 +78,28 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 
 Os conteúdos abaixo cobrem alguns conceitos aliados às boas práticas no design de RESTful APIs. Quando falamos em design de RESTful APIs, estamos abordando como definir um contrato de API que expõe as entidades e funções de um determinado sistema respeitando as restrições do REST.
 
-> Para fazer o entendimento da necessidade do negócio e definição das entidades, recomendamos o uso de Domain Driven Design. 
-> *Em breve será disponibilizado um guia explorando toda a fase de entendimento do negócio e transformação dos conceitos de negócio em entidades para serem usadas na esposição delas via API.*
+> Para fazer o entendimento das necessidades de negócio e definição das entidades, recomendamos o uso de Domain Driven Design.
+> TODO: Em breve será disponibilizado um guia explorando toda a fase de entendimento e transformação dos conceitos de negócio em entidades para serem expostas como recursos via REST API.
 
-> O conteúdo deste material contempla os conceitos para especificação do contrato de forma genérica, não abordando necessariamente nenhuma linguagem específica de definição de contrato REST, como Swagger, RAML, Open API, etc.
-> *Em breve será disponibilizado um guia explorando a declaração do contrato em uma destas linguagens.*
+> O conteúdo deste material contempla os conceitos para especificação do contrato de REST APIs de forma genérica, não abordando necessariamente nenhuma linguagem específica de definição de contrato: como RAML, Open API, etc.
+> TODO: Em breve serão disponibilizados exemplos dos conceitos deste guia em uma destas linguagens.
 
-**API** (Application Programming Interface) é um software que permite comunicação entre sistemas onde há um fornecedor e um ou mais consumidores de informação, serviços, etc. Para consumir uma API respeita-se um contrato que deve incluir o protocolo de comunicação, as operações (consultas e atualizações) e os formatos de dados para entradas, saídas e erros.
-
+**API** (**A**pplication **P**rogramming **I**nterface) é um software que permite comunicação entre sistemas onde há um fornecedor e um ou mais consumidores de informação, serviços, etc.  Para consumir uma API respeita-se um contrato que deve incluir o protocolo de comunicação, as operações (consultas e atualizações) e os formatos de dados para entradas, saídas e erros.
 A maioria dos softwares nos quais nós interagimos são construídos para atender às necessidades humanas e normalmente referenciam as "coisas" reais das quais esses softwares tratam. Por exemplo, um software de biblioteca vai representar livros, seções, autores, etc. e, através de alguma interface, permitir que um usuário interaja com estas representações. Uma API difere-se deste tipo de software no que tange o usuário: quem interage com o software é outro software, não diretamente o usuário final. No entanto, quem desenvolve o software que interage com a API é um programador - e até a data deste documento, a maioria ainda são humanos - e para que a experiência deste usuário programador e do usuário do software que ele desenvolve seja a melhor possível, princípios de design devem ser respeitados. 
 
-**REST API** (Representational State Transfer Application Application Programming Interface) é um estilo de arquitetura que define um conjunto de restrições e propriedades baseadas em HTTP fornecendo interoperabilidade entre sistemas de computadores na internet (ou rede local). REST permite que os sistemas consumidores acessem e manipulem o estado de representações textuais de recursos usando um conjunto pré definido de operações. As "coisas" da vida real em REST se chamam recursos. O conjunto de valores dos atributos de um determinado recurso em um determinado momento, se chama estado.
+**REST API** (**R**epresentational **S**tate **T**ransfer **A**pplication **P**rogramming **I**nterface) é um estilo de arquitetura que define um conjunto de restrições e propriedades baseadas em HTTP fornecendo interoperabilidade entre sistemas de computadores na internet (ou rede local). REST permite que os sistemas consumidores acessem e manipulem o estado de representações textuais de recursos usando um conjunto pré definido de operações. As "coisas" da vida real em REST se chamam recursos. O conjunto de valores dos atributos de um determinado recurso em um determinado momento, se chama estado.
 Por colocar mais restrições do que WebServices - que é uma outra forma de integrar sistemas - e utilizar mais recursos do HTTP do que WebServices, acabou padronizando melhor a forma de comunicação e isso agilizou o desenvolvimento das integrações.
-
 O REST enfatiza simplicidade, extensibilidade, confiabilidade e performance: 
- 
 - **Simplicidade** porque a forma como se interage com REST APIs é bem definida e de certa forma restritiva e a interação é stateless, ou seja, todos as informações necessárias para o processamento de uma requisição (no REST, alteração do estado de um recurso) deve estar contida naquela requisição. 
 - **Extensibilidade** porque um determinado recurso pode ser representado em diferentes formatos e até mesmo versões, além da possibilidade de se adicionar novos recursos sem precisar alterar os já existentes. 
 - **Confiabilidade** porque existe uma separação clara das ações que podem ser feitas e dos seus efeitos colaterais.
 - **Performance** porque faz parte dos principais pilares do REST o uso de cache através de uma semântica bem definida, além de uma arquitetura baseada em separação de camadas, permitindo que partes diferentes do sistema possam ser escaladas de forma independente e isolada. 
 
-TODO: definir RESTful
+O **HTTP** (**H**yper**T**ext **T**ransfer **P**rotocol) - ou HTTPS na sua variante com encriptação - é o protocolo da internet, no qual acontece a grande maioria das comunicações. Basicamente, ele trata requisições entre um cliente e um servidor através de uma mensagem que contém um Header e um Body. Se fizer uma analogia a uma carta, eu tenho informações de entrega no envelope (header) e um conteúdo (carta dentro do envelope). O ciclo de vida contempla um envio (request que parte do cliente) e um retorno (response que parte do servidor). Na maioria das implementações, a comunicação é stateless, ou seja, ao término do ciclo "request/response", as conexões com o servidor são encerradas. Além da mensagem, o HTTP define verbos para tratar as mensagens, códigos de retorno para indicar sucesso ou insucesso no processamento, padrões de endereço do servidor, entre outros.
 
-O **HTTP** (HyperText Transfer Protocol) - ou HTTPS na sua variante com encriptação - é o protocolo da internet, no qual acontece a grande maioria da comunicação. Basicamente, ele trata requisições entre um cliente e um servidor através de uma mensagem que contém um Header e um Body. Se fizer uma analogia a uma carta, eu tenho informações de entrega no envelope (header) e um conteúdo (carta dentro do envelope). E o ciclo de vida contempla um envio (request que parte do cliente) e um retorno (response que parte do servidor). Na maioria das implementações, a comunicação no é stateless, ou seja, ao término do ciclo "request/response", as conexões com o servidor são encerradas. Além da mensagem, o HTTP define verbos para tratar as mensagens, códigos de retorno para indicar sucesso ou insucesso no processamento, padrões de endereço do servidor, entre outros.
+**RESTful** é um conceito que define uma API construída seguindo todas as restrições impostas pelo REST. Leonard Richardson definiu um [modelo de maturidade](https://martinfowler.com/articles/richardsonMaturityModel.html) onde ele divide a adoção do REST em etapas. Quando se implementa todas as etapas, considera-se que aquela é uma RESTful API.
 
-O REST surgiu à partir da dissertação de Roy Thomas Fielding - um dos criadores da web - e se baseia fortemente no HTTP reaproveitando muitos conceitos deste protocolo. A dissertação define de forma aberta o conceito e o mercado foi refinando e definindo convenções. Dessa forma, em alguns pontos, existem várias formas de fazer a mesma coisa e não há necessariamente a mais correta. Assim, cabe a você analisar os *trade-offs* de cada forma e escolher a que melhor atende às necessidades dos seus software e principalmente do cliente consumidor do seu software.
+O REST surgiu à partir da dissertação de Roy Thomas Fielding - um dos criadores da web - e se baseia fortemente no HTTP reaproveitando muitos conceitos deste protocolo. A dissertação define de forma aberta o conceito e o mercado foi refinando e definindo convenções. Dessa forma, em alguns pontos existem várias formas de fazer a mesma coisa e não há necessariamente a mais correta. Assim, cabe a você analisar os *trade-offs* de cada forma e escolher a que melhor atende às necessidades dos seus software e principalmente do cliente consumidor do seu software.
 
 O ponto mais importante quando se fala em boas práticas é que seja adotado um padrão, pois à partir do momento que se tem um padrão, a curva de aprendizado para novas soluções é mais rápida e podem ser utilizados frameworks e automações para reduzir o tempo de desenvolvimento dos sistemas.
 
@@ -407,7 +405,7 @@ Por padrão, passamos nos headers informações não relacionadas aos recursos  
 
 Nos headers trafegamos informações técnicas como informações de acesso e credenciais, tokens, chaves de API, Correlation IDs, metadados, etc. 
 
-Alguns headers são padrões do protocolo HTTP, outros podem ser definidos de forma personalizada para as necessidades da sua empresa ou por frameworks de mercado que definem conjuntos de headers para necessidades específicas.
+Alguns headers são padrões do protocolo [HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers), outros podem ser definidos de forma personalizada para as necessidades da sua empresa ou por frameworks de mercado que definem conjuntos de headers para necessidades específicas.
 
 Separar este tipo de informação nos headers evita que as entidades de negócio (recursos) trafeguem dados que só existem por conta da comunicação ser via REST API junto com dados de negócio. 
 
@@ -415,7 +413,7 @@ Por exemplo, se eu estou expondo uma REST API de seguros, informações de token
 
 Para mais informações sobre headers, veja: [Segurança](#segurança) e [Cache](#cache).
 
-A seguir, alguns dos principais headers serão explicados.
+Dentre os vários headers do protocolo [HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers), alguns são mais utilizados no contexto de API e explicados a seguir.
 
 ### Request > Headers > Content-Type
 
@@ -1236,7 +1234,9 @@ Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não ex
 
 - **410 Gone**: O recurso (URL) não existe mais e esta condição é permanente. Este status é usado quando um recurso que um dia existiu não existe mais. Ao contrário do 404 que em que o recurso pode nunca ter existido ou ele está temporariamente indisponível.
 
-- **418 I'm a teapot**: Descubra o significado desse status code [aqui](https://sitesdoneright.com/blog/2013/03/what-is-418-im-a-teapot-status-code-error). #momentodescontracao :-)
+- **414 URI Too Long**: O tamanho da URL pode ser limitado pelo servidor. Assim, este erro é lançado quando uma URL ultrapassa o tamanho máximo permitido. [+ info](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/414)
+
+- **418 I'm a teapot**: O servidor se recusa a servir um café porque o bule é chá. Código de resposta do Hyper Text Coffee Pot Control Protocol ([HTCPCP/1.0](https://tools.ietf.org/html/rfc2324#section-2.3.2)).  #AprilFoolsJoke #1998 :-) [+ info](https://sitesdoneright.com/blog/2013/03/what-is-418-im-a-teapot-status-code-error)
 
 - **422 Unprocessable Entity**:	Quando a requisição está correta ao nível sintático, mas existem erros de negócio na requisição. Por exemplo, se existe regra que o uso de um query parameter está condicionado a outro e eles não foram preenchidos, ou uma data informada é inválida, ou uma requisição de transferência de dinheiro é feita e a conta não tem fundo, etc.
 
