@@ -106,10 +106,11 @@ O ponto mais importante quando se fala em boas práticas é que seja adotado um 
 Neste guia, busco compartilhar os padrões que implemento nas empresas onde já trabalhei ou boas práticas definidas em livros, artigos ou até mesmo APIs de mercado.
  
 ## Request
+<sub>[ir para o índice](#conte%C3%BAdo)</sub>
 
 Assim como no protocolo HTTP, um cliente (consumidor da API) deve enviar uma mensagem dentro de um determinado padrão a um endereço (onde o servidor responde àquele padrão de mensagem) e aguardar a resposta.
 
-Na requisição, existem alguns padrões a serem seguidos e eles serão explicados um a um a seguir. Alguns são obrigatórios para o funcionamento da REST API, outros são boas práticas que adotadas pelo mercado.
+Na requisição, existem alguns padrões a serem seguidos e eles serão explicados um a um a seguir. Alguns são obrigatórios para o funcionamento da REST API, outros são boas práticas.
 
 ### Request > URL
 
