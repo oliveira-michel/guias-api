@@ -23,7 +23,7 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 		- [Domínios Funcionais](#request--url--resources--dom%C3%ADnios-funcionais)
 		- [Path Parameters](#request--url--resources--path-parameters)
 		- [Query Strings](#request--url--query-strings)
-			- [Full text search]
+			- [Full text search](#request--url--query-strings--full-text-search)
 			- [Paginação](#request--url--query-strings--pagina%C3%A7%C3%A3o)
 				- [Range](#request--url--query-strings--pagina%C3%A7%C3%A3o--range)
 				- [Page e Page Size](#request--url--query-strings--pagina%C3%A7%C3%A3o--page-e-page-size)
@@ -52,7 +52,7 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 	- [Body](#response--body)
 		- [Envelope "Data"](#response--body--envelope-data)
 		- [Recurso unitário, array ou nenhum](#response--body--recurso-unit%C3%A1rio-array-ou-nenhum)
-		- [Full text search]
+		- [Full text search](#response--body--full-text-search)
 		- [Paginação](#response--body--pagina%C3%A7%C3%A3o)
 			- [Range](#response--body--pagina%C3%A7%C3%A3o--range)
 			- [Page e Page Size](#response--body--pagina%C3%A7%C3%A3o--page-e-page-size)
@@ -64,12 +64,13 @@ TODO: citar início da GFT + BBVA, experiência com 3 anos de governança de ser
 		- [Errors e Warnings](#response--body--errors-e-warnings)
 		- [HATEOAS](#response--body--hateoas)
 	- [HTTP Status Code](#response--http-status-codes)
-- [Tipos de dados]
-- [Processamento assíncrono]
-- [Processamento em lotes]
-- [Recursividade]
-- [Versionamento]
-- [Segurança]
+- [Tipos de dados](#tipos-de-dados)
+- [Processamento assíncrono](#processamento-ass%C3%ADncrono)
+- [Processamento em lotes](#processamento-em-lotes)
+- [Recursividade](#recursividade)
+- [Versionamento](#versionamento)
+- [Segurança](#seguran%C3%A7a)
+- [Performance, Cache e compressão](#performance-cache-e-compress%C3%A3o)
 <!-- /TOC -->
 
 ## Introdução e conceitos básicos
@@ -744,39 +745,6 @@ No body de response, colocamos a informação do recurso dentro de um envelope "
 	...
 }
 ```
-### Response > Body > Full text search
-
-Quando é definido um query string para buscas gerais, o termo defindo na busca deve ser aplicado como filtro em todos os campos pesquisáveis daquele recurso. Por exemplo, uma requisição com a seguinte estrutura GET http://api.empresarh.com/candidatos?q=Paulo deveria retornar um array de resultados como este:
-```json
-{
-	"data": [
-		{
-			"id": "87426",
-			"nome": "Paulo Ferreira de Araújo",
-			"pai": "José de Araújo",
-			"mãe": "Patrícia Silva Ferreira",
-			"cidade": "Santos"
-			...
-		},
-		{
-			"id": "87426",
-			"nome": "Américo Guedes Oliveira",
-			"pai": "Roberto Carvalho de Oliveira",
-			"mãe": "Maria José Oliveira",
-			"cidade": "São Paulo"
-			...
-		},
-		{
-			"id": "87426",
-			"nome": "Carla Mendes Pinheiros",
-			"pai": "Carlos Gosmes de Pinheiros",
-			"mãe": "Lívia de Paulo Pinheiros",
-			"cidade": "Vitória"
-			...
-		}
-	]
-}
-```
 
 ### Response > Body > Recurso unitário, array ou nenhum
 
@@ -827,6 +795,40 @@ Response:
 ```
 
 Também é possível se obter resposta vazia quando a busca não retorna nenhum resultado. No caso do GET, retorna-se um envelope "data" vazio. Veja mais sobre o [código de resposta HTTP](#)  204 para mais informações. 
+
+### Response > Body > Full text search
+
+Quando é definido um query string para buscas gerais, o termo defindo na busca deve ser aplicado como filtro em todos os campos pesquisáveis daquele recurso. Por exemplo, uma requisição com a seguinte estrutura GET http://api.empresarh.com/candidatos?q=Paulo deveria retornar um array de resultados como este:
+```json
+{
+	"data": [
+		{
+			"id": "87426",
+			"nome": "Paulo Ferreira de Araújo",
+			"pai": "José de Araújo",
+			"mãe": "Patrícia Silva Ferreira",
+			"cidade": "Santos"
+			...
+		},
+		{
+			"id": "87426",
+			"nome": "Américo Guedes Oliveira",
+			"pai": "Roberto Carvalho de Oliveira",
+			"mãe": "Maria José Oliveira",
+			"cidade": "São Paulo"
+			...
+		},
+		{
+			"id": "87426",
+			"nome": "Carla Mendes Pinheiros",
+			"pai": "Carlos Gosmes de Pinheiros",
+			"mãe": "Lívia de Paulo Pinheiros",
+			"cidade": "Vitória"
+			...
+		}
+	]
+}
+```
 
 ### Response > Body > Paginação
 
