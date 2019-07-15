@@ -106,17 +106,17 @@ O ponto mais importante quando se fala em boas práticas é que seja adotado um 
 Neste guia, busco compartilhar os padrões que implemento nas empresas onde já trabalhei ou boas práticas definidas em livros, artigos ou até mesmo APIs de mercado.
  
 ## Request
-<sub>[ir para o índice](#conte%C3%BAdo)</sub>
 
 Assim como no protocolo HTTP, um cliente (consumidor da API) deve enviar uma mensagem dentro de um determinado padrão a um endereço (onde o servidor responde àquele padrão de mensagem) e aguardar a resposta.
 
 Na requisição, existem alguns padrões a serem seguidos e eles serão explicados um a um a seguir. Alguns são obrigatórios para o funcionamento da REST API, outros são boas práticas.
 
+<sub>ir para: [índice](#conte%C3%BAdo) | [response](#response)</sub>
 ### Request > URL
 
 A URL (Universal Resource Location) é endereço onde o cliente vai fazer a requisição. Cada URL identifica um recurso diferente na API. Como no navegador, quando digitamos um endereço de um site e ele nos responde com a página, no REST é enviada uma solicitação para o endereço e ele nos responde com informações sobre o recurso.
 
-A URL é formada por basicamente 3 partes Base Path, Resources ou Path e Query Strings. Os capítulos a seguir detalharão cada uma delas.
+A URL é formada por basicamente 3 partes [Base Path](#request--url--base), [Resources](#request--url--resources) (ou Path) e [Query Strings](#request--url--query-strings). 
 
 Dado que URLs são case sensitive, é uma boa prática usar tudo em minúsculo para evitar possibilidade de erro na digitação (o que pode ser difícil de identificar). Veja:
 - I <- isto é um i maiúsculo
@@ -131,30 +131,32 @@ Quando na URL existirem palavras compostas, é indicado o uso de hífen para sep
 > [https://support.google.com/webmasters/answer/76329](https://support.google.com/webmasters/answer/76329)
 > [https://stackoverflow.com/questions/10302179/hyphen-underscore-or-camelcase-as-word-delimiter-in-uris](https://stackoverflow.com/questions/10302179/hyphen-underscore-or-camelcase-as-word-delimiter-in-uris)
 
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 ### Request > URL > Base
 
-O Base Path é a parte inicial da URL, nela você tem o protocolo (http:// ou https://, por exemplo) e o endereço do servidor na web. O Base Path se repetirá em todas as requisições.
+O Base Path é a parte inicial da URL, nele você tem o protocolo (http:// ou https://, por exemplo) e o endereço do servidor na web. O Base Path se repetirá em todas as requisições.
 Ex:
 - https://maps.googleapis.com
 - https://management.azure.com
 - https://api.spotify.com
 
-Algumas empresas têm URLs que representam os produtos da empresa, em outras a próprie empresa é um produto. Nestes cenários, normalmente encontramos Base Paths com estruturas semelhantes a essas:
+Algumas empresas têm URLs que representam os produtos da empresa, em outras a própria empresa é um produto. Nestes cenários, normalmente encontramos Base Paths com estruturas semelhantes a essas:
 - https://api.empresaexemplo.com
 - https://api.produtoexemplo.com
 
 Em outros cenários, não usam o termo "api" como nos exemplos do google ou azure (acima).
-Mas o ponto principal é que normalmente é utilizada uma URL diferente da URL do site da empresa (http://www.empresaexemplo.com).
+Mas o ponto principal é que normalmente é utilizada uma URL diferente da URL do site da empresa (http://www.empresaexemplo.com ou http://empresaexemplo.com).
 
-Identificar ambientes de homologação e produção no Base Path também é interessante, pois reduz a configuração do ambiente a apenas um parâmetro. Ex:
+Identificar ambientes de homologação e produção no Base Path também é interessante, pois reduz a configuração do ambiente durante o processo de publicação a apenas um parâmetro. Ex:
 - Homologação: https://api-hml.empresaexemplo.com
 - Desenvolvimento: https://api-dev.empresaexemplo.com
 - Sandbox: https://api-sbx.empresaexemplo.com
 - Produção: https://api.empresaexemplo.com
 
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 ### Request > URL > Resources
 
-No REST, a letra R significa "Representação ". Representação é a forma de apresentar os recursos ("coisas") que existem no sistema. Recursos no REST são batizados usando substantivos. Eles são as entidades que serão expostas para outros sistemas. Cada um desses recursos têm um endereço (URL) diferente e são representados por textos separados por barras após o Base Path. É muito importante que os nomes dos recursos sejam estruturados de forma que cumpram uma hierarquia que proporcione sentido próprio à URL. Os nomes escolhidos para os recursos devem ser de fácil entendimento, de modo que ao ler a URL se obtenha rapidamente a informação sobre qual recurso ela representa.
+No REST, a letra R significa "Representação ". Representação é a forma de apresentar os recursos ("coisas") que existem no sistema. Recursos no REST são nomeados usando substantivos. Eles são as entidades de sistema que serão expostas para outros sistemas. Cada um desses recursos têm um endereço (URL) diferente e são representados por textos separados por barras após o Base Path. É muito importante que os nomes dos recursos sejam estruturados de forma que cumpram uma hierarquia que proporcione sentido próprio à URL. Os nomes escolhidos para os recursos devem ser de fácil entendimento, de modo que ao ler a URL se obtenha rapidamente a informação sobre qual recurso ela representa.
 
 Ex:
 - Endereço da representação de um recurso chamado "artists" no Spotify: https://api.spotify.com/v1/artists/
@@ -164,31 +166,32 @@ Ex:
 
 Repare que existe um Base Path se repetindo em cada um dos endereços (https://api.spotify.com) e um "/v1" também. Ele representa a versão da API e também é exposto como um recurso. Há mais informações sobre versionamento no capítulo [Versionamento](#versionamento).
 
-Observe que algumas URLs têm recursos como artists ou albums (sem o {id} na frente) que deverão retonar listas, pois não se especifica nenhum "artist" ou "album" através de um {id}.
-Outras URLs têm o {id} e retornação apenas um item cujo id seja o id definido na URL. Este {id} é um [URI Parameter](#uri-parameters).
+Observe que algumas URLs têm recursos como artists ou albums que não têm o {id} na frente. Elas deverão retornar listas, pois não se especifica nenhum "artist" ou "album" específico através de um {id}. Outras URLs têm o {id} e retornação apenas um item cujo id seja o id definido naquela URL. Este {id} é um [Path Parameter](#request--url--resources--path-parameters).
 
-É boa prática, usar nomes em minúsculo e se composto, separar com hífen.
+Quando os recursos forem formados por duas palavras, é boa prática separar com hífen. E assim como no [Base Path](#request--url--base), escreve-se tudo em minúsculo. 
 
-Os recursos na maioria dos casos serão substantivos no plural, pois geralmente definem coleções (ex: cartões, usuários, clientes, carros, ruas, etc.) Ao pensar no nome do recurso, é importante verificar se o nome não conflitará com alguma possível implementação parecida no futuro. Por exemplo, imagina um recurso que se chamaria ofertas_credito. Neste caso, a deve-se perguntar: "este serviço ofertará todos os tipos de crédito no domínio de crédito?" Se a reposta for: "Não, apenas consignado", deve-se especificar o nome da entidade como ofertas-credito-consignado porque no futuro uma nova rota que oferte todos os tipos de crédito poderá ser criada com o nome oferta-credito.
+Os recursos na maioria dos casos serão substantivos no plural, pois geralmente definem coleções (ex: cartões, usuários, clientes, carros, endereços, etc.) Ao pensar no nome do recurso, é importante verificar se o nome não conflitará com alguma possível implementação parecida no futuro. Por exemplo, imagina um recurso que se chamaria ofertas_credito. Neste caso, a deve-se perguntar: "este serviço ofertará todos os tipos de crédito no domínio de crédito?" Se a reposta for: "Não, apenas consignado", deve-se especificar o nome da entidade como ofertas-credito-consignado porque no futuro uma nova rota que oferte todos os tipos de crédito poderá ser criada com o nome oferta-credito.
 Ex:
-- http://api.exmpresaexemplo.com/creditos/v1/ofertas-credito-consignado
+http://api.exmpresaexemplo.com/creditos/v1/ofertas-credito-consignado
 
 Recursos criados no singular são menos frequentes e pode acontecer quando:
--	Haver requerimentos de segurança ou permissão específicos para um atributo. Neste caso, o atributo se torna um recurso na URL, podendo aplicar policies específicas de segurança naquela rota.
--	Há um atributo complexo com um número elevado de "sub-atributos".
--	Há recursos que não existam no plural, como saldo, extrato, etc.
+-	Haver requerimentos de segurança ou permissão específicos para um atributo. Neste caso, o atributo se torna um recurso na URL, podendo ser aplicadas políticas específicas de segurança naquela rota.
+-	No recurso existir um [atributo](#request--body) complexo com um número elevado de "sub-atributos". Por conta da complexidade, pode-se optar por tornar este atributo um recurso.
+-	Haver recursos que não existam no plural, como saldo, extrato, etc.
 
 Quando definir os recursos a serem expostos, deve-se **evitar**:
-- Utilizar termos que não façam parte do nome da entidade de negócio, por exemplo: <s>detalhes_</s>lancamentos-cheque. A entidade de negócio se chama lancamentos_cheque, exibir todos os atributos ou não, fica a cargo de filtros na [query string](#query-string), não na exposição como um recurso.
-- Utilizar termos que representam as ações básicas do CRUD (consultar, gravar, atualizar, apagar, etc). Por exemplo: <s>consultar-</s>fatura. As ações básicas do CRUD são representadas pelos verbos HTTP (GET, POST, PUT, PATCH e DELETE).
-- Expor representações de detalhes do backend na entidade, por exemplo: <s>servico-</s>transferencias. O termo "servico" neste caso está representando, por exemplo, o serviço do sistema que processa uma transferência. Este tipo de informação deve ser abstraída no nome da entidade.
+- Utilizar termos que não façam parte do nome da entidade de negócio, por exemplo: <s>detalhes_</s>lancamentos-cheque. A entidade de negócio se chama lancamentos_cheque, exibir todos os atributos ou não, fica a cargo de filtros na [query string](#request--url--query-strings), não na exposição como um recurso.
+- Utilizar termos que representam as ações básicas do CRUD (consultar, gravar, atualizar, apagar, etc). Por exemplo: <s>consultar-</s>fatura. As ações básicas do CRUD são representadas pelos [verbos HTTP](#request--verbs) (GET, POST, PUT, PATCH e DELETE).
+- Expor representações de detalhes do backend na entidade, por exemplo: /<s>servico-</s>transferencias. O termo "servico" neste caso está representando, por exemplo, o "serviço" do sistema que processa uma transferência. Este tipo de informação deve ser abstraída no nome do recurso. Nomeie-o apenas como .../transferencias. Ou um exemplo pior, chamar um recurso de .../X0PSD002, sendo X0PSD002 o nome interno de um serviço que processa boletos. Nomeie-o apenas como /boletos.
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ### Request > URL > Resources > Funções que não são CRUD
 
-Uma das restrições do REST é que ele se aplica a recursos que representam as "entidades" de um [Domínio Funcional](#). Para alterar o estado dessas entidades, usamos os [verbos](#) GET, POST, PATCH, PUT e DELETE, que basicamente fazem o CRUD.
+Uma das restrições do REST é que ele se aplica a recursos que representam as "entidades" de um [Domínio Funcional](#request--url--resources--dom%C3%ADnios-funcionais). Para alterar o estado dessas entidades, usamos os verbos GET, POST, PATCH, PUT e DELETE, que basicamente fazem o CRUD.
  
-No entanto, existem alguns cenários em que não temos "entidades" de um domínio, mas sim, ações e que não fazem parte do conjunto restrito de verbos do HTTP. Aqui estão alguns exemplos:
-- Distância entre dois pontos (via coordenadas de GPS)
+No entanto, existem alguns cenários em que não temos "entidades" de um domínio, mas sim, ações e que não fazem parte do conjunto restrito de [verbos](#request--verbs) do HTTP. Aqui estão alguns exemplos:
+- Distância entre dois pontos (via coordenadas de GPS, CEP, etc.)
 - Validação de dados de cartão de crédito
 - Cálculos em geral
 
@@ -199,8 +202,8 @@ Ex:
 ```json
 {
 	"numero": "5346931596124410",
-	"nome-titular": "JOSE A OLIVEIRA",
-	"data-validade": "2024-05-23",
+	"nomeTitular": "JOSE A OLIVEIRA",
+	"dataValidade": "2024-05-23",
 	"CVV": 996
 }
 ```
@@ -209,13 +212,15 @@ Ex:
 Observem que algumas chamadas representam consultas seguras e idempotentes. Portanto, o verbo HTTP que foi utilizado foi o GET.
 No exemplo da validação de cartão, trafegamos **dados sensíveis**. Mesmo sendo uma consulta segura e idempotente, por questões de segurança, o tráfego de dados sensíveis são feitos sempre via POST para permitir a encriptação do Body.
 
-E há casos em que a chamada não é segura, nem idempotente. Por exemplo, em uma API de login, onde depois de algumas tentativas o login será bloqueado. Nestes casos devemos usar verbos como o POST. 
+Nos casos em que a chamada não é segura, nem idempotente (por exemplo, em uma API de login, em que depois de algumas tentativas o login será bloqueado) devemos usar verbos como o POST. 
 
-Para saber mais sobre idempotência, leia sobre os [verbos HTTP](#) .
+Para saber mais sobre idempotência, leia sobre os [verbos](#request--verbs) HTTP.
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ###  Request > URL > Resources > Domínios Funcionais
 
-Em algumas empresas, pode ser que não exista um Base Path para cada produto e uma mesma empresa forneça Recursos de vários produtos diferentes através de API. Neste caso, pode-se criar um recurso que serve para agrupar os recursos de cada produto.
+Em algumas empresas, pode ser que não exista um Base Path para cada produto e uma mesma empresa forneça recursos de vários produtos diferentes através de API. Neste caso, pode-se criar um recurso que serve para agrupar os recursos de cada um dos produtos.
 Ex:
 - https://apis.bbva.com/customers/v1
 - https://apis.bbva.com/accounts/v1
@@ -229,13 +234,15 @@ Nos caso acima, o Banco BBVA agrupa todos os recursos referentes ao assunto "car
 - https://apis.bbva.com/cards/v2/cards/{cardid}
 - https://apis.bbva.com/cards/v2/cards/{cardid}/transactions
 
-> Mais detalhes sobre essas APIs: https://www.bbvaapimarket.com/products
+> Para mais detalhes sobre essas APIs veja: https://www.bbvaapimarket.com/products
 
-A mesma abordagem de agrupamento provavelmente será útil para APIs expostas apenas internamente nas empresas para integrações entre diferentes sistemas, pois definir um recurso na URL envolve menos mudanças na implantação do que criar um Base Path para cada um dos produtos/assuntos da empresa. 
+A mesma abordagem de agrupamento provavelmente será útil para APIs expostas apenas internamente nas empresas para integrações entre diferentes sistemas. Isso porque definir um recurso na URL envolve menos mudanças na implantação do que criar um Base Path para cada um dos produtos/assuntos da empresa. 
 
-Em alguns lugares esses grandes assuntos são conhecidos como domínios funcionais. Eles agrupam entidades relacionadas por um contexto funcional como produtos (cartões, contas, etc.), processos (contratações, on-boarding, etc.) ou serviços (comunicações, chat, etc.). É boa prática, usar nomes em minúsculo e se composto, separar com hífen. Os domínios funcionais na maioria dos casos serão substantivos no plural.
+Em algumas empresas, esses grandes assuntos são conhecidos como domínios funcionais. Eles agrupam entidades relacionadas por um contexto funcional como produtos (cartões, contas, etc.), processos (contratações, on-boarding, etc.) ou serviços (comunicações, chat, etc.). É boa prática, usar nomes em minúsculo e se composto, separar com hífen. Os domínios funcionais na maioria dos casos serão substantivos no plural.
 
-Também é interessante manter os contratos de cada domínio separados para dar independência para os times que cuidam de cada um deles, além de gerir o ciclo de vida de cada um deles de forma separada.
+Também é interessante manter os contratos de cada domínio separados para dar independência para os times que cuidam de cada um deles, além de permitir gerir o ciclo de vida de cada um deles de forma separada.
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ###  Request > URL > Resources > Path Parameters
 
@@ -253,25 +260,27 @@ Ex:
 Desta forma, quando a aplicação recuperar a coleção de parâmetros, terá a seguinte lista:
 *id-cartao*, *id-fatura* e *id-lancamento*, cada uma com um nome que a identifica unicamente na coleção.
 
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
+
 ###  Request > URL > Query Strings
 
-Além dos [URI Parameters](#uri-parameters), Query Strings também permite passar parâmetros na URL da chamada. Query Strings são usadas para filtrar resultados em consultas. São definidas após os [Resources](#resources), iniciando com uma **?** e separando cada par de chave e valor  (**chave=valor**) com um **&**:
+Além dos URI Parameters, query strings também permite passar parâmetros na URL da chamada. Query Strings são usadas para filtrar resultados em consultas. Elas são definidas após os resources, iniciando com uma **?** e separando cada par de chave e valor  (**chave=valor**) com um **&**:
 
-***.../...?chave1=valor1&chave2=valor2&chaveA=valorA***
+***.../recurso?chave1=valor1&chave2=valor2&chaveA=valorA***
 
 Assim, uma API que busque restaurantes de comida japonesa na cidade de são paulo, teria uma URL semelhante a esta:
-```
-https://api.empresaturismo.com.br/locais/v1/restaurantes?tipo-comida=japonesa&cidade=S%C3%A3o%20Paulo
-```
-Os valores devem sempre respeitar os caracteres permitidos em URLs. Mais informações, veja [W3Schools URL Encode](https://www.w3schools.com/tags/ref_urlencode.asp).
 
-É importante convencionar o comportamento da API conforme o tipo de filtro que é feito:
+<pre>https://api.empresaturismo.com.br/locais/v1/restaurantes?tipo-comida=japonesa&cidade=S%C3%A3o%20Paulo</pre>
+
+Sempre respeitando o conjunto caracteres permitidos em URLs. Para mais informações sobre esses valores, veja [URL Encode](https://www.w3schools.com/tags/ref_urlencode.asp).
+
+Os filtros aplicados podem tratar diversas situaçoes e é importante convencionar o comportamento da API conforme o tipo de filtro que é feito:
 
 | Tipo de dado | Operação | Descrição |
 | ------------ | -------- | --------- |
-|Numérico, Data e Booleano|Igualdade|Retorna aqueles recursos cujo valor do atributo tenha exatamente o valor especificado. Ex: .../?quantidade=5 devolverá aqueles recursos cujo atributo "quantidade" tenha o valor 5.|
-|Numérico, Data e Booleano|Ou|Retorna aqueles recursos cujo valor do atributo esteja contido em uma lista de valores. Ex: .../?quantidade=5&quantidade=9&quantidade=12 retornará aqueles recursos cujo atributo quantidade seja 5, 9 ou 12.|
-|Numérico e Data|Maior ou Igual|Retorna aqueles recursos cujo valor do atributo seja maior ou igual o valor definido em “from-quantidade” e menor ou igual o valor definido em "to-quantidade". Ex: .../?from_quantidade=5 retornará os recursos com quantidade maior ou igual a 5. Consulte também [Ranges](#ranges).|
+|Numérico, Data e Booleano|Igualdade|Retorna aqueles recursos cujo valor do atributo tenha exatamente o valor especificado. Ex: ...?quantidade=5 devolverá aqueles recursos cujo atributo "quantidade" tenha o valor 5.|
+|Numérico, Data e Booleano|Ou|Retorna aqueles recursos cujo valor do atributo esteja contido em uma lista de valores. Ex: ...?quantidade=5&quantidade=9&quantidade=12 retornará aqueles recursos cujo atributo quantidade seja 5, 9 ou 12.|
+|Numérico e Data|Maior ou Igual|Retorna aqueles recursos cujo valor do atributo seja maior ou igual o valor definido em “from-quantidade” e menor ou igual o valor definido em "to-quantidade". Ex: ...?from_quantidade=5 retornará os recursos com quantidade maior ou igual a 5. Consulte também [Ranges](#ranges).|
 |Texto|Contém|Retorna aqueles recursos cujo valor do atributo contenha o valor especificado. Ex: …?nome=Frederico retornará aqueles recursos que contenham “Frederico” no atributo nome. São retornos válidos válidos: “Frederico Garcia”, “Don Frederico”, “Frederico”.|
 |Texto|Ou Contém|Retorna aqueles recursos cujo valor do atributo contenha um dos valores especificados. Ex: nome=Frederico&nome=Antonio retornará aqueles recursos que contenham “Frederico” ou "Antonio" no atributo nome. São retornos válidos válidos: “Frederico Antonio”, “Don Frederico”, “Frederico”, “Antonio Ramirez”.|
 
@@ -281,7 +290,9 @@ Geralmente, query strings não são utilizadas nos casos em que se busca um recu
 
 As query string não são utilizadas somente para filtros, ela pode ser utilizada como parâmetros para paginação, versionamento, ordenação, etc. 
 
->Existem padrões de mercado para filtrar os recursos via query string como [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), [OData](https://www.odata.org/getting-started/basic-tutorial/), [GraphQL](https://graphql.org/) e a adoção de uma delas significa agregar mais uma especificação sobre o REST. Assim, em um primeiro momento, utilizar um conjunto padrão, mas reduzido, de query strings para fazer filtros mais básicos vai permitir trazer uma grande flexibilidade às REST APIs e ao mesmo tempo entregar uma curva de aprendizado mais rápida àqueles que estão embarcando no padrão. Com a maturidade do time de TI neste assunto, a adoção futura de um desses frameworks ajudará a entregar APIs ainda mais flexíveis.
+>Existem padrões de mercado para filtrar os recursos via query string como [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), [OData](https://www.odata.org/getting-started/basic-tutorial/), [GraphQL](https://graphql.org/) e a adoção de uma delas significa agregar mais uma especificação sobre o REST. Assim, em um primeiro momento, utilizar um conjunto padrão, mais reduzido de query strings para fazer filtros básicos vai permitir trazer uma grande flexibilidade às REST APIs e ao mesmo tempo entregar uma curva de aprendizado mais rápida àqueles que estão embarcando no padrão. Com a maturidade do time de TI neste assunto, a adoção futura de um desses frameworks ajudará a entregar APIs ainda mais flexíveis.
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ### Request > URL > Query Strings > Full text search
 
@@ -290,6 +301,7 @@ Ex:
 GET http://api.empresarh.com/candidatos?q=Paulo
 No caso, o resultado tratá todos os recursos candidatos onde algum atributo pesquisável contém o texto Paulo.
 
+<sub>ir para: [índice](#conte%C3%BAdo) | [response  full text search](#response--body--full-text-search)</sub>
 ### Request > URL > Query Strings > Paginação
 
 Quando uma API retorna uma lista de resultados, pode ser que esses resultados cheguem a dezenas ou milhares de registros. Na maioria das vezes, as telas das aplicações não exibem todos ao mesmo tempo e quando se trata de API, espera-se respostas rápidas. Por conta disso, é uma boa prática dividir os resultados em blocos. Este processo chamamos de paginação.
@@ -588,7 +600,7 @@ Apaga a cidade de Sorocaba.
 
 O envio de informações com o objetivo de filtrar informações existentes, se dá via URI Parameters e/ou query parametes.
 
-Quando se utiliza os verbos POST, PUT ou PATCH, estamos enviando informações para serem persistidas no servidor via REST API. Neste caso, enviamos as informações no Body.
+Quando se utiliza os [verbos](#request--verbs) POST, PUT ou PATCH, estamos enviando informações para serem persistidas no servidor via REST API. Neste caso, enviamos as informações no Body.
 
 Ao definir o contrato de uma REST API, cada recurso deve ser declarado como um conjunto de atributos com seus tipos definidos (números, datas, textos, booleanos, etc), descrições, exemplos, obrigatoriedade, etc.
 
@@ -715,7 +727,7 @@ Para DELETE, não se utiliza Body.
 
 Quando não se retorna nada no body em uma requisição que foi processada com sucesso, é importante atentar-se em usar o HTTP Status Code correto. Para GET, utiliza-se 200 sempre, para POST 204, PUT, PATCH ou DELETE 204. Leia mais sobre o [HTTP Status Code 204](#) para mais informações.
  
-Quanto são usados verbos que enviam body no request (POST, PUT e PATCH), é importante notar que o body de request e o de response não precisam ser idênticos. Há casos em que a criação de um recurso implica que se populem atributos do mesmo em tempo de criação. Um exemplo muito recorrente é o identificador (id) que normalmente é gerado pelo servidor e não precisa estar definido no body de request.
+Quanto são usados [verbos](#request--verbs) que enviam body no request (POST, PUT e PATCH), é importante notar que o body de request e o de response não precisam ser idênticos. Há casos em que a criação de um recurso implica que se populem atributos do mesmo em tempo de criação. Um exemplo muito recorrente é o identificador (id) que normalmente é gerado pelo servidor e não precisa estar definido no body de request.
 
 ### Response > Body > Envelope "Data"
 Quando nos referimos ao body de request, apenas passamos os atributos sem nenhum tipo de envelope. Ex:
@@ -828,6 +840,7 @@ Quando é definido um query string para buscas gerais, o termo defindo na busca 
 	]
 }
 ```
+<sub>ir para: [índice](#conte%C3%BAdo) | [request  full text search](#request--url--query-strings--full-text-search)</sub>
 
 ### Response > Body > Paginação
 
@@ -1194,7 +1207,7 @@ Este é o grupo de status que dá respostas informativas. Respostas com este sta
 
 Os códigos deste grupo são usado em caso de sucesso na requisição. Os mais utilizados são:
 
-- **200 OK**:  Código mais utilizado e que indica que a requisição foi processada com sucesso. Esta resposta pode ser usada em todos os verbos. Os dados solicitados serão retornados no Body.
+- **200 OK**:  Código mais utilizado e que indica que a requisição foi processada com sucesso. Esta resposta pode ser usada em todos os [verbos](#request--verbs). Os dados solicitados serão retornados no Body.
 
 - **201 Created**:  Indica que a requisição foi bem sucedida e que um novo recursos foi criado como resultado. Esta resposta é utilizada em requisições do método POST.
 
@@ -1433,7 +1446,7 @@ Neste caso, o cliente pode optar por não chamar mais a API de processamento par
 
 Hoje existem ferramentas que permitem grande performance para atender grandes volumes de requisições online, sem a necessidade de precisar acumular requisições para processar de uma só vez. Quando se fala em REST API, normalmente busca-se este cenário de processamento em tempo real. No entanto, principalmente em REST APIs de uso interno, existem situações onde o processamento é feito em lotes. Neste cenário, pode-se seguir o seguinte padrão:
 
-1.	O cliente define um array de objetos, sendo cada deles um request HTTP declarado com todos os seus componentes (incluindo URI, verbos e headers);
+1.	O cliente define um array de objetos, sendo cada deles um request HTTP declarado com todos os seus componentes (incluindo URI, [verbos](#request--verbs) e headers);
 2.	O cliente submete o array mensagem para o servidor usando o verbo POST para um recurso de API preparado para receber a requisição do passo 1;
 
 POST .../batch
@@ -1637,7 +1650,7 @@ E as buscas nestas rotas seguiriam as práticas já utilizadas pela modelagem. E
 
 TODO: pesquisar melhor as vantagens e desvantagens de cada abordagem.
 
-Versionamento acontece quanto ocorrem alterações no contrato da API. Contrato é a definição de todo o conjunto de verbos, códigos de resposta, recursos, etc. feita em uma notação padrão para isso como o RAML, Swagger, etc. O ideal é que estes documentos sejam armazenados em um repositório de código fonte e a cada alteração, versionados.
+Versionamento acontece quanto ocorrem alterações no contrato da API. Contrato é a definição de todo o conjunto de [verbos](#request--verbs), códigos de resposta, recursos, etc. feita em uma notação padrão para isso como o RAML, Swagger, etc. O ideal é que estes documentos sejam armazenados em um repositório de código fonte e a cada alteração, versionados.
 Assim, existirão dois tipos de versão: aquela do contrato no repositório e aquela que repassamos para o cliente (consumidor da API).
 
 Para realizar o versionamento dos contratos das APIs podemos fazer uso do [Semantic Versioning 2.0.0](https://semver.org/). Esta definição utiliza a seguinte estrutura **MAJOR.MINOR.PATCH**. Onde se incrementa os valores conforme a seguinte regra:
@@ -1651,7 +1664,7 @@ Ex (era 2.**0**.0 e vira 2.**1**.0):
 	- adição de novos recursos;
 	- em recursos já existentes, adição de novos atributos ou parâmetros não obrigatórios na requisição;
 	- adição de novos atributos no response;
-	- adição de novos verbos;
+	- adição de novos [verbos](#request--verbs);
 	- adição de novos status codes;
 - **PATCH**: implica em mudanças que não alteram a API.
 Ex (era 2.0.**0** e vira 2.1.**1**):
@@ -1706,6 +1719,7 @@ https://api.empresaexemplo.com/v1/clientes
 
 Esta é a minha forma preferencial de versionar pois, fazendo parte da URL você força sempre o cliente a informá-la. A versão está sempre visível. Em processo de deploy, é muito mais simples criar uma pasta do que definir um novo [host](#). Mantém um visual clean na URL e facilita na definição de contratos para versões novas.
 
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 ## Segurança
 
 (o conjunto das implementações garante a segurança)
