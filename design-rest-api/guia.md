@@ -65,6 +65,7 @@ Este é um documento "vivo" em que o autor está atualizando com a experiência 
 		- [Errors e Warnings](#response--body--errors-e-warnings)
 		- [HATEOAS](#response--body--hateoas)
 	- [HTTP Status Code](#response--http-status-codes)
+- [Tipo de case]
 - [Tipos de dados](#tipos-de-dados)
 - [Processamento assíncrono](#processamento-ass%C3%ADncrono)
 - [Processamento em lotes](#processamento-em-lotes)
@@ -280,11 +281,13 @@ Os filtros aplicados podem tratar diversas situaçoes e é importante convencion
 | ------------ | -------- | --------- |
 |Numérico, Data e Booleano|Igualdade|Retorna aqueles recursos cujo valor do atributo tenha exatamente o valor especificado. Ex: ...?quantidade=5 devolverá aqueles recursos cujo atributo "quantidade" tenha o valor 5.|
 |Numérico, Data e Booleano|Ou|Retorna aqueles recursos cujo valor do atributo esteja contido em uma lista de valores. Ex: ...?quantidade=5&quantidade=9&quantidade=12 retornará aqueles recursos cujo atributo quantidade seja 5, 9 ou 12.|
-|Numérico e Data|Maior ou Igual|Retorna aqueles recursos cujo valor do atributo seja maior ou igual o valor definido em “from-quantidade” e menor ou igual o valor definido em "to-quantidade". Ex: ...?from_quantidade=5 retornará os recursos com quantidade maior ou igual a 5. Consulte também [Ranges](#ranges).|
+|Numérico e Data|Maior ou Igual|Retorna aqueles recursos cujo valor do atributo seja maior ou igual o valor definido em “from-quantidade” e menor ou igual o valor definido em "to-quantidade". Ex: ...?from-quantidade=5 retornará os recursos com quantidade maior ou igual a 5. Consulte também [Ranges](#ranges).|
 |Texto|Contém|Retorna aqueles recursos cujo valor do atributo contenha o valor especificado. Ex: …?nome=Frederico retornará aqueles recursos que contenham “Frederico” no atributo nome. São retornos válidos válidos: “Frederico Garcia”, “Don Frederico”, “Frederico”.|
 |Texto|Ou Contém|Retorna aqueles recursos cujo valor do atributo contenha um dos valores especificados. Ex: nome=Frederico&nome=Antonio retornará aqueles recursos que contenham “Frederico” ou "Antonio" no atributo nome. São retornos válidos válidos: “Frederico Antonio”, “Don Frederico”, “Frederico”, “Antonio Ramirez”.|
 
 De forma resumida, o operador **&** que separa as query strings é um **Ou** para os valores de um mesmo atributo e um **E** entre atributos diferentes.
+
+Como as query strings geralmente serão atributos dos recursos, utiliza-se o mesmo padrão (camelCase) que os utilizados no body dos recursos.
 
 Geralmente, query strings não são utilizadas nos casos em que se busca um recurso cujo ID que já está definido na URL via Path Parameter. Isto porque, normalmente as query strings são utilizadas para filtrar dentro de uma coleção de resultados. Quando se tem o ID definido, não temos uma coleção de resultados, mas um específico já especificado pelo cliente.
 
@@ -313,71 +316,81 @@ Existem algumas formas de definir exatamente qual "bloco de informação" consul
 ### Request > URL > Query Strings > Paginação > Range
 
 Podemos delimitar a quantidade de resultados à partir da filtragem de um determinado parâmetro, por exemplo, se o parâmetro for **data-nascimento**, a chamada à uma API ficaria assim:
-```
-http://api.empresarh.com/candidatos?from-data-nascimento=1985-01-01&to-data-nascimento=2001-12-31
-```
+
+http://api.empresarh.com/candidatos?from-dataNascimento=1985-01-01&to-dataNascimento=2001-12-31
+
 Para atuar como um cursor e filtrar um range de IDs, a chamada ficaria assim:
-```
-http://api.empresarh.com/candidatos?from-id-candidato=1000&to-id-candidato=1099
-```
+
+http://api.empresarh.com/candidatos?from-id=1000&to-id=1099
+
 É uma boa prática adotar padrões para definir a estrutura do parâmetro que trata ranges, como sugestão:
 - **"from-" + nome-do-atributo**
 - **"to-" + nome-do-atributo**
 
+<sub>ir para: [índice](#conte%C3%BAdo) | [response  range](#response--body--pagina%C3%A7%C3%A3o--range)</sub>
 ### Request > URL > Query Strings > Paginação > Page e Page Size
 
-A paginação baseada em  **page**  e  **page-size,**  como o próprio nome já diz, é utilizada através dos parâmetros de número da página a ser navegada e o seu respectivo tamanho (em número de registros).
+A paginação baseada em  **page**  e  **pageSize,**  como o próprio nome já diz, é utilizada através dos parâmetros de número da página a ser navegada e o seu respectivo tamanho (em número de registros).
 
-Ambos são opcionais e caso não sejam definidos na URL, é esperado que a API retorne todos os registros ou retorne na página e tamanho padrão dela.
+Ambos são opcionais e caso não sejam definidos na URL, é esperado que a API retorne todos os registros ou retorne na página 1 com a quantidade de registros padrão da API.
 Ex:
-```
-https://api.classificados/veiculos?page=3&page-size=30
-```
+
+https://api.exemploclassificados.com/veiculos?page=3&pageSize=30
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [response  page e pageSize](#response--body--pagina%C3%A7%C3%A3o--page-e-page-size)</sub>
+
 ### Request > URL > Query Strings > Paginação > Limit
 
-O  **limit** permite limitar a quantidade de registros que a API retorna.
+O query string **limit** permite limitar a quantidade de registros que a API retorna à partir do primeiro registro da coleção.
 
 Ex:
 https://api.lojaexemplo.com/ofertas-noturnas?limit=10
 
+<sub>ir para: [índice](#conte%C3%BAdo) | [response  limit](#response--body--pagina%C3%A7%C3%A3o--limit)</sub>
 ### Request > URL > Query Strings > Ordenação
 
 Em APIs que retornem conjuntos de registros, é interessante permitir alguma ordenação básica.
-A ordenação pode ser especificada através das query strings **sort=[{atributo}:{asc|desc}]**.
+A ordenação pode ser especificada através das query string **sort=[{atributo}:{asc|desc}]**.
 Ex:
 GET .../pedidos?sort=dataPagamento:desc,dataPedido
-No exemplo acima, desejo que a lista de pedidos venha ordenada de forma decrescente pela dataPagamento e de forma crescente - valor default - pela dataPedido.
+No exemplo, desejo que a lista de pedidos venha ordenada de forma decrescente pela dataPagamento e de forma ascendente (valor default) pela dataPedido.
 
-No caso de não ser especificada uma ordem {asc|desc}, será utilizada a crescente como padrão.
+No caso de não ser especificada uma ordem {asc|desc}, será utilizada a ascendente como padrão.
 
-Importante: Quando se define o contrato da API, é importante definir a lista de quais atributos estão disponíveis para ordenação, já quem nem sempre todos eles estarão disponíveis para definir ordem.
+Importante: Quando se define o contrato da API, é importante definir a lista de quais atributos estão disponíveis para ordenação, já quem nem sempre todos eles estarão disponíveis para esse fim.
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [response  ordenação](#response--body--ordena%C3%A7%C3%A3o)</sub>
 
 ### Request > URL > Query Strings > Fields
 
-Existem situações onde o cliente deseja obter apenas alguns dos atributos de um recurso. Para estas situações pode-se utilizar o query string **fields[atributo.sub-atributo]** para selecionar apenas aqueles atributos do recurso que o cliente deseja receber.
+Existem situações onde o cliente deseja obter apenas alguns dos atributos de um recurso. Para estas situações pode-se utilizar o query string **fields=[atributo.sub-atributo]** para selecionar apenas aqueles atributos do recurso que o cliente deseja receber.
 Para "sub-atributos",  utiliza-se o "." para separá-los.
 Veja o exemplo:
-```
-https://api.lojaexemplo.com/clientes/jose-da-silva123/endereços/residencial-1?fields=nome,situacao,logradouro.rua,logradouro.numero
-```
+
+https://api.lojaexemplo.com/clientes/jose-da-silva123/enderecos/residencial-1?fields=nome,situacao,logradouro.rua,logradouro.numero
+
 Com a chamada acima, não terei como retorno qualquer outro atributo de endereço senão os definidos no fields: _nome_, _situacao_, _logradouro.rua_ e _logradouro.numero_
 
 O uso desta opção nos permite otimizar o uso da banda de rede em toda a cadeia de comunicação, reduzir a quantidade de logs gerados e tamanho das respostas a serem processadas, melhorando a experiência final do usuário.
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [response  fields](#response--body--fields)</sub>
 
 ### Request > URL > Query Strings > Views
 
 Existem situações em que é comum um recurso ter vários atributos e ter um conjunto deles que é de uso muito comum entre os clientes daquela API. 
 
-Ao invés de fazer com que esses clientes filtrem os atributos pela query string [fields](#), fazendo com que a URL da requisição fique muito grande, pode-se criar conjuntos pré defindos de "visões" que retornam apenas alguns sub conjuntos de atributos.
+Ao invés de fazer com que esses clientes filtrem os atributos pela query string [fields](#request--url--query-strings--fields), fazendo com que a URL da requisição fique muito grande, pode-se criar conjuntos pré defindos de "visões" que retornam apenas alguns sub conjuntos de atributos.
 Ex:
 - GET .../cartoes/a7834dcG456?view=basico
 para retornar o conjunto de atributos relacionados a alguma consulta frequente de dados básicos.
-- GET .../pessoas/a7834dcG456?view=limites
+- GET .../cartoes/a7834dcG456?view=limites
 para retornar todos os atributos relacionados a alguma consulta frequente de limites.
-- GET .../pessoas/a7834dcG456
+- GET .../cartoes/a7834dcG456
 para retornar todos os atributos.
 
-Dependendo da complexidade do recurso, as visões podem ser combinadas na mesma requisição e ela pode ser usada em conjunto com o [fields](#) e [expand](#).
+TODO: continuar aqui
+
+Dependendo da complexidade do recurso, as visões podem ser combinadas na mesma requisição e ela pode ser usada em conjunto com o [fields](#request--url--query-strings--fields) e [expand](#).
 
 ### Request > URL > Query Strings > Expand
 
@@ -876,6 +889,7 @@ Por exemplo, em uma requisição GET .../...?from-id=3&to-id=6, possuindo o banc
 	]
 }
 ```
+<sub>ir para: [índice](#conte%C3%BAdo) | [request  range](#request--url--query-strings--pagina%C3%A7%C3%A3o--range)</sub>
 
 #### Response > Body > Paginação > Page e Page Size
 
@@ -922,6 +936,8 @@ Muitas vezes, criamos APIs para sistemas legados e com isso, precisamos nos ajus
 	- Ex: GET .../...?page=fgg12d8bfb4567820c46
 - O sistema pode não ter a informação da quantidade total de registros (ex: totalElements e totalPages),  dessa forma, não temos como devolver todas as propriedades. Neste caso, devolvemos apenas as que são possível de serem informadas.
 
+<sub>ir para: [índice](#conte%C3%BAdo) | [request  page e pageSize](#request--url--query-strings--pagina%C3%A7%C3%A3o--page-e-page-size)</sub>
+
 #### Response > Body > Paginação > Limit
 
 Quando se usa o query string [limit](#) para limitar a quantidade de registros, o retorno deve trazer apenas a quantidade de registros definida no query string. Ex:
@@ -945,6 +961,8 @@ GET .../...?limit=3
 }
 ```
 No caso do exemplo, a API deve retornar apenas os 3 primeiros registros (recursos) da coleção.
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [request  limit](#request--url--query-strings--pagina%C3%A7%C3%A3o--limit)</sub>
 
 ### Response > Body > Ordenação
 
@@ -979,9 +997,13 @@ Response
 No exemplo acima, o retorno está ordenado primeiramente de forma decrescente pela dataPagamento, seguido de dataPedido de forma ascendente.
 Ordernar de forma ascendente é o comportamento padrão quando a forma de ordenação não for declarada.
 
+<sub>ir para: [índice](#conte%C3%BAdo) | [request  ordenação](#request--url--query-strings--ordena%C3%A7%C3%A3o)</sub>
+
 ### Response > Body > Fields
 
+TODO: Fazer este tópico
 
+<sub>ir para: [índice](#conte%C3%BAdo) | [request fields](#request--url--query-strings--fields)</sub>
 
 ### Response > Body > Views
 
@@ -1031,6 +1053,7 @@ Retorno:
   }  
 }
 ```
+<sub>ir para: [índice](#conte%C3%BAdo) | </sub>
 
 ### Response > Body > Expand
 
