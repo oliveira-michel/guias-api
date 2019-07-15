@@ -388,58 +388,63 @@ para retornar todos os atributos relacionados a alguma consulta frequente de lim
 - GET .../cartoes/a7834dcG456
 para retornar todos os atributos.
 
-TODO: continuar aqui
+Dependendo da complexidade do recurso, as visões podem ser combinadas na mesma requisição e ela pode ser usada em conjunto com o [fields](#request--url--query-strings--fields) e [expand](#request--url--query-strings--expand).
 
-Dependendo da complexidade do recurso, as visões podem ser combinadas na mesma requisição e ela pode ser usada em conjunto com o [fields](#request--url--query-strings--fields) e [expand](#).
+<sub>ir para: [índice](#conte%C3%BAdo) | [response  views](#response--body--views)</sub>
 
 ### Request > URL > Query Strings > Expand
 
-Quando é necessário em uma única chamada retornar um determinado recurso mais os recursos relacionados com ele, pode-se utilizar um query string expand. Este mecanismo permite reduzir a quantidade de chamadas à API e volume de informações trafegadas.
+Quando é necessário em uma única chamada retornar um determinado recurso mais os recursos relacionados com ele, pode-se utilizar um query string **expand**. Este mecanismo permite reduzir a quantidade de chamadas à API e volume de informações trafegadas.
 
 Ex:
-> referência
+Tome como referência as seguintes APIs
 GET .../cartoes/{id-cartao}
 GET .../cartoes/{id-cartao}/faturas/{id-fatura}
 
-Para retornar os dados do cartão com id = a7834dcG456 mais o recurso de faturas associado a ele, especificamente a de agosto de 2018, faz-se a seguinte chamada.
-GET .../cartoes/a7834dcG456?expand=faturas&faturas.id=ago18
+Para retornar os dados do cartão com id = a7834dcG456 mais o recurso de faturas associado a ele, especificamente a de agosto de 2018,  com o expand, faz-se a seguinte chamada:
+GET .../cartoes/a7834dcG456?**expand**=faturas&faturas.id=ago18
 Observe que há a definição do recurso a ser expandido (expand=faturas) e também um filtro (faturas.id=ago18), sendo que no filtro, utilizou-se um padrão de recurso+"."+atributo.
 
 Caso vários recursos precisem ser expandidos, define-se separando-os por vírgulas.
 Ex: GET .../cartoes/a7834dcG456?expand=faturas,adicionais,ofertas-upgrade
 
-Caso seja necessário especificar paginação em um recurso expandido, deve-se definir estes query strings assim como se definem filtros. Ex:
+Caso seja necessário especificar paginação ou ordenação em um recurso expandido, deve-se definir estes query strings assim como se definem filtros. Ex:
 GET .../cartoes/a7834dcG456?expand=faturas&faturas.limit=5&faturas.sort=dataVencimento:desc
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [response  expand](#response--body--expand)</sub>
 
 ### Request > URL > Alias
 
-Alias é o conceito de que é possível ter mais de um caminho para fazer a mesma tarefa. Não é ideal, no entanto, muitas APIs nascem com alguns poucos recursos e conforme demandas de negócio, novos vão sendo adicionados. Por falta de visão do todo no início da criação da API, por vezes, é necessário criar outras formas de fazer a mesma tarefa.
-No entanto, é importante buscar que uma entidade de negócio (recurso) se mantenha a mesma, independente da forma com que a consulta é feita.
+**Alias** é o conceito de que é possível ter mais de um caminho para fazer a mesma tarefa. Não é ideal, no entanto, muitas APIs nascem com alguns poucos recursos e conforme demandas de negócio, novos recursos vão sendo adicionados. Por falta de visão do todo no início da criação da API, por vezes, é necessário criar outras formas de fazer a mesma tarefa.
+No entanto, é importante que uma entidade de negócio (recurso) se mantenha a mesma, independente da forma com que a consulta é feita.
  
 Por exemplo, em uma APIs de cartões, o time da TI cria o recurso de busca de transações da seguinte forma:
-<pre>	GET .../transacoes?id-cartao=123</pre>
+GET .../transacoes?idCartao=123
 Em um segundo momento, novos recursos surgiram e com o amadurecimento, entenderam que a estrutura mais adequada seria essa:
-<pre>	GET .../cartoes/123/transacoes</pre>
+GET .../cartoes/123/transacoes
 
 Ambas implementam a mesma busca, apesar das diferentes abordagens de modelagem.
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ### Request > Headers
 
 O header é um dos componentes que fazem parte do protocolo HTTP. Como o REST é baseado neste protocolo, as REST APIs trafegam headers como parte da comunicação. O header basicamente é um conjunto de chaves/valor.
 
-Por padrão, passamos nos headers informações não relacionadas aos recursos  (que representam as entidades de negócio) expostos nas URLs. De forma análoga, não colocamos atributos que não representem o negócio dentro dos recursos.
+Por padrão, passamos nos headers informações não relacionadas aos recursos expostos nas URLs (que representam as entidades de negócio). De forma análoga, não colocamos atributos técnicos que não representem o negócio dentro dos recursos.
 
-Nos headers trafegamos informações técnicas como informações de acesso e credenciais, tokens, chaves de API, Correlation IDs, metadados, etc. 
+Nos headers trafegamos somente informações técnicas como informações de acesso e credenciais, tokens, chaves de API, Correlation IDs, metadados, etc. 
 
 Alguns headers são padrões do protocolo [HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers), outros podem ser definidos de forma personalizada para as necessidades da sua empresa ou por frameworks de mercado que definem conjuntos de headers para necessidades específicas.
 
-Separar este tipo de informação nos headers evita que as entidades de negócio (recursos) trafeguem dados que só existem por conta da comunicação ser via REST API junto com dados de negócio. 
-
+Separar este tipo de informação nos headers evita que as entidades de negócio (recursos) trafeguem dados que só existem por conta da comunicação via REST API. 
 Por exemplo, se eu estou expondo uma REST API de seguros, informações de token são desconhecidas pelo negócio de seguros e só existem na comunicação por se tratar de REST API. Caso a comunicação acontecesse via webservices, os dados de seguro seriam os mesmos, mas os metadados da comunicação seriam diferentes.
 
-Para mais informações sobre headers, veja: [Segurança](#segurança) e [Cache](#cache).
+Para mais informações sobre headers, veja: [Segurança](#segurança) e [Cache](#performance-cache-e-compress%C3%A3o).
 
-Dentre os vários headers do protocolo [HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers), alguns são mais utilizados no contexto de API e explicados a seguir.
+Dentre os vários headers do protocolo [HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers), alguns são mais utilizados no contexto de API e serão explicados a seguir.
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ### Request > Headers > Content-Type
 
@@ -450,37 +455,40 @@ Ex:
 
 Obs: Não utilizado no DELETE, pois o DELETE não tem Body.
 
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
+
 ### Request > Headers > Accept
 
-O cliente da REST API pode expressar qual o tipo de informação que ele deseja receber a resposta através do hearder **Accept** .
+O cliente da REST API pode expressar qual o tipo de informação que ele deseja receber a resposta através do hearder **Accept** . Nota-se que nem todos os content-types são implementados pelos servidores.
 
 Ex:
 **Accept**: application/json
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ###  Request > Headers > Correlation ID
 
 Não há um header padronizado para Correlation ID, mas é de grande valor que todas as chamadas tenham um Correlation Id. 
 
-Correlation ID é um dado geralmente gerado randomicamente (UUIDs é um bom formato para isso) que deve ser repassado em cada camada de software pelo qual a comunicação trafega. Como cada camada gera o seu próprio log e muitas vezes em banco de dados diferentes, através do Correlation ID, é possível identificar uma chamada específica entre estes diferentes banco de dados, permitindo um mapeamento da chamada de ponta-a-ponta.
+Correlation ID é um dado geralmente gerado randomicamente (UUIDs é um bom formato para isso) que deve ser repassado em cada camada de software pelo qual a comunicação trafega. Como cada camada gera o seu próprio log e muitas vezes em banco de dados diferentes, através do Correlation ID, é possível identificar uma chamada específica entre estes diferentes bancos de dados, permitindo um mapeamento da chamada de ponta-a-ponta.
 
-O comportamento esperado de qualquer camada é: se o correlation id vier preenchido, repassar para a próxima camada, senão, gerar um novo e repassar. O momento mais adequado para que o Correlation ID seja gerado é no início da cadeia de eventos de uma chamada, normalmente no canal (cliente) quando uma requisição é disparada e algum log de evento do canal é gerado.
+O comportamento esperado de qualquer camada é: se o Correlation ID vier preenchido, repassar para a próxima camada, senão, gerar um novo Correlation ID e repassar. O momento mais adequado para que o Correlation ID seja gerado é no início da cadeia de eventos de uma chamada, normalmente é no cliente quando uma requisição é disparada.
 
-Quando a arquitetura das aplicações está baseada em microsserviço, o correlation ID percorre uma tragetória mais ampla do que simplesmente algo que inicia no [gateway](#) e termina na API. Quando um cliente preenche um formulário e clica em gravar, podem ocorrer validações de cartão de crédito, acionamento do sistema de pagamento, comunicação com sistema de envio postal, serviço de e-mails, serviço de geolocalização, etc. sendo cada um desses um microsserviço diferente, com suas camadas de gateway, API, sistema produto, LOGs, etc. Em todos esses sistemas, o mesmo Correlation ID deve ser compartilhado.
+Quando a arquitetura das aplicações está baseada em microsserviço, o Correlation ID percorre uma tragetória mais ampla do que simplesmente algo que inicia no canal e termina na API. Quando um cliente preenche um formulário e clica em gravar, podem ocorrer validações de cartão de crédito, acionamento do sistema de pagamento, comunicação com sistema de envio postal, serviço de e-mails, serviço de geolocalização, etc. sendo cada um desses um microsserviço diferente, com suas camadas de gateway, API, sistema produto, LOGs, etc. Em todos esses sistemas, o mesmo Correlation ID deve ser compartilhado.
 
 Ex:
-Uma aplicação client faz uma chamada à API, neste momento cria um Correlation ID para esta chamada e grava o seu log na sua estrutura de log com este Correlation ID. Um Gateway de API recebe este Correlation ID e grava o seu log em outra estrutura utilizando o mesmo identificador. O sistema que responde ao produto que está exposto via API recebe o Correlation ID, grava o seu log e chama outro sistema que responde a uma parte da requisição e assim todos os demais envolvidos nesta chamada mantém o mesmo comportamento.
+Uma aplicação client faz uma chamada à API, neste momento ele cria um Correlation ID para esta chamada, acrescenta o no header e grava o seu log na sua estrutura de log com este Correlation ID. Um Gateway de API recebe este Correlation ID e grava o seu log em outra estrutura utilizando o mesmo identificador. O sistema que responde ao produto que está exposto via API recebe o Correlation ID, grava o seu log e chama outro sistema que responde a uma parte da requisição e assim todos os demais envolvidos nesta chamada mantém o mesmo comportamento. 
 No momento em que se faz necessário mapear a chamada de ponta-a-ponta, basta unir os logs vindos de diversos fontes através deste identificador.
 
-Quando se define headers não padrões ao HTTP, muitos utilizam a *X-Nome-Header*, no entanto, esta abordagem não é a mais atual desde 2012 ([rfc6648](https://tools.ietf.org/html/rfc6648)).
+Quando se define headers que não são padrões do HTTP, muitos utilizam o formato *X-Nome-Header*, no entanto, esta abordagem não é a mais recomendada desde 2012 ([rfc6648](https://tools.ietf.org/html/rfc6648)). No caso, não se usa mais este "X-".
 
-É interessante colocar um prefixo para diferenciar headers específicos da sua API, por exemplo, se sua empresa se chamada "Amarelo", os headers que não são padrões HTTP podem ser definidos como Amarelo-Nome-Header.
+É interessante colocar um prefixo para diferenciar headers específicos da sua API, por exemplo, se sua empresa se chamada "Banco Dourado", os headers que não são padrões HTTP podem ser definidos como BancoDourado-Nome-Header-Customizado.
 
 Se observar a estrutura dos headers padrões ([Headers HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)), as palavras são separadas por hífen e iniciam em maiúsculas.
 
 Assim, para o Correlation ID é interessante assumir o formato **Empresa-Correlation-ID**.
-
-Ex, assumindo o nome da empresa como "Amarelo":
-- **Amarelo-Correlation-ID**: 680987b5-c18d-4f2f-a772-2a2d422789b1
+Por exemplo, assumindo o nome da empresa como "Banco Dourado", o header fica:
+- **BancoDourado-Correlation-ID**: 680987b5-c18d-4f2f-a772-2a2d422789b1
 
 Recomenda-se que o Correlation ID siga o padrão UUID v4.
 >Para conhecer mais sobre UUID, consulte:
@@ -488,37 +496,37 @@ https://en.wikipedia.org/wiki/Universally_unique_identifier
 https://www.npmjs.com/package/uuid
 https://www.uuidgenerator.net/
 
-O Correlation ID também é útil para ser lançado na tela de erro. Por exemplo, nesta tela do  Office 365:
+O Correlation ID também é útil para ser lançado na tela de erro. Por exemplo, como apresentado nesta tela do Office 365:
 
 ![Imagem exibindo um erro no Office 365 com o Correlation ID](https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/resources/office365errorscreen.png?raw=true)
 
 _Com o Correlation Id, é possível buscar nas bases de log a exata transação que estava acontecendo no momento do erro._
 
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
+
 ###  Request > Verbs
 
-Os **métodos** (ou verbos do protocolo HTTP) são basicamente as ações permitidas dentro de uma API. Para cada URL, associamos um verbo. Estas ações solicitam que seja processado CRUD (Create, Read, Update e Delete) nos recursos, alterando os seus estados.
+Os **métodos** (ou verbos do protocolo HTTP) são basicamente as ações permitidas dentro de uma API. Estas ações solicitam que seja processado  o CRUD (Create, Read, Update e Delete) nos recursos alterando os seus estados.
 
-Existem vários verbos HTTP ([rfc2616](https://tools.ietf.org/html/rfc2616)) , mas 5 são os principais e em muitos casos, os únicos adotados nas APIs. Cada verbo HTTP tem um objetido bem definido dentro do contexto de REST API. São eles:
+Existem vários verbos HTTP ([rfc2616](https://tools.ietf.org/html/rfc2616)), mas 5 são os principais e em muitos casos, os únicos adotados nas APIs. Cada verbo HTTP tem um objetivo bem definido dentro do contexto de REST API. São eles:
 - GET: para a obtenção de um recurso ou uma coleção de recursos.
 - POST: para a criação de um recurso.
 - DELETE: para eliminar um recurso.
 - PUT: para atualizações completas de um recurso.
 - PATCH: para atualizações parciais de um recurso.
 
-Os verbos são usados na requisição em conjunto com a URL e às vezes com um [Body](#body), como nos casos de inserção ou atualização.
+Os verbos são usados na requisição em conjunto com a URL e às vezes com um [Body](#request--body), como nos casos de inserção ou atualização.
 
 Existem também outros verbos como OPTIONS, HEAD e TRACE que raramente são utilizados. Vale a leitura da função desses métodos [aqui](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Methods).
 
 #### Idempotência e Segurança
 
-Os verbos têm características importantes que devem ser conhecidas e respeitadas, são elas segurança e idempotência.
-Idempotência significa que se um cliente realiza um reenvio de uma requisição, o servidor devolve a mesma resposta da vez anterior (salvo se o recurso teve seu estado alterado neste meio tempo). Ou seja, a requisição não gera efeito nenhum sobre o recurso.
+Os verbos têm características importantes que devem ser conhecidas e respeitadas, são elas segurança e idempotência:
+- **Idempotência** significa que se um cliente realiza um reenvio de uma requisição, o servidor devolve a mesma resposta da vez anterior (salvo se o recurso teve seu estado alterado neste meio tempo). Ou seja, o reenvio da requisição não gera efeito nenhum sobre o recurso.
 
-Resumindo, o envio N vezes de uma requisição deveria provocar o mesmo efeito da requisição realizada uma única vez.
+- **Seguros** são todos os verbos que não podem provocam alterações no estado dos recursos. Ou seja, os verbos apenas de consulta (HEAD, GET, OPTIONS). Destes três, somente o GET é mais utilizado.
 
-Seguros são todos os verbos que não podem provocam alterações no estado dos recursos. Ou seja, os verbos de consulta apenas (HEAD, GET, OPTIONS). Destes três, somente o GET será utilizado.
-
-Tabela de resumo onde se relaciona o Verbo/Método HTTP e os conceitos de Idempotente e método seguro:
+Abaixo a tabela exibe a relação entre Verbo HTTP e os conceitos de Idempotência e método Seguro:
  
  | Verbo | Idempotente | Seguro |
  | --- | --- | --- |
@@ -530,7 +538,7 @@ Tabela de resumo onde se relaciona o Verbo/Método HTTP e os conceitos de Idempo
 
 É importante escolher o verbo correto conforme estas características ao definir uma API, assim como codificar a API respeitando estas regras. Parta do princípio que o cliente da sua API sabe que, por exemplo, o GET é idempotente e seguro. Por isso, ele não vai hesitar em implementar re-tentativas em caso de insucesso na chamada.
 Se ao codificar a API, o desenvolvedor da API codificar um GET que não seja seguro ou idempotente, o cliente não terá o comportamento esperado.
-Se o analista de sistemas que cuida do [Gateway](#) resolver colocar [caches](#) nas chamadas com GET, o cache não terá o comportamento esperado. E assim por diante.
+Se, por exemplo, o analista de sistemas que cuida do [Gateway](#) resolver colocar [caches](#) nas chamadas com GET, o cache não terá o comportamento esperado. E assim por diante.
 
 ###  Request > Verbs > GET
 
@@ -1053,7 +1061,7 @@ Retorno:
   }  
 }
 ```
-<sub>ir para: [índice](#conte%C3%BAdo) | </sub>
+<sub>ir para: [índice](#conte%C3%BAdo) | [request  views](#request--url--query-strings--views)</sub>
 
 ### Response > Body > Expand
 
@@ -1095,6 +1103,8 @@ Retorno
 }
 ```
 Observe que até o atributo limites são atributos do recurso cartão, no atributo faturas, é retornado o array de faturas como se tivesse havido uma chamada ao recurso .../cartoes/a7834dcG456/faturas/ago18.
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [request  expand](#request--url--query-strings--expand)</sub>
 
 ### Response > Body > Errors e Warnings
 
@@ -1876,6 +1886,8 @@ D[Gateway] --> G[API Cartões]
 ## Performance, Cache e compressão
 
 TODO: Aguarde! Este capítulo será escrito em breve. :-)
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ## Palavras finais
 
