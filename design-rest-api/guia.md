@@ -8,7 +8,7 @@ Este documento é guia para design de REST API com base em melhores práticas e 
 
 ## _Status of this document_
 
-_This is an "alive" document where the author is updating with day-by-day experience. Therefore, it may never arrive in its final version. However, the published content already accumulates project experiences that totaled a few hundred REST APIs._
+_This is a living document where the author is updating with day-by-day experience. Therefore, it may never arrive in its final version. However, the published content already accumulates project experiences that sum up a few hundred REST APIs._
 
 Este é um documento "vivo" em que o autor está atualizando com a experiência do dia a dia. Portanto, nunca pode chegar em sua versão final. No entanto, o conteúdo publicado já acumula experiências de projetos que totalizaram algumas centenas de REST APIs.
 
