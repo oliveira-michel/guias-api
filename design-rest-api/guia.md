@@ -8,7 +8,7 @@ Este documento é guia para design de REST API com base em melhores práticas e 
 
 ## _Status of this document_
 
-_This is a living document where the author is updating with day-by-day experience. Therefore, it may never arrive in its final version. However, the published content already accumulates project experiences that sum up a few hundred REST APIs._
+_This is an "alive" document where the author is updating with day-by-day experience. Therefore, it may never arrive in its final version. However, the published content already accumulates project experiences that totaled a few hundred REST APIs._
 
 Este é um documento "vivo" em que o autor está atualizando com a experiência do dia a dia. Portanto, nunca pode chegar em sua versão final. No entanto, o conteúdo publicado já acumula experiências de projetos que totalizaram algumas centenas de REST APIs.
 
@@ -538,78 +538,77 @@ Abaixo a tabela exibe a relação entre Verbo HTTP e os conceitos de Idempotênc
 
 É importante escolher o verbo correto conforme estas características ao definir uma API, assim como codificar a API respeitando estas regras. Parta do princípio que o cliente da sua API sabe que, por exemplo, o GET é idempotente e seguro. Por isso, ele não vai hesitar em implementar re-tentativas em caso de insucesso na chamada.
 Se ao codificar a API, o desenvolvedor da API codificar um GET que não seja seguro ou idempotente, o cliente não terá o comportamento esperado.
-Se, por exemplo, o analista de sistemas que cuida do [Gateway](#) resolver colocar [caches](#) nas chamadas com GET, o cache não terá o comportamento esperado. E assim por diante.
 
 ###  Request > Verbs > GET
 
-Este verbo é o mais utilizado e serve para buscar dados nas APIs. Você utiliza em conjunto com uma URL com seus [URI Parameters](#uri-parameters) e/ou [Query Strings](#query-strings) definidos para enviar uma consulta e o servidor retorna os dados em caso de sucesso. Em requisições do tipo GET, não se envia [Body](#).
+Este verbo é o mais utilizado e serve para buscar dados nas APIs. Ele é utilizado em conjunto com uma URL com seus Path Parameters e/ou Query Strings para enviar uma consulta e o servidor retorna os dados em caso de sucesso. Em requisições do tipo GET, não se envia [Body](#request--body).
 
-Exemplo utilizando o verbo GET para fazer uma consulta por cidades:
-_referência: http://api.exemplo.com/estados/{id-estado}/cidades_
+Exemplo de utilização de GET para fazer uma consulta por cidades no estado de São Paulo com população maior do que 20000 habitantes:
+Com a URL com o formato http://api.exemplo.com/estados/{id-estado}/cidades
 **GET** http://api.exemplo.com/estados/sp/cidades?from-populacao=20000
 
-Exemplo utilizando o verbo GET para fazer uma consulta por uma cidade específica:
-_referência: http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
+Exemplo de utilização de GET para fazer uma consulta pela cidade de Santos:
+Com a URL com o formato http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}
 **GET** http://api.exemplo.com/estados/sp/cidades/santos
 
 ### Request > Verbs > POST
 
-O **POST** é usado para criar novos recursos. Você utiliza em conjunto com uma URL com seus [URI Parameters](#uri-parameters) e um [Body](#body) para enviar um conjunto de atributos que represente o estado do novo recurso no momento que você está criando ele.
+O **POST** é usado para criar novos recursos. Ele é utilizado em conjunto com uma URL com seus Path Parameters e um [Body](#request--body) para enviar um conjunto de atributos que represente o estado do novo recurso no momento que você está criando ele.
 
 Exemplo utilizando o verbo POST para criar uma nova cidade:
-_referência: http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
+Com a URL com o formato http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}
 **POST** http://api.exemplo.com/estados/sp/cidades/
-```
+```json
 {
-"nome": "São Vicente",
-"DDD": 13,
-"descrição": "Primeira cidade do Brasil", 
-"populacao": 355542
+   "nome": "São Vicente",
+   "DDD": 13,
+   "descrição": "Primeira cidade do Brasil", 
+   "populacao": 355542
 }
 ```
 Dando tudo certo, uma nova cidade será criada na coleção de cidades.
 
-Obs: O POST também pode ser usado em casos especiais onde se faz necessário proteger as informações que seriam usadas na consulta (como em um GET), pois como uso de POST, podemos enviar [Body](#) e o body pode ser encriptado. Por exemplo, no login. 
+Obs: O POST também pode ser usado em casos especiais onde se faz necessário proteger as informações que seriam usadas em uma consulta, pois com o uso de POST, podemos enviar um [Body](#request--body) que segue encriptado, ao contrário do GET que passa os parâmetros na URL que não é encriptada. Ex: login. 
 
 ### Request > Verbs > PUT
 
-O verbo  **PUT** atualiza ou cria um recurso, ou seja, se eu utilizasse o PUT para enviar novamente a cidade de São Vicente (como no exemplo do POST), o servidor iria sobrepor completamente o recurso com os dados definidos no Body. Portanto, caso algum campo não seja informado, o valor dele será apagado. Caso seja utilizado um PUT e o recurso não exista, a API deveria criá-lo.
-Quando usamos **PUT** normalmente estamos atualizando um recurso existente, por isso é importante definir qual é especificamente o recurso através do ID no [URI Parameter](#uri-parameters).
+O verbo  **PUT** atualiza ou cria um recurso, ou seja, se eu utilizar o PUT para enviar novamente a cidade de São Vicente (como no exemplo do POST), o servidor iria sobrepor completamente o recurso com os dados definidos no Body. Portanto, caso algum campo não seja informado, o valor dele será apagado. Caso seja utilizado um PUT e o recurso não exista, a API deveria criá-lo.
+Quando usamos **PUT** normalmente estamos atualizando um recurso existente, por isso é importante definir qual é especificamente o recurso através do ID no Path Parameter.
 Ex:
-_referência: http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
+Com a URL com o formato http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}
 **PUT** http://api.exemplo.com/estados/sp/cidades/sao-vicente
-```
+```json
 {
-"nome": "São Vicente",
-"DDD": 13,
-"descrição": "Primeira cidade do Brasil.", 
-"populacao": 400000
+   "nome": "São Vicente",
+   "DDD": 13,
+   "descrição": "Primeira cidade do Brasil.", 
+   "populacao": 400000
 }
 ```
-No exemplo, passamos dois URI Parameters, o {id-estado} com o valor "sp" e o {id-cidade} com o valor "santos".
+No exemplo, passamos dois Path Parameters, o {id-estado} com o valor "sp" e o {id-cidade} com o valor "santos".
 
 ### Request > Verbs > PATCH
 
 O verbo **PATCH**  serve para fazer atualizações parciais no recurso. Neste caso, ele se comporta de forma semelhante ao PUT, no entanto, define-se no Body apenas os parâmetros que serão alterados.
 
 Ex:
-_referência: http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
+Com a URL com o formato http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
 **PATCH** http://api.exemplo.com/estados/sp/cidades/sao-vicente
-```
+```json
 {
-"populacao": 500000
+   "populacao": 500000
 }
 ```
 No exemplo, a API atualizará apenas o atributo "populacao". Em uma nova chamada usando GET, o valor em "populacao" deverá ser 500000.
 
 ### Request > Verbs > DELETE
 
-O verbo DELETE é o responsável por deletar os registros. Semelhante ao GET, você utiliza em conjunto com uma URL com seus [URI Parameters](#uri-parameters) e/ou [Query Strings](#query-strings) definidos para enviar uma consulta e o servidor retorna os dados em caso de sucesso.
+O verbo **DELETE** é o responsável por deletar os registros. Semelhante ao GET, é usado em conjunto com uma URL com seus Path Parameters e/ou Query Strings para fazer filtro no conjunto que será afetado pelo DELETE.
 
-Caso a requisição seja em um recurso específico, o recurso será deletado, caso seja em uma coleção de recursos, toda a coleção será deletada, caso seja em um filtro (com query strings), todos os registros que retornarem no resultado serão apagados.
+Caso a requisição seja em um recurso específico, o recurso será deletado, caso seja em uma coleção de recursos, toda a coleção será deletada, caso seja em um filtro (com query strings), todos os registros que correspondem ao filtro serão apagados.
 
 Ex:
-_referência: http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
+Com a URL com o formato http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}
 - **DELETE** http://api.exemplo.com/estados/sp/cidades?to-populacao=5000
 Apaga todas as cidades com população até 5000 habitantes.
 - **DELETE** http://api.exemplo.com/estados/sp/cidades
@@ -617,22 +616,24 @@ Apaga todas as cidades do estado de São Paulo.
 - **DELETE** http://api.exemplo.com/estados/sp/cidades/sorocaba
 Apaga a cidade de Sorocaba.
 
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
+
 ### Request > Body
 
-O envio de informações com o objetivo de filtrar informações existentes, se dá via URI Parameters e/ou query parametes.
+O envio de informações com o objetivo de filtrar informações existentes, se dá via Path Parameters e/ou query strings.
 
-Quando se utiliza os [verbos](#request--verbs) POST, PUT ou PATCH, estamos enviando informações para serem persistidas no servidor via REST API. Neste caso, enviamos as informações no Body.
+Quando se utiliza os verbos POST, PUT ou PATCH, estamos enviando informações para serem persistidas no servidor. Neste caso, enviamos as informações no Body.
 
-Ao definir o contrato de uma REST API, cada recurso deve ser declarado como um conjunto de atributos com seus tipos definidos (números, datas, textos, booleanos, etc), descrições, exemplos, obrigatoriedade, etc.
+O Body é o espaço da requisição HTTP onde se trafega as informações referentes ao recurso endereçado pela URL. Ao definir o contrato de uma REST API, cada recurso deve ser declarado como um conjunto de atributos com seus tipos definidos (números, datas, textos, booleanos, etc), descrições, exemplos, obrigatoriedade, etc. O Body trafega o conjunto destes atributos.
 
-Ao enviar informações via REST API, respeitando as definições do contrato, devemos montar um documento estruturado em alguma notação pré-definida. Hoje, a notação mais utilizada é o [JSON]([https://www.json.org/](https://www.json.org/)).
+Os atributos podem ser definidos em diversos formatos, os mais tradicionais são XML e [JSON]([https://www.json.org/](https://www.json.org/)), sendo este o mais adotado atualmente.
 
 Ex:
 POST http://api.fabricacarros.com/carros
 ```json
 {
   "modelo": "Kicknegade Freestyle HR AT",
-  "cor": "Branco Sombra",
+  "cor": "Branco Branquinho",
   "acessoriosExtras": [
       {
         "id": "senr002",
@@ -643,7 +644,7 @@ POST http://api.fabricacarros.com/carros
         "descricao": "Rack de teto"
       },
       {
-        "id": "film60",
+        "id": "filmc60",
         "descricao": "Película protetora UV Cinza 60%"
       }
     ],
@@ -654,11 +655,11 @@ POST http://api.fabricacarros.com/carros
 ```
 Quando se define o contrato da API deve-se atentar para que os atributos presentes do Body sejam relacionados apenas ao recurso definido na URL. Por exemplo, na API de cidades usada em outros exemplos neste guia, quando forem feitas chamadas para "http://api.exemplo.com/estados", devem ser trabalhados apenas atributos que definam um estado; quando forem feitas chamadas para http://api.exemplo.com/estados/{id-estado}/cidades devem ser trabalhados apenas atributos que definam uma cidade.
 
-Ao definir os atributos do contrato da REST API, não existe um consenso de mercado quando ao Case a ser adotado, no entanto, dado que os atributos em algum momento serão associados às propriedades das classes nas linguagens de programação seja no servidor ou no cliente, é uma boa prática adotar o lowerCamelCase, dado que as principais linguagens de programação adotam este case para as propriedades.
+Ao definir os atributos do contrato da REST API, não existe um consenso de mercado quando ao tipo de caixa a ser adotada (maiúsculo, minúsculo, etc), no entanto, dado que os atributos em algum momento serão associados às propriedades das classes nas linguagens de programação seja no servidor ou no cliente, é uma boa prática adotar o lowerCamelCase, dado que as principais linguagens de programação adotam esta caixa para as propriedades.
 
-Deve-se utilizar termos que auto-descrevam o atributo, reduzindo a necessidade de consultas às documentações. Portanto, utilize as palavras por extenso, evitando abreviações, exceto para casos amplamente conhecidos como "Id" ou acrônimos como "BACEN". Ainda assim, o padrão para uso de Acrônimos ou Abreviações é controverso. Dê uma lida neste fórum [acronyms-in-camelcase](https://stackoverflow.com/questions/15526107/acronyms-in-camelcase) para comprovar a complexidade deste assunto.
+Sobre os termos usados para definir os atributos, deve-se utilizar aqueles que melhor auto-descrevam o atributo, reduzindo a necessidade de consultas às documentações. Portanto, utilize as palavras por extenso, evitando abreviações, exceto para casos amplamente conhecidos como "Id" ou acrônimos como "RG". Ainda assim, o padrão para uso de Acrônimos ou Abreviações é controverso. Dê uma lida neste fórum [acronyms-in-camelcase](https://stackoverflow.com/questions/15526107/acronyms-in-camelcase) para comprovar a complexidade deste assunto.
 
-Também não se coloca em APIs alguns padrões antigos de definição de variável escrevendo o tipo de dado no nome do atributo - por exemplo, dt, int, bool, etc. - dado que os atributos tipos já tão tipados na definição do contrato.
+Também não se usa em REST APIs alguns padrões antigos de definição de variável com o tipo de dado no nome do atributo - por exemplo, dt, int, bool, etc. - dado que os atributos tipos já tão tipados na definição do contrato.
 
 Exemplos dentro do padrão:
 -	"id": "12ed58r9"
@@ -679,8 +680,10 @@ Exemplos fora do padrão:
 -	"flag_casado": true
 
 Os tipos de atributos devem ser declarados e convencionados no contrato da REST API.
-As linguagens de definição de contrato como Swagger e RAML documentam os data types suportados: [RAML DataTypes](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#raml-data-types) e [Swagger Data Types]([https://swagger.io/docs/specification/data-models/data-types/](https://swagger.io/docs/specification/data-models/data-types/)).
- 
+As linguagens de definição de contrato como Swagger e RAML documentam os data types suportados: [RAML DataTypes](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#raml-data-types) e [Swagger Data Types]([https://swagger.io/docs/specification/data-models/data-types/](https://swagger.io/docs/specification/data-models/data-types/)). E [aqui](#tipos-de-dados), tem um resumo já agregando boas práticas.
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
+
 ## Response
 
 Após o envio de uma requisição à partir de um cliente, o servidor onde a API está localizada deve processar a requisição e gerar uma resposta (Response).
@@ -1320,6 +1323,8 @@ Abaixo, seguem algumas formatações padrões para os tipos de dados:
 | Moeda | String com formato [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217) | EUR (Euro Member Countries)<br>USD (United State Dollar)<br>BRL (Brazillian Real)|
 | Idiomas | String com o formato [ISO 693(https://en.wikipedia.org/wiki/Lists_of_ISO_639_codes) |por (Portuguese)<br>eng (English)<br>spa (Spanish) |
 | Países | String com o formato [ISO 3166-2](https://en.wikipedia.org/wiki/ISO_3166)|BR (Brasil)<br>PT (Portugal)
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ## Processamento Assíncrono
 
