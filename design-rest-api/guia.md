@@ -455,7 +455,7 @@ Ex:
 
 Obs: Não utilizado no DELETE, pois o DELETE não tem Body.
 
-<sub>ir para: [índice](#conte%C3%BAdo)</sub>
+<sub>ir para: [índice](#conte%C3%BAdo) | [response content type](#response--headers--content-type)</sub>
 
 ### Request > Headers > Accept
 
@@ -616,7 +616,7 @@ Apaga todas as cidades do estado de São Paulo.
 - **DELETE** http://api.exemplo.com/estados/sp/cidades/sorocaba
 Apaga a cidade de Sorocaba.
 
-<sub>ir para: [índice](#conte%C3%BAdo)</sub>
+<sub>ir para: [índice](#conte%C3%BAdo) | [response body](#response--body)</sub>
 
 ### Request > Body
 
@@ -682,66 +682,77 @@ Exemplos fora do padrão:
 Os tipos de atributos devem ser declarados e convencionados no contrato da REST API.
 As linguagens de definição de contrato como Swagger e RAML documentam os data types suportados: [RAML DataTypes](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#raml-data-types) e [Swagger Data Types]([https://swagger.io/docs/specification/data-models/data-types/](https://swagger.io/docs/specification/data-models/data-types/)). E [aqui](#tipos-de-dados), tem um resumo já agregando boas práticas.
 
-<sub>ir para: [índice](#conte%C3%BAdo)</sub>
+<sub>ir para: [índice](#conte%C3%BAdo) | [response body](#response--body)</sub>
 
 ## Response
 
 Após o envio de uma requisição à partir de um cliente, o servidor onde a API está localizada deve processar a requisição e gerar uma resposta (Response).
 
-No response, existem alguns padrões a serem seguidos e eles serão explicados um a um a seguir. Alguns são obrigatórios para o funcionamento da REST API, outros são boas práticas que adotadas pelo mercado.
+No response, existem alguns padrões a serem seguidos e eles serão explicados um a um a seguir. Alguns são obrigatórios para o funcionamento da REST API, outros são boas práticas adotadas pelo mercado.
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [request](#request)</sub>
 
 ### Response > Headers
 
-Assim como na requisição, no retorno da resposta pode trazer definir um conjunto de chaves/valor que são metadados ou informações técnicas sobre a comunicação que está sendo feita através daquela API.
+Assim como na requisição, o retorno da resposta pode trazer um conjunto de headers que são metadados ou informações técnicas sobre a comunicação que está sendo feita através daquela API.
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [request headers](#request--headers)</sub>
 
 ### Response > Headers > Content-Type
 
-Assim como na requisição, o header Content-Type define qual é o formato da estrutura de dados presente no Body.
+Assim como na requisição, o header **Content-Type** define qual é o formato da estrutura de dados presente no Body.
 Ex:
 **Content-Type**: application/json
 
-Obs: Não utilizado no DELETE, quando não é enviado body de retorno (HTTP Status Code 204).
+Obs: Este header não é utilizado no DELETE, pois não é enviado no body de retorno.
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [request content type](#request--headers--content-type)</sub>
 
 ### Response > Headers > Content-Location
 
-O header Content-Location expõe a URL relativa (somente dos recursos para frente) ou absoluta (desde o início incluindo o Base Path) que expõe um determinado recurso.
+O header **Content-Location** expõe a URL relativa (somente dos recursos para frente) ou absoluta (desde o início incluindo o Base Path) que expõe um determinado recurso.
 
 Quando uma requisição é feita com o verbo POST, por exemplo, o cliente ainda não sabe o Id do recurso que ele está criando: muitas vezes são identificadores gerados no momento da gravação. Assim, quando o servidor retorna a resposta, além de preencher a propriedade id no body da requisição, deve-se preencher o header Content-Location.
 
 Ex:
 Request
 POST http://api.exemplo.com/estados/sp/cidades/
-```
+```json
 {
-"nome": "São Vicente",
-"DDD": 13,
-"descrição": "Primeira cidade do Brasil", 
-"populacao": 355542
+   "nome": "São Vicente",
+   "DDD": 13,
+   "descrição": "Primeira cidade do Brasil", 
+   "populacao": 355542
 }
 ```
-Header Content-Location no Response
+Response
+HTTP 201
 **Content-Location**: http://api.exemplo.com/estados/sp/cidades/saovic001
 ```
 {
-"id": "saovic001",
-"nome": "São Vicente",
-"DDD": 13,
-"descrição": "Primeira cidade do Brasil", 
-"populacao": 355542
+   "id": "saovic001",
+   "nome": "São Vicente",
+   "DDD": 13,
+   "descrição": "Primeira cidade do Brasil", 
+   "populacao": 355542
 }
 ```
 Obs: Não utilizado no DELETE, pois depois de um DELETE com sucesso, não existe mais o conteúdo.
 
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
+
 ### Response > Headers > Location 
 
-O header Location expõe a URL relativa (somente dos recursos para frente) ou absoluta (desde o início incluindo o Base Path) que expõe outra localização para um determinado recurso. Normalmente é utilizado em [fluxos de processamento assíncrono](#).
+O header Location expõe a URL relativa (somente dos recursos para frente) ou absoluta (desde o início incluindo o Base Path) que expõe **outra** localização para um determinado recurso. Normalmente é utilizado em processamento assíncrono.
 
 Ex:
 **Location**: http://api.exemplo.com/contas/v1/tarefas/1
 
+<sub>ir para: [índice](#conte%C3%BAdo) | [processamento assíncrono](#processamento-ass%C3%ADncrono)</sub>
+
 ### Response > Body
 
-Quando é feita uma requisição na API, na maioria das vezes, espera-se uma resposta com informações. Colocamos estas informações no Body. Assim como no Body do [request](#), deve-se utilizar lowerCamelCase para definir os atributos e JSON como padrão de notação.
+Quando é feita uma requisição na API, na maioria das vezes, espera-se uma resposta com informações. Colocamos estas informações no Body. Assim como no Body do [request](#request--body), é recomendado utilizar lowerCamelCase para definir os atributos e JSON como padrão de notação.
 
 A resposta de uma requisição de gravação (POST, PUT, PATCH) não precisa necessariamente retornar o body com o recurso gravado. O critério para a decisão de retorná-lo ou não fica em ponderar se:
 - Existe transformação da informação no momento da gravação e o cliente precisa saber, então devolve-se o recurso e gasta-se banda, log, etc.
@@ -749,9 +760,11 @@ A resposta de uma requisição de gravação (POST, PUT, PATCH) não precisa nec
 
 Para DELETE, não se utiliza Body.
 
-Quando não se retorna nada no body em uma requisição que foi processada com sucesso, é importante atentar-se em usar o HTTP Status Code correto. Para GET, utiliza-se 200 sempre, para POST 204, PUT, PATCH ou DELETE 204. Leia mais sobre o [HTTP Status Code 204](#) para mais informações.
+Quando não se retorna nada no body de uma requisição que foi processada com sucesso, é importante atentar-se em usar o HTTP Status Code correto. Para GET, utiliza-se 200, para POST 204, PUT, PATCH ou DELETE 204. Leia mais sobre o [HTTP Status Code 204](#response--http-status-codes) para mais informações.
  
 Quanto são usados [verbos](#request--verbs) que enviam body no request (POST, PUT e PATCH), é importante notar que o body de request e o de response não precisam ser idênticos. Há casos em que a criação de um recurso implica que se populem atributos do mesmo em tempo de criação. Um exemplo muito recorrente é o identificador (id) que normalmente é gerado pelo servidor e não precisa estar definido no body de request.
+
+------------TODO: Continuar daqui---------------
 
 ### Response > Body > Envelope "Data"
 Quando nos referimos ao body de request, apenas passamos os atributos sem nenhum tipo de envelope. Ex:
@@ -1333,7 +1346,7 @@ O HTTP é um protocolo síncrono, logo, quando um cliente faz uma requisição, 
 No entanto, em determinadas situações os servidores não processam as requisições de forma imediata, seja porque o processamento necessita de mais tempo do que o habitual, ou porque estará esperando que chegue a sua vez para ser executado, ou ainda porque depende de um agendamento batch para completar a operação.
 
 Assim, quando sistemas deste tipo são expostos via API, o processamento segue alguns passos a mais:
-1. Na primeira requisição, o cliente receberá como resposta um HTTP Status Code **202 - Accepted**. Ou seja, a requisição foi aceita, mas ainda não foi processada. E será informado no header [Location](#) uma URL onde é possível consultar o andamento deste processamento.
+1. Na primeira requisição, o cliente receberá como resposta um HTTP Status Code **202 - Accepted**. Ou seja, a requisição foi aceita, mas ainda não foi processada. E será informado no header [Location](#response--headers--location) uma URL onde é possível consultar o andamento deste processamento.
 
 Ex:
 Request
@@ -1479,6 +1492,8 @@ Location:  http://api.exemplo.com/contas/v1/contas-processamento/1
 ```
 
 Neste caso, o cliente pode optar por não chamar mais a API de processamento para verificar o andamento, pois o servidor enviará a resposta via POST para a URL informada pelo cliente (http://api.clienteexemplo.com/contas-callback) ao término do processamento. No Body enviado para o cliente, deverá conter todas informações referentes ao processamento.
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ## Processamento em lotes
 
