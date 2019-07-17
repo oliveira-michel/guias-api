@@ -80,10 +80,10 @@ Este é um documento "vivo" em que o autor está atualizando com a experiência 
 Os conteúdos abaixo cobrem alguns conceitos aliados às boas práticas no design de RESTful APIs. Quando falamos em design de RESTful APIs, estamos abordando como definir um contrato de API que expõe as entidades e funções de um determinado sistema respeitando as restrições do REST.
 
 > Para fazer o entendimento das necessidades de negócio e definição das entidades, recomendamos o uso de Domain Driven Design.
-> TODO: Em breve será disponibilizado um guia explorando toda a fase de entendimento e transformação dos conceitos de negócio em entidades para serem expostas como recursos via REST API.
+> TO DO: Em breve será disponibilizado um guia explorando toda a fase de entendimento e transformação dos conceitos de negócio em entidades para serem expostas como recursos via REST API.
 
 > O conteúdo deste material contempla os conceitos para especificação do contrato de REST APIs de forma genérica, não abordando necessariamente nenhuma linguagem específica de definição de contrato: como RAML, Open API, etc.
-> TODO: Em breve serão disponibilizados exemplos dos conceitos deste guia em uma destas linguagens.
+> TO DO: Em breve serão disponibilizados exemplos dos conceitos deste guia em uma destas linguagens.
 
 **API** (**A**pplication **P**rogramming **I**nterface) é um software que permite comunicação entre sistemas onde há um fornecedor e um ou mais consumidores de informação, serviços, etc.  Para consumir uma API respeita-se um contrato que deve incluir o protocolo de comunicação, as operações (consultas e atualizações) e os formatos de dados para entradas, saídas e erros.
 A maioria dos softwares nos quais nós interagimos são construídos para atender às necessidades humanas e normalmente referenciam as "coisas" reais das quais esses softwares tratam. Por exemplo, um software de biblioteca vai representar livros, seções, autores, etc. e, através de alguma interface, permitir que um usuário interaja com estas representações. Uma API difere-se deste tipo de software no que tange o usuário: quem interage com o software é outro software, não diretamente o usuário final. No entanto, quem desenvolve o software que interage com a API é um programador - e até a data deste documento, a maioria ainda são humanos - e para que a experiência deste usuário programador e do usuário do software que ele desenvolve seja a melhor possível, princípios de design devem ser respeitados. 
@@ -715,7 +715,7 @@ O header **Content-Location** expõe a URL relativa (somente dos recursos para f
 Quando uma requisição é feita com o verbo POST, por exemplo, o cliente ainda não sabe o Id do recurso que ele está criando: muitas vezes são identificadores gerados no momento da gravação. Assim, quando o servidor retorna a resposta, além de preencher a propriedade id no body da requisição, deve-se preencher o header Content-Location.
 
 Ex:
-Request
+*Request*
 POST http://api.exemplo.com/estados/sp/cidades/
 ```json
 {
@@ -725,8 +725,8 @@ POST http://api.exemplo.com/estados/sp/cidades/
    "populacao": 355542
 }
 ```
-Response
-HTTP 201
+*Response*
+HTTP/1.1 201 Created
 **Content-Location**: http://api.exemplo.com/estados/sp/cidades/saovic001
 ```
 {
@@ -795,11 +795,11 @@ No body de response, colocamos a informação do recurso dentro de um envelope "
 }
 ```
 
-TODO: padronizar o HTTP-CODE XXX em cada resposta
-TODO: padronizar o maiúsculo ou minúsculo em termos como query strings, Path Parameters, http status code, etc.
-TODO: rever {id-entidade} vs idEntidade :: definir qual melhor modelo.
-TODO: rever atributosEmCamel vs query-strings que podem estar sem camel.
-TODO: padronizar os itens que estão como referência
+TO DO: padronizar o HTTP-CODE XXX em cada resposta
+TO DO: padronizar o maiúsculo ou minúsculo em termos como query strings, Path Parameters, http status code, etc.
+TO DO: rever {id-entidade} vs idEntidade :: definir qual melhor modelo.
+TO DO: rever atributosEmCamel vs query-strings que podem estar sem camel.
+TO DO: padronizar os itens que estão como referência
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [tipos de dados](#tipos-de-dados) | [request body](#request--body)</sub>
 
@@ -807,12 +807,12 @@ TODO: padronizar os itens que estão como referência
 
 Quando se faz uma requisição por um elemento com um ID especificado no Path Parameter, por exemplo, GET .../pessoas/{id-pessoa}, o retorno da resposta será um único elemento. Assim, coloca-se o recurso unitário diretamente no envelope "data". Ex:
 
-Request:
+*Request*
 GET .../pessoas/456
 
-Response:
-``HTTP-CODE 200``
-``Content-Location: .../pessoas/456``
+*Response*
+HTTP/1.1 200 OK
+Content-Location: .../pessoas/456
 ```json
 {
    "data": {
@@ -825,12 +825,12 @@ Response:
 
 Quando se faz uma requisição sem o ID, filtrando apenas com query strings, pode-se ter como retorno um ou mais elementos. Neste cenário, retornamos com um array do referido recurso (mesmo que só retorne um). Ex:
 
-Request:
+*Request*
 GET .../pessoas?from-data=2019-06-01
 
-Response:
-``HTTP-CODE 200``
-``Content-Location: .../pessoas/456``
+*Response*
+HTTP/1.1 200 Ok
+Content-Location: .../pessoas/456
 ```json
 {
    "data": [
@@ -1017,8 +1017,10 @@ No caso do exemplo, a API deve retornar apenas os 3 primeiros registros (recurso
 
 Quando se recebe uma solicitação contendo query strings de ordenação (**sort**), deve-se retornar os resultados respeitando os critérios da query.
 Ex:
+*Request*
 GET .../pedidos?sort=dataPagamento:desc,dataPedido
-Response
+
+*Response*
 ```json
 {
    "data":[
@@ -1050,7 +1052,7 @@ Ordernar de forma ascendente é o comportamento padrão quando a forma de ordena
 
 ### Response > Body > Fields
 
-TODO: Fazer este tópico
+TO DO: Fazer este tópico
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [request fields](#request--url--query-strings--fields)</sub>
 
@@ -1059,7 +1061,7 @@ TODO: Fazer este tópico
 Quando a requisição recebe o query string **view**, o response deve devolver apenas os atributos convencionados (e documentados) como pertencentes àquela view.
 Ex:
 - GET .../cartoes/a7834dcG456?view=basico
-Retorno:
+*Response*
 ```json
 {
    "data": {
@@ -1072,7 +1074,7 @@ Retorno:
 }
 ```
 - GET .../cartoes/a7834dcG456?view=limites
-Retorno:
+*Response*
 ```json
 {
    "data": {
@@ -1087,7 +1089,7 @@ Retorno:
 }
 ```
 - GET .../cartoes/a7834dcG456
-Retorno:
+*Response*
 ```json
 {
    "data": {
@@ -1119,9 +1121,9 @@ Sendo uma API com o formato
 GET .../cartoes/{id-cartao} e 
 GET .../cartoes/{id-cartao}/faturas/{id-fatura}
 
-Request
+*Request*
 GET .../cartoes/a7834dcG456?expand=faturas&faturas.id=ago18
-Retorno
+*Response*
 ```json
 {
 	"data": {
@@ -1161,7 +1163,7 @@ Quando ocorrem requisições cujo retorno seja um erro ([HTTP Status Code](#resp
 O detalhamento do erro, é algo mais do que simplesmente o que o HTTP Status Code já expressa por si, mesmo. Ele deve ser suficiente para que o cliente entenda o que aconteceu e saiba o que fazer diante daquele problema.
 
 Ex:
-HTTP Status Code 422
+HTTP/1.1 422 Unprocessable Entity
 ```json
 {
    "codigo": "ER0059",
@@ -1169,7 +1171,7 @@ HTTP Status Code 422
    "detalhes": "https://developer.empresa.com/apis/cartoes/erros/ER0059"
 }
 ```
-HTTP Status Code 428
+HTTP/1.1 428 Preconditional Required
 ```json
 {
    "codigo": "err-pto-A320",
@@ -1179,7 +1181,7 @@ HTTP Status Code 428
 ```
 Quando a API retorna HTTP Status Code 400 e 422, muito provavelmente o erro foi causado por algum atributo específico. Nestes casos, deve-se especificar as informações sobre cada um dos atributos envolvidos no erro.
 
-HTTP Status Code 400
+HTTP/1.1 Status Code 400 Bad Request
 ```json
 {
    "codigo": "10023",
@@ -1207,7 +1209,7 @@ Durante requisições com retorno de sucesso ([HTTP Status Code](#response--http
 
 O alerta se dá através de um envelope **messages** com a estrutura semelhante às das mensagens de erro.
 Ex:
-HTTP Status Code 201
+HTTP/1.1 201 Created
 ```json
 {
    "data":{
@@ -1305,7 +1307,7 @@ Os códigos deste grupo são usado em caso de sucesso na requisição. Os mais u
 
 Este grupo define respostas de redirecionamento. Servem para informar o cliente sobre mudanças na requisição e redirecionamento para uma nova URL. Para saber mais sobre estes status codes, veja [requisições assíncronas](#processamento-ass%C3%ADncrono). Os mais utilizados são:
 
-TODO: exemplificar melhor isso aqui!
+TO DO: exemplificar melhor isso aqui!
 
 - **301 Moved Permanently**: Informa que o recurso A agora é o recurso B, de forma que quando o cliente solicitar o recurso A ele será automaticamente encaminhado ao recurso B.
 
@@ -1386,7 +1388,7 @@ Assim, quando sistemas deste tipo são expostos via API, o processamento segue a
 1. Na primeira requisição, o cliente receberá como resposta um HTTP Status Code **202 - Accepted**. Ou seja, a requisição foi aceita, mas ainda não foi processada. E será informado no header [Location](#response--headers--location) uma URL onde é possível consultar o andamento deste processamento.
 
 Ex:
-Request
+*Request*
 POST  http://api.exemplo.com/contas/v1/contas
 ```json
 {
@@ -1395,16 +1397,16 @@ POST  http://api.exemplo.com/contas/v1/contas
 	"...": "..."
 }
 ```
-Response
-HTTP 202 Accepted
+*Response*
+HTTP/1.1 202 Accepted
 Location: http://api.exemplo.com/contas/v1/contas-processamento/1
 
 2. Na segunda requisição, o cliente deverá consultar a URL informada no Location para acompanhar o andamento da requisição.
 Ex:
-Request
+*Request*
 GET http://api.exemplo.com/contas/v1/contas-processamento/1
-Response
-HTTP 200 Ok
+*Response*
+HTTP/1.1 200 Ok
 ```json
 {
    "data":{
@@ -1456,10 +1458,10 @@ Content-Location: http://api.exemplo.com/contas/v1/contas-processamento/1
 ```
 5. Agora já é possível fazer a requisição no endereço do Location http://api.exemplo.com/contas/v1/contas/21531234567 e consultar o recurso criado.
 Ex:
-Request
+*Request*
 GET http://api.exemplo.com/contas/v1/contas/21531234567
-Response
-HTTP 200 Ok
+*Response*
+HTTP/1.1 200 Ok
 ```json
 {
    "data":{
@@ -1476,10 +1478,10 @@ HTTP 200 Ok
 
 Caso a situação no retorno no passo 2 seja falha,  deve-se retornar o motivo e o processamento é encerrado.
 Ex:
-Request
+*Request*
 GET http://api.exemplo.com/contas/v1/contas-processamento/1
-Response
-HTTP 200 Ok
+*Response*
+HTTP/1.1 200 Ok
 Content-Location: http://api.exemplo.com/contas/v1/contas-processamento/1
 ```json
 {
@@ -1508,11 +1510,12 @@ Ao término do processamento:
 Além da possibilidade do cliente fazer consultas recorrentes no passo 2 para verificar o andamento do processamento, pode-se optar por fazer callback do servidor para o cliente quando a requisição estiver terminada. Neste caso, o cliente deverá chamar o recurso cujo processamento se dá assincronament informando o header **[Empresa]-Callback**.
 
 Ex:
-Request
+*Request*
 POST  http://api.exemplo.com/contas/v1/contas
 EmpresaExemplo-Callback: http://api.clienteexemplo.com/contas-callback
-Response
-HTTP 200 OK
+
+*Response*
+HTTP/1.1 200 OK
 Location:  http://api.exemplo.com/contas/v1/contas-processamento/1
 ```json
 {
@@ -1542,7 +1545,7 @@ Hoje existem ferramentas que permitem alta performance para atender grandes volu
 1.	O cliente define um array de objetos, sendo cada deles um request HTTP declarado com todos os seus componentes (incluindo URL, verbos e headers);
 2.	O cliente submete o array mensagem para o servidor usando o verbo POST para um recurso de API preparado para receber a requisição do passo 1;
 Ex:
-Request:
+*Request*
 POST .../batch
 Content-Type: application/xml
 ```json
@@ -1575,8 +1578,8 @@ Content-Type: application/xml
 	- Alternativamente, o servidor pode ignorar o envio para cada API e processar diretamente a lista de requests;
 4. O servidor coleta a resposta de cada request e devolve para o cliente através de um array respeitando a sequência da requisição. 
 
-Response:
-200 OK
+*Response*
+HTTP/1.1 200 OK
 Content-Type: application/json
 ```json
 {
@@ -1606,6 +1609,8 @@ Content-Type: application/json
    ]
 }
 ```
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
+
 ## Recursividade
 
 Existem casos em que os recursos da API podem se aninhar recursivamente.
@@ -1633,7 +1638,11 @@ Esta abordagem traz as seguintes dificuldades:
 •	um mesmo recurso (o sócio id JOSÉ) poderia estar representado em duas rotas diferentes, ora como sócio da empresa "abc123Xyz", ora como sócio do sócio "Empresas Verdes". O ideal no REST é que o recurso seja acessado apenas em uma rota.
 
 Caso a opção fosse definir estes sócios não como recursos, mas como estruturas aninhadas dentro de um único recurso "sócio", teríamos algo assim:
-GET .../empresas/abc123Xyz/**socios**/JOSE e o retorno ficaria algo assim:
+*Request*
+GET .../empresas/abc123Xyz/**socios**/JOSE
+*Response*
+HTTP/1.1 200 OK
+
 ```json
 {
    "data":[
@@ -1684,9 +1693,9 @@ Esta abordagem traz as seguintes dificuldades:
 
 Para contornar os problemas explicados acima, podemos separar o recurso sócio do relacionamento entre eles. Ex:
 Recurso **sócio**:
-Request
+*Request*
 GET .../empresas/abc123Xyz/**socios**/JOSE
-Response:
+*Response*
 ```json
 {
    "data": {
@@ -1698,8 +1707,9 @@ Response:
 }
 ```
 Recurso **associacoes** (unitário):
+*Request*
 GET .../empresas/abc123Xyz/**associacoes**/123
-Response:
+*Response*
 ```json
 {
    "data": {
@@ -1711,9 +1721,9 @@ Response:
 ```
 
 Recurso **associacoes** (array):
-Request:
+*Request*
 GET .../empresas/abc123Xyz/**associacoes**
-Response:
+*Response*
 ```json
 {
    "data": [
@@ -1745,6 +1755,8 @@ As buscas nestas rotas seguem as mesmas práticas já explicadas neste guia. Ex:
 *(apagaria a associação com o id 123)*
 - DELETE .../empresas/abc123Xyz/associacoes?associacaoPai=MARIA
 *(apagaria a associação cujo pai é o sócio MARIA)*
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ## Versionamento
 
@@ -1820,13 +1832,13 @@ Esta é a minha forma preferencial de versionar pois, fazendo parte da URL você
 
 ## Segurança
 
-TODO: Aguarde! Este capítulo será escrito em breve. :-)
+TO DO: Aguarde! Este capítulo será escrito em breve. :-)
 
 <sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ## Performance, Cache e compressão
 
-TODO: Aguarde! Este capítulo será escrito em breve. :-)
+TO DO: Aguarde! Este capítulo será escrito em breve. :-)
 
 <sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
