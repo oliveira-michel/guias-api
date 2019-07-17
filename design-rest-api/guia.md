@@ -1,3 +1,4 @@
+
 # Guia de Design REST
 
 ## _Abstract_
@@ -254,18 +255,19 @@ Ex:
 
 Os path parameters são destinados exclusivamente para identificar os recursos dentro das coleções mediante seu identificador único.
 
-É boa prática, usar nomes em minúsculo e se composto, separar com hífen. Os URI Parameters na maioria dos casos serão compostos por "id-" + nome do recurso no singular.
+É boa prática, usar nomes em minúsculo e se composto, separar com hífen. Os Path Parameters na maioria dos casos serão compostos por "id" + nome do recurso no singular em camelCase.
+
 Ex:
-- http://api.exemploempresa.com/cartoes/v1/cartoes/{id-cartao}/faturas/{id-fatura}/lancamentos/{id-lancamento}
+- http://api.exemploempresa.com/cartoes/v1/cartoes/{idCartao}/faturas/{idFatura}/lancamentos/{idLancamento}
 
 Desta forma, quando a aplicação recuperar a coleção de parâmetros, terá a seguinte lista:
-*id-cartao*, *id-fatura* e *id-lancamento*, cada uma com um nome que a identifica unicamente na coleção.
+*idCartao*, *idFatura* e *idLancamento*, cada uma com um nome que a identifica unicamente na coleção.
 
 <sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ###  Request > URL > Query Strings
 
-Além dos URI Parameters, query strings também permite passar parâmetros na URL da chamada. Query Strings são usadas para filtrar resultados em consultas. Elas são definidas após os resources, iniciando com uma **?** e separando cada par de chave e valor  (**chave=valor**) com um **&**:
+Além dos Path Parameters, Query Strings também permite passar parâmetros na URL da chamada. Query Strings são usadas para filtrar resultados em consultas. Elas são definidas após os resources, iniciando com uma **?** e separando cada par de chave e valor  (**chave=valor**) com um **&**:
 
 ***.../recurso?chave1=valor1&chave2=valor2&chaveA=valorA***
 
@@ -285,15 +287,15 @@ Os filtros aplicados podem tratar diversas situaçoes e é importante convencion
 |Texto|Contém|Retorna aqueles recursos cujo valor do atributo contenha o valor especificado. Ex: …?nome=Frederico retornará aqueles recursos que contenham “Frederico” no atributo nome. São retornos válidos válidos: “Frederico Garcia”, “Don Frederico”, “Frederico”.|
 |Texto|Ou Contém|Retorna aqueles recursos cujo valor do atributo contenha um dos valores especificados. Ex: nome=Frederico&nome=Antonio retornará aqueles recursos que contenham “Frederico” ou "Antonio" no atributo nome. São retornos válidos válidos: “Frederico Antonio”, “Don Frederico”, “Frederico”, “Antonio Ramirez”.|
 
-De forma resumida, o operador **&** que separa as query strings é um **Ou** para os valores de um mesmo atributo e um **E** entre atributos diferentes.
+De forma resumida, o operador **&** que separa as Query Strings é um **Ou** para os valores de um mesmo atributo e um **E** entre atributos diferentes.
 
-Como as query strings geralmente serão atributos dos recursos, utiliza-se o mesmo padrão (camelCase) que os utilizados no body dos recursos.
+Como as Query Strings geralmente serão atributos dos recursos, utiliza-se o mesmo padrão (camelCase) que os utilizados no body dos recursos.
 
-Geralmente, query strings não são utilizadas nos casos em que se busca um recurso cujo ID que já está definido na URL via Path Parameter. Isto porque, normalmente as query strings são utilizadas para filtrar dentro de uma coleção de resultados. Quando se tem o ID definido, não temos uma coleção de resultados, mas um específico já especificado pelo cliente.
+Geralmente, Query Strings não são utilizadas nos casos em que se busca um recurso cujo ID que já está definido na URL via Path Parameter. Isto porque, normalmente as Query Strings são utilizadas para filtrar dentro de uma coleção de resultados. Quando se tem o ID definido, não temos uma coleção de resultados, mas um específico já especificado pelo cliente.
 
 As query string não são utilizadas somente para filtros, ela pode ser utilizada como parâmetros para paginação, versionamento, ordenação, etc. 
 
->Existem padrões de mercado para filtrar os recursos via query string como [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), [OData](https://www.odata.org/getting-started/basic-tutorial/), [GraphQL](https://graphql.org/) e a adoção de uma delas significa agregar mais uma especificação sobre o REST. Assim, em um primeiro momento, utilizar um conjunto padrão, mais reduzido de query strings para fazer filtros básicos vai permitir trazer uma grande flexibilidade às REST APIs e ao mesmo tempo entregar uma curva de aprendizado mais rápida àqueles que estão embarcando no padrão. Com a maturidade do time de TI neste assunto, a adoção futura de um desses frameworks ajudará a entregar APIs ainda mais flexíveis.
+>Existem padrões de mercado para filtrar os recursos via query string como [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), [OData](https://www.odata.org/getting-started/basic-tutorial/), [GraphQL](https://graphql.org/) e a adoção de uma delas significa agregar mais uma especificação sobre o REST. Assim, em um primeiro momento, utilizar um conjunto padrão, mais reduzido de Query Strings para fazer filtros básicos vai permitir trazer uma grande flexibilidade às REST APIs e ao mesmo tempo entregar uma curva de aprendizado mais rápida àqueles que estão embarcando no padrão. Com a maturidade do time de TI neste assunto, a adoção futura de um desses frameworks ajudará a entregar APIs ainda mais flexíveis.
 
 <sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
@@ -398,8 +400,8 @@ Quando é necessário em uma única chamada retornar um determinado recurso mais
 
 Ex:
 Tome como referência as seguintes APIs
-GET .../cartoes/{id-cartao}
-GET .../cartoes/{id-cartao}/faturas/{id-fatura}
+GET .../cartoes/{idCartao}
+GET .../cartoes/{idCartao}/faturas/{idFatura}
 
 Para retornar os dados do cartão com id = a7834dcG456 mais o recurso de faturas associado a ele, especificamente a de agosto de 2018,  com o expand, faz-se a seguinte chamada:
 GET .../cartoes/a7834dcG456?**expand**=faturas&faturas.id=ago18
@@ -408,7 +410,7 @@ Observe que há a definição do recurso a ser expandido (expand=faturas) e tamb
 Caso vários recursos precisem ser expandidos, define-se separando-os por vírgulas.
 Ex: GET .../cartoes/a7834dcG456?expand=faturas,adicionais,ofertas-upgrade
 
-Caso seja necessário especificar paginação ou ordenação em um recurso expandido, deve-se definir estes query strings assim como se definem filtros. Ex:
+Caso seja necessário especificar paginação ou ordenação em um recurso expandido, deve-se definir estes Query Strings assim como se definem filtros. Ex:
 GET .../cartoes/a7834dcG456?expand=faturas&faturas.limit=5&faturas.sort=dataVencimento:desc
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [response  expand](#response--body--expand)</sub>
@@ -544,11 +546,11 @@ Se ao codificar a API, o desenvolvedor da API codificar um GET que não seja seg
 Este verbo é o mais utilizado e serve para buscar dados nas APIs. Ele é utilizado em conjunto com uma URL com seus Path Parameters e/ou Query Strings para enviar uma consulta e o servidor retorna os dados em caso de sucesso. Em requisições do tipo GET, não se envia [Body](#request--body).
 
 Exemplo de utilização de GET para fazer uma consulta por cidades no estado de São Paulo com população maior do que 20000 habitantes:
-Com a URL com o formato http://api.exemplo.com/estados/{id-estado}/cidades
+Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades
 **GET** http://api.exemplo.com/estados/sp/cidades?from-populacao=20000
 
 Exemplo de utilização de GET para fazer uma consulta pela cidade de Santos:
-Com a URL com o formato http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}
+Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}
 **GET** http://api.exemplo.com/estados/sp/cidades/santos
 
 ### Request > Verbs > POST
@@ -556,7 +558,7 @@ Com a URL com o formato http://api.exemplo.com/estados/{id-estado}/cidades/{id-c
 O **POST** é usado para criar novos recursos. Ele é utilizado em conjunto com uma URL com seus Path Parameters e um [Body](#request--body) para enviar um conjunto de atributos que represente o estado do novo recurso no momento que você está criando ele.
 
 Exemplo utilizando o verbo POST para criar uma nova cidade:
-Com a URL com o formato http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}
+Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}
 **POST** http://api.exemplo.com/estados/sp/cidades/
 ```json
 {
@@ -575,7 +577,7 @@ Obs: O POST também pode ser usado em casos especiais onde se faz necessário pr
 O verbo  **PUT** atualiza ou cria um recurso, ou seja, se eu utilizar o PUT para enviar novamente a cidade de São Vicente (como no exemplo do POST), o servidor iria sobrepor completamente o recurso com os dados definidos no Body. Portanto, caso algum campo não seja informado, o valor dele será apagado. Caso seja utilizado um PUT e o recurso não exista, a API deveria criá-lo.
 Quando usamos **PUT** normalmente estamos atualizando um recurso existente, por isso é importante definir qual é especificamente o recurso através do ID no Path Parameter.
 Ex:
-Com a URL com o formato http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}
+Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}
 **PUT** http://api.exemplo.com/estados/sp/cidades/sao-vicente
 ```json
 {
@@ -585,14 +587,14 @@ Com a URL com o formato http://api.exemplo.com/estados/{id-estado}/cidades/{id-c
    "populacao": 400000
 }
 ```
-No exemplo, passamos dois Path Parameters, o {id-estado} com o valor "sp" e o {id-cidade} com o valor "santos".
+No exemplo, passamos dois Path Parameters, o {idEstado} com o valor "sp" e o {idCidade} com o valor "santos".
 
 ### Request > Verbs > PATCH
 
 O verbo **PATCH**  serve para fazer atualizações parciais no recurso. Neste caso, ele se comporta de forma semelhante ao PUT, no entanto, define-se no Body apenas os parâmetros que serão alterados.
 
 Ex:
-Com a URL com o formato http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}_
+Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}_
 **PATCH** http://api.exemplo.com/estados/sp/cidades/sao-vicente
 ```json
 {
@@ -605,10 +607,10 @@ No exemplo, a API atualizará apenas o atributo "populacao". Em uma nova chamada
 
 O verbo **DELETE** é o responsável por deletar os registros. Semelhante ao GET, é usado em conjunto com uma URL com seus Path Parameters e/ou Query Strings para fazer filtro no conjunto que será afetado pelo DELETE.
 
-Caso a requisição seja em um recurso específico, o recurso será deletado, caso seja em uma coleção de recursos, toda a coleção será deletada, caso seja em um filtro (com query strings), todos os registros que correspondem ao filtro serão apagados.
+Caso a requisição seja em um recurso específico, o recurso será deletado, caso seja em uma coleção de recursos, toda a coleção será deletada, caso seja em um filtro (com Query Strings), todos os registros que correspondem ao filtro serão apagados.
 
 Ex:
-Com a URL com o formato http://api.exemplo.com/estados/{id-estado}/cidades/{id-cidade}
+Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}
 - **DELETE** http://api.exemplo.com/estados/sp/cidades?to-populacao=5000
 Apaga todas as cidades com população até 5000 habitantes.
 - **DELETE** http://api.exemplo.com/estados/sp/cidades
@@ -620,7 +622,7 @@ Apaga a cidade de Sorocaba.
 
 ### Request > Body
 
-O envio de informações com o objetivo de filtrar informações existentes, se dá via Path Parameters e/ou query strings.
+O envio de informações com o objetivo de filtrar informações existentes, se dá via Path Parameters e/ou Query Strings.
 
 Quando se utiliza os verbos POST, PUT ou PATCH, estamos enviando informações para serem persistidas no servidor. Neste caso, enviamos as informações no Body.
 
@@ -653,7 +655,7 @@ POST http://api.fabricacarros.com/carros
   "adaptacaoPDC": false
 }
 ```
-Quando se define o contrato da API deve-se atentar para que os atributos presentes do Body sejam relacionados apenas ao recurso definido na URL. Por exemplo, na API de cidades usada em outros exemplos neste guia, quando forem feitas chamadas para "http://api.exemplo.com/estados", devem ser trabalhados apenas atributos que definam um estado; quando forem feitas chamadas para http://api.exemplo.com/estados/{id-estado}/cidades devem ser trabalhados apenas atributos que definam uma cidade.
+Quando se define o contrato da API deve-se atentar para que os atributos presentes do Body sejam relacionados apenas ao recurso definido na URL. Por exemplo, na API de cidades usada em outros exemplos neste guia, quando forem feitas chamadas para "http://api.exemplo.com/estados", devem ser trabalhados apenas atributos que definam um estado; quando forem feitas chamadas para http://api.exemplo.com/estados/{idEstado}/cidades devem ser trabalhados apenas atributos que definam uma cidade.
 
 Ao definir os atributos do contrato da REST API, não existe um consenso de mercado quando ao tipo de caixa a ser adotada (maiúsculo, minúsculo, etc), no entanto, dado que os atributos em algum momento serão associados às propriedades das classes nas linguagens de programação seja no servidor ou no cliente, é uma boa prática adotar o lowerCamelCase, dado que as principais linguagens de programação adotam esta caixa para as propriedades.
 
@@ -795,17 +797,11 @@ No body de response, colocamos a informação do recurso dentro de um envelope "
 }
 ```
 
-TO DO: padronizar o HTTP-CODE XXX em cada resposta
-TO DO: padronizar o maiúsculo ou minúsculo em termos como query strings, Path Parameters, http status code, etc.
-TO DO: rever {id-entidade} vs idEntidade :: definir qual melhor modelo.
-TO DO: rever atributosEmCamel vs query-strings que podem estar sem camel.
-TO DO: padronizar os itens que estão como referência
-
 <sub>ir para: [índice](#conte%C3%BAdo) | [tipos de dados](#tipos-de-dados) | [request body](#request--body)</sub>
 
 ### Response > Body > Recurso unitário, array ou nenhum
 
-Quando se faz uma requisição por um elemento com um ID especificado no Path Parameter, por exemplo, GET .../pessoas/{id-pessoa}, o retorno da resposta será um único elemento. Assim, coloca-se o recurso unitário diretamente no envelope "data". Ex:
+Quando se faz uma requisição por um elemento com um ID especificado no Path Parameter, por exemplo, GET .../pessoas/{idPessoa}, o retorno da resposta será um único elemento. Assim, coloca-se o recurso unitário diretamente no envelope "data". Ex:
 
 *Request*
 GET .../pessoas/456
@@ -823,7 +819,7 @@ Content-Location: .../pessoas/456
 }
 ```
 
-Quando se faz uma requisição sem o ID, filtrando apenas com query strings, pode-se ter como retorno um ou mais elementos. Neste cenário, retornamos com um array do referido recurso (mesmo que só retorne um). Ex:
+Quando se faz uma requisição sem o ID, filtrando apenas com Query Strings, pode-se ter como retorno um ou mais elementos. Neste cenário, retornamos com um array do referido recurso (mesmo que só retorne um). Ex:
 
 *Request*
 GET .../pessoas?from-data=2019-06-01
@@ -913,7 +909,7 @@ Existem algumas técnicas diferentes para fazer a paginação. Serão explicadas
 
 #### Response > Body > Paginação > Range
 
-Uma das formas de se limitar a quantidade de registros retornados é através de um filtro em algum atributo que represente um intervalo. Assim, quando se recebe um filtro nas query strings, deve-se retornar o resultado respeitando os critérios do filtro.
+Uma das formas de se limitar a quantidade de registros retornados é através de um filtro em algum atributo que represente um intervalo. Assim, quando se recebe um filtro nas Query Strings, deve-se retornar o resultado respeitando os critérios do filtro.
 Por exemplo, em uma requisição GET .../...?from-id=3&to-id=6, possuindo o banco de dados uma coleção de 8 registros, e os ids sendo sequenciais, o retorno devem ser os registros 3, 4, 5 e 6:
 ```json
 {
@@ -975,7 +971,7 @@ Os campos são auto-explicativos, só é preciso atenção especial para defini�
 
 No caso do exemplo, para obtenção da página seguinte, o cliente faria a chamada GET .../...?page=3, conforme informado no atributo "next".
 
-Também devem ser mantidos (repetidos) os query strings (filtros, ordenação, etc..) que o cliente passar na requisição, ainda porque, caso o cliente altere o filtro, todo o envelope de paginação pode ter seus valores alterados.
+Também devem ser mantidos (repetidos) os Query Strings (filtros, ordenação, etc..) que o cliente passar na requisição, ainda porque, caso o cliente altere o filtro, todo o envelope de paginação pode ter seus valores alterados.
 
 Quando se está na primeira página ou na última, os atributos "previous"e "next" devem ficar vazios.
 
@@ -1015,7 +1011,7 @@ No caso do exemplo, a API deve retornar apenas os 3 primeiros registros (recurso
 
 ### Response > Body > Ordenação
 
-Quando se recebe uma solicitação contendo query strings de ordenação (**sort**), deve-se retornar os resultados respeitando os critérios da query.
+Quando se recebe uma solicitação contendo Query Strings de ordenação (**sort**), deve-se retornar os resultados respeitando os critérios da query.
 Ex:
 *Request*
 GET .../pedidos?sort=dataPagamento:desc,dataPedido
@@ -1118,8 +1114,8 @@ Quando a requisição traz um query string **expand**, o body deverá retornar o
 
 Ex:
 Sendo uma API com o formato
-GET .../cartoes/{id-cartao} e 
-GET .../cartoes/{id-cartao}/faturas/{id-fatura}
+GET .../cartoes/{idCartao} e 
+GET .../cartoes/{idCartao}/faturas/{idFatura}
 
 *Request*
 GET .../cartoes/a7834dcG456?expand=faturas&faturas.id=ago18
@@ -1305,7 +1301,7 @@ Os códigos deste grupo são usado em caso de sucesso na requisição. Os mais u
 
 **Grupo 3xx**
 
-Este grupo define respostas de redirecionamento. Servem para informar o cliente sobre mudanças na requisição e redirecionamento para uma nova URL. Para saber mais sobre estes status codes, veja [requisições assíncronas](#processamento-ass%C3%ADncrono). Os mais utilizados são:
+Este grupo define respostas de redirecionamento. Servem para informar o cliente sobre mudanças na requisição e redirecionamento para uma nova URL. Para saber mais sobre estes Status Codes, veja [requisições assíncronas](#processamento-ass%C3%ADncrono). Os mais utilizados são:
 
 TO DO: exemplificar melhor isso aqui!
 
@@ -1321,7 +1317,7 @@ TO DO: exemplificar melhor isso aqui!
 
 Esse grupo informa os erros cometidos pelo cliente durante o request. São eles:
 
-- **400 Bad Request**: Significa que o servidor não consegue entender a requisição, pois existe uma sintaxe ou estrutura inválida, pode ser caracteres não permitidos na URL, falta de cabeçalhos obrigatórios, cabeçalhos mal formados, falta de query strings obrigatórias, falta de atributos obrigatórios, body com estrutura inválida, etc.
+- **400 Bad Request**: Significa que o servidor não consegue entender a requisição, pois existe uma sintaxe ou estrutura inválida, pode ser caracteres não permitidos na URL, falta de cabeçalhos obrigatórios, cabeçalhos mal formados, falta de Query Strings obrigatórias, falta de atributos obrigatórios, body com estrutura inválida, etc.
 
 - **401 Unauthorized**: A camada de segurança do recurso solicitado ao servidor, apontou que não está sendo utilizada as credenciais corretas nessa requisição (token, por exemplo). É um erro de [autenticação](#seguran%C3%A7a).
 
@@ -1633,7 +1629,7 @@ Por exemplo, estruturando os sócios em URLs como recursos, teríamos o cenário
 .../empresas/abc123Xyz/**socios**/JOSÉ/**socios**/Maria/**socios**/EmpresasAzul/**socios**/...
 
 Esta abordagem traz as seguintes dificuldades:
-•	todos os sócios da rota é a entidade sócio, então ao tentar acessar os URI parameters, teremos vários com o mesmo identificador "id-socio", ficando menos óbvia a recuperação destas informações no servidor.
+•	todos os sócios da rota é a entidade sócio, então ao tentar acessar os Path Parameters, teremos vários com o mesmo identificador "idSocio", ficando menos óbvia a recuperação destas informações no servidor.
 •	não é possível definir previamente a quantidade de aninhamentos (recursos do tipo sócio)
 •	um mesmo recurso (o sócio id JOSÉ) poderia estar representado em duas rotas diferentes, ora como sócio da empresa "abc123Xyz", ora como sócio do sócio "Empresas Verdes". O ideal no REST é que o recurso seja acessado apenas em uma rota.
 
@@ -1774,7 +1770,7 @@ Ex (era 2.**0**.0 e vira 2.**1**.0):
 	- em recursos já existentes, adição de novos atributos ou parâmetros não obrigatórios na requisição;
 	- adição de novos atributos no response;
 	- adição de novos verbos;
-	- adição de novos status codes;
+	- adição de novos Status Codes;
 - **PATCH**: implica em mudanças que não alteram a API.
 Ex (era 2.0.**0** e vira 2.1.**1**):
 	- alteração nas descrições dos campos;
