@@ -764,6 +764,8 @@ Quando não se retorna nada no body de uma requisição que foi processada com s
  
 Quando são usados [verbos](#request--verbs) que enviam body no request (POST, PUT e PATCH), é importante notar que o body de request e o de response não precisam ser idênticos. Há casos em que a criação de um recurso implica que se populem atributos do mesmo em tempo de criação. Um exemplo muito recorrente é o identificador (id) que normalmente é gerado pelo servidor e não precisa estar definido no body de request.
 
+<sub>ir para: [índice](#conte%C3%BAdo) | [tipos de dados](#tipos-de-dados) | [request body](#request--body)</sub>
+
 ### Response > Body > Envelope "Data"
 
 Chamamos de **envelope** alguns **atributos que separam conteúdos importantes na resposta**. Quando nos referimos ao body de request, apenas passamos os atributos sem nenhum tipo de envelope. Ex:
@@ -797,6 +799,9 @@ TODO: padronizar o HTTP-CODE XXX em cada resposta
 TODO: padronizar o maiúsculo ou minúsculo em termos como query strings, Path Parameters, http status code, etc.
 TODO: rever {id-entidade} vs idEntidade :: definir qual melhor modelo.
 TODO: rever atributosEmCamel vs query-strings que podem estar sem camel.
+TODO: padronizar os itens que estão como referência
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [tipos de dados](#tipos-de-dados) | [request body](#request--body)</sub>
 
 ### Response > Body > Recurso unitário, array ou nenhum
 
@@ -861,6 +866,8 @@ Também é possível obter resposta vazia quando a busca não retorna nenhum res
 ```
 Veja mais sobre o [HTTP Status Code](#response--http-status-codes) 204 para mais informações. 
 
+<sub>ir para: [índice](#conte%C3%BAdo) | [tipos de dados](#tipos-de-dados) | [request body](#request--body)</sub>
+
 ### Response > Body > Full text search
 
 Quando é definido um query string para buscas gerais, o termo definido na busca deve ser aplicado como filtro em todos os campos pesquisáveis daquele recurso. Por exemplo, uma requisição com a seguinte estrutura GET http://api.empresarh.com/candidatos?q=Paulo deveria retornar um array de resultados como este:
@@ -894,49 +901,47 @@ Quando é definido um query string para buscas gerais, o termo definido na busca
    ]
 }
 ```
-<sub>ir para: [índice](#conte%C3%BAdo) | [request  full text search](#request--url--query-strings--full-text-search)</sub>
-
------TODO Continuar daqui-----
+<sub>ir para: [índice](#conte%C3%BAdo) | [request  full text search](#request--url--query-strings--full-text-search) | [tipos de dados](#tipos-de-dados) | [request body](#request--body)</sub>
 
 ### Response > Body > Paginação
 
 Toda REST API que retorne muitos registros deveria suportar paginação. A paginação reduz o tráfego de dados na rede e o tempo de processamento da API entregando listas menores de resultados por vez. Ainda porque, as interfaces que exibem as informações para os usuários costumam ter um espaço limitado, preenchendo gradativamente conforme o usuário "rola" o conteúdo ou "avança a página".
 
-Sempre que se retorna um resultado paginado, utiliza-se o HTTP Status Code **206 Partial Content**. Além do envelope "data" com o resultado da requisição, deve-se criar um envelope "pagination" com as informações necessárias para permitir que o cliente se movimente entre as páginas.
+Sempre que se retorna um resultado paginado, utiliza-se o HTTP Status Code **206 Partial Content**. Além do envelope "data" com o resultado da requisição, deve-se criar um envelope "**pagination**" com as informações necessárias para permitir que o cliente se movimente entre as páginas.
 
 Existem algumas técnicas diferentes para fazer a paginação. Serão explicadas abaixo.
 
 #### Response > Body > Paginação > Range
 
-Uma das formas de se limitar a quantidade de registros retornados é através de um filtro em algum atributo que represente um intervalo. Assim, quando se recebe um [filtro](#) nas query strings, deve-se retornar o resultado respeitando os critérios do filtro.
-Por exemplo, em uma requisição GET .../...?from-id=3&to-id=6, possuindo o banco de dados uma coleção de 8 registros, o retorno devem ser os registros 3, 4, 5 e 6:
+Uma das formas de se limitar a quantidade de registros retornados é através de um filtro em algum atributo que represente um intervalo. Assim, quando se recebe um filtro nas query strings, deve-se retornar o resultado respeitando os critérios do filtro.
+Por exemplo, em uma requisição GET .../...?from-id=3&to-id=6, possuindo o banco de dados uma coleção de 8 registros, e os ids sendo sequenciais, o retorno devem ser os registros 3, 4, 5 e 6:
 ```json
 {
-	"data": [
-		{
-			"id": 3,
-			...
-		},
-		{
-			"id": 4,
-			...
-		},
-		{
-			"id": 5,
-			...
-		},
-		{
-			"id": 6,
-			...
-		}	
-	]
+   "data": [
+      {
+         "id": 3,
+         "...": "..."
+      },
+      {
+         "id": 4,
+         "...": "..."
+      },
+      {
+         "id": 5,
+         "...": "..."
+      },
+      {
+         "id": 6,
+         "...": "..."
+      }	
+   ]
 }
 ```
 <sub>ir para: [índice](#conte%C3%BAdo) | [request  range](#request--url--query-strings--pagina%C3%A7%C3%A3o--range)</sub>
 
 #### Response > Body > Paginação > Page e Page Size
 
-Quando se utiliza a abordagem de page e page size, a requisição pode ser feita informando a página e o tamanho dela como query string (GET .../...?page=10&page-size=50). A API deve recortar do total de respostas apenas as páginas solicitadas conforme solicitação do cliente ou, caso não tenha sido informado, à partir de valores padrões. Por exemplo, em uma requisição GET .../...?page=2&page-size=3, possuindo o banco de dados uma coleção de 8 registros, o retorno devem ser os registros 4, 5 e 6 mais o envelope "pagination" com seguinte estrutura:
+Quando se utiliza a abordagem de page e page size, a requisição pode ser feita informando a página e o tamanho dela como query string (GET .../...?page=10&pageSize=50). A API deve recortar do total de respostas apenas as páginas solicitadas conforme solicitação do cliente ou, caso não tenha sido informado, à partir de valores padrões. Por exemplo, em uma requisição GET .../...?page=2&pageSize=3, possuindo o banco de dados uma coleção de 8 registros, o retorno devem ser os registros 4, 5 e 6 mais o envelope "pagination" com seguinte estrutura:
 
 ```json
 {
@@ -966,11 +971,11 @@ Quando se utiliza a abordagem de page e page size, a requisição pode ser feita
 }
 ```
 
-Os campos são auto-explicativos, só é preciso atenção especial para definição do que é considerado a página inicial, se 0 ou 1. Por convenção, adotar o 1 vai fazer com que a paginação coincida com o dado que normalmente é exibido na tela para o usuário.
+Os campos são auto-explicativos, só é preciso atenção especial para definição do que é considerado a página inicial, se 0 ou 1. Por convenção, adotar o 1 vai fazer com que a paginação coincida com a paginação que normalmente é exibida na tela para o usuário.
 
-No caso do exemplo, para obtenção da página seguinte, o cliente faria a chamada GET .../...?page=3&page-size=3, conforme informado no atributo "next".
+No caso do exemplo, para obtenção da página seguinte, o cliente faria a chamada GET .../...?page=3, conforme informado no atributo "next".
 
-Também devem ser mantidos (repetidos) os query strings (filtros, ordenação, etc..) que o cliente passar na requisição, ainda porque, caso o cliente altere o filtro, toda o envelope de páginação pode ter seus valores alterados.
+Também devem ser mantidos (repetidos) os query strings (filtros, ordenação, etc..) que o cliente passar na requisição, ainda porque, caso o cliente altere o filtro, todo o envelope de paginação pode ter seus valores alterados.
 
 Quando se está na primeira página ou na última, os atributos "previous"e "next" devem ficar vazios.
 
@@ -983,40 +988,41 @@ Muitas vezes, criamos APIs para sistemas legados e com isso, precisamos nos ajus
 
 #### Response > Body > Paginação > Limit
 
-Quando se usa o query string [limit](#) para limitar a quantidade de registros, o retorno deve trazer apenas a quantidade de registros definida no query string. Ex:
+Quando se usa o query string **limit** para limitar a quantidade de registros, o retorno deve trazer apenas a quantidade de registros definida no query string. Ex:
 GET .../...?limit=3
 ```json
 {
-	"data": [
-		{
-			"id": 1,
-			...
-		},
-		{
-			"id": 2,
-			...
-		},
-		{
-			"id": 3,
-			...
-		}
-	]
+   "data": [
+      {
+         "id": 1,
+         "...": "..."
+      },
+      {
+         "id": 2,
+         "...": "..."
+      },
+      {
+         "id": 3,
+         "...": "..."
+      }
+   ]
 }
 ```
 No caso do exemplo, a API deve retornar apenas os 3 primeiros registros (recursos) da coleção.
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [request  limit](#request--url--query-strings--pagina%C3%A7%C3%A3o--limit)</sub>
 
+
 ### Response > Body > Ordenação
 
-Quando se recebe uma solicitação contendo query strings de ordenação, deve-se retornar os resultados respeitando os critérios da query.
+Quando se recebe uma solicitação contendo query strings de ordenação (**sort**), deve-se retornar os resultados respeitando os critérios da query.
 Ex:
 GET .../pedidos?sort=dataPagamento:desc,dataPedido
 Response
 ```json
 {
-	"data":[
-		{
+   "data":[
+         {
 			"id": 456985,
 			"dataPagamento": "2019-06-05",
 			"dataPedido": "2019-06-02",
@@ -1050,63 +1056,70 @@ TODO: Fazer este tópico
 
 ### Response > Body > Views
 
-Quando a requisição recebe o query string [view](#), o response deve devolver apenas os atributos convencionados (e documentados) como pertencentes àquela view.
+Quando a requisição recebe o query string **view**, o response deve devolver apenas os atributos convencionados (e documentados) como pertencentes àquela view.
 Ex:
 - GET .../cartoes/a7834dcG456?view=basico
 Retorno:
 ```json
 {
-  "id": "a7834dcG456",
-  "status": "válido",
-  "produto": "Platinum",
-  "bandeira": "mastercard",
-  "numero": "5461********7965"
+   "data": {
+      "id": "a7834dcG456",
+      "status": "válido",
+      "produto": "Platinum",
+      "bandeira": "mastercard",
+      "numero": "5461********7965"
+  }
 }
 ```
 - GET .../cartoes/a7834dcG456?view=limites
 Retorno:
 ```json
 {
-  "id": "a7834dcG456",
-  "status": "válido",
-  "limites": {
-	  "contratado": 8000,
-	  "usado": 2500,
-	  "disponivel": 5500
-  }
+   "data": {
+      "id": "a7834dcG456",
+      "status": "válido",
+      "limites": {
+         "contratado": 8000,
+	     "usado": 2500,
+	     "disponivel": 5500
+      }
+   }
 }
 ```
 - GET .../cartoes/a7834dcG456
 Retorno:
 ```json
 {
-  "id": "a7834dcG456",
-  "status": "válido",
-  "produto": "Platinum",
-  "bandeira": "mastercard",
-  "numero": "5461********7965",
-  "dataMelhorCompra": {
-    "data": "2016-02-28",
-    "quantidadeDiasParaPagar": 12
-  },
-  "limites": {
-	  "contratado": 8000,
-	  "usado": 2500,
-	  "disponivel": 5500
-  }  
+   "data": {
+      "id": "a7834dcG456",
+      "status": "válido",
+      "produto": "Platinum",
+      "bandeira": "mastercard",
+      "numero": "5461********7965",
+      "dataMelhorCompra": {
+         "data": "2016-02-28",
+         "quantidadeDiasParaPagar": 12
+      },
+      "limites": {
+         "contratado": 8000,
+         "usado": 2500,
+         "disponivel": 5500
+      }
+   } 
 }
 ```
 <sub>ir para: [índice](#conte%C3%BAdo) | [request  views](#request--url--query-strings--views)</sub>
 
 ### Response > Body > Expand
 
-Quando a requisição traz um query string [expand](#), o body deverá retornar o recurso definido na URL mais os recursos definidos no expand aninhados no recurso principal.
+Quando a requisição traz um query string **expand**, o body deverá retornar o recurso definido na URL mais os recursos definidos no expand aninhados no recurso principal.
 
 Ex:
-> referência
-GET .../cartoes/{id-cartao}
+Sendo uma API com o formato
+GET .../cartoes/{id-cartao} e 
 GET .../cartoes/{id-cartao}/faturas/{id-fatura}
 
+Request
 GET .../cartoes/a7834dcG456?expand=faturas&faturas.id=ago18
 Retorno
 ```json
@@ -1137,67 +1150,68 @@ Retorno
 	}
 }
 ```
-Observe que até o atributo limites são atributos do recurso cartão, no atributo faturas, é retornado o array de faturas como se tivesse havido uma chamada ao recurso .../cartoes/a7834dcG456/faturas/ago18.
+Observe que o conteúdo até o atributo limites são atributos do recurso cartão, no atributo faturas, é retornado o array de faturas como se tivesse havido uma chamada ao recurso .../cartoes/a7834dcG456/faturas/ago18.
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [request  expand](#request--url--query-strings--expand)</sub>
 
 ### Response > Body > Errors e Warnings
 
 #### Errors
-Quando ocorrem requisições cujo retorno seja um erro (HTTP Status Code 5xx e 4xx), o body deve retornar o detalhamento do erro. Neste caso, não são retornados os envelopes relacionados às requisições bem sucedidas como "data", "pagination", "links", etc.
+Quando ocorrem requisições cujo retorno seja um erro ([HTTP Status Code](#response--http-status-codes) 5xx e 4xx), o body deve retornar o detalhamento do erro. Neste caso, não são retornados os envelopes relacionados às requisições bem sucedidas como "data", "pagination", "links", etc.
 O detalhamento do erro, é algo mais do que simplesmente o que o HTTP Status Code já expressa por si, mesmo. Ele deve ser suficiente para que o cliente entenda o que aconteceu e saiba o que fazer diante daquele problema.
+
 Ex:
 HTTP Status Code 422
 ```json
-	{
-	   "codigo": "ER0059",
-	   "mensagem": "Operação não permitida fora do horário comercial.",
-	   "detalhes": "https://developer.empresa.com/apis/cartoes/erros/ER0059"
-	}
+{
+   "codigo": "ER0059",
+   "mensagem": "Operação não permitida fora do horário comercial.",
+   "detalhes": "https://developer.empresa.com/apis/cartoes/erros/ER0059"
+}
 ```
 HTTP Status Code 428
 ```json
-	{
-	   "codigo": "err-pto-A320",
-	   "mensagem": "Não é possível fazer o lançamento de horas extras sem pré-aprovação do gerente.",
-	   "detalhes": "https://developer.empresa.com/apis/rh/erros/err-pto-A320"
-	}
+{
+   "codigo": "err-pto-A320",
+   "mensagem": "Não é possível fazer o lançamento de horas extras sem pré-aprovação do gerente.",
+   "detalhes": "https://developer.empresa.com/apis/rh/erros/err-pto-A320"
+}
 ```
 Quando a API retorna HTTP Status Code 400 e 422, muito provavelmente o erro foi causado por algum atributo específico. Nestes casos, deve-se especificar as informações sobre cada um dos atributos envolvidos no erro.
 
 HTTP Status Code 400
 ```json
-	{
-	   "codigo": "10023",
-	   "mensagem": "Alguns campos estão preenchidos incorretamente.",
-	   "detalhes": "https://developer.empresa.com/apis/erros/10023",
-	   "atributos":[
-            {
-               "nome":"dataPedido",
-               "mensagem":"O formato de data é inválido. Utilize data no padrão yyyy-MM-DD.",
-               "valor":"01-05-2019",
-               "detalhes": "https://developer.empresa.com/apis/erros/err-gen-086"
-            },
-            {
-               "nome":"valorPagamento",
-               "mensagem":"Valor não é number.",
-               "valor":"R$ 27.568,90",
-               "detalhes": "https://developer.empresa.com/apis/erros/err-gen-073"
-            }
-         ]
-	}
+{
+   "codigo": "10023",
+   "mensagem": "Alguns campos estão preenchidos incorretamente.",
+   "detalhes": "https://developer.empresa.com/apis/erros/10023",
+   "atributos":[
+      {
+         "nome":"dataPedido",
+         "mensagem":"O formato de data é inválido. Utilize data no padrão yyyy-MM-DD.",
+         "valor":"01-05-2019",
+         "detalhes": "https://developer.empresa.com/apis/erros/err-gen-086"
+      },
+      {
+         "nome":"valorPagamento",
+         "mensagem":"Valor não é number.",
+         "valor":"R$ 27.568,90",
+          "detalhes": "https://developer.empresa.com/apis/erros/err-gen-073"
+      }
+   ]
+}
 ```
 
 #### Warnings
-Durante requisições com retorno de sucesso (HTTP Status Code 2xx e 3xx) pode haver situações que um alerta deve ser enviado ao cliente ser emitido. Por exemplo, alertar que uma transação no cartão de crédito atingiu o 80% do limite disponível no cartão ou até mesmo, tendo atingido o limite do cartão, alertar que será cobrada uma taxa pelo uso do limite emergencial.
+Durante requisições com retorno de sucesso ([HTTP Status Code](#response--http-status-codes) 2xx e 3xx) pode haver situações que um alerta deve ser enviado ao cliente. Por exemplo, alertar que uma transação no cartão de crédito atingiu o 80% do limite disponível ou até mesmo, tendo atingido o limite do cartão, alertar que será cobrada uma taxa pelo uso do limite emergencial.
 
-O alerta se dá através de um envelope **messages** com a mesma estrutura do envelope de [erro](#).
+O alerta se dá através de um envelope **messages** com a estrutura semelhante às das mensagens de erro.
 Ex:
 HTTP Status Code 201
 ```json
 {
    "data":{
-      ...
+      "...": "..."
    },
    "messages":[
       {
@@ -1209,48 +1223,50 @@ HTTP Status Code 201
 ```
 O atributo "atributos" não é obrigatório e neste cenário, no entanto, nos casos que fizer sentido, informá-los pode ajudar o cliente a entender mais especificamente o que provocou o alerta.
 
+<sub>ir para: [índice](#conte%C3%BAdo) | [http status codes](#response--http-status-codes)</sub>
+
 ### Response > Body > HATEOAS
 
 **H**ypermedia **A**s **T**he **E**ngine **O**f **A**pplication **S**tate (HATEOAS) é uma dos pilares da arquitetura REST pela qual um cliente pode interagir com a API através de links informados pelo servidor. Assim, simplesmente fazendo requisições aos recursos, o cliente vai "descobrindo" as opções disponíveis sem ter de estudar uma documentação, proporcionando uma maneira de fazer os protocolos auto-documentados.
 
 A implementação é a disponibilização de um envelope **links** na resposta de um recurso.
 
-Por exemplo, em um serviço de consulta de cartões, podemos informar ao cliente que ele também pode consultar as transações, faturas e contratar novos adicionais.
+Por exemplo, em um serviço de consulta de cartões, podemos informar ao cliente que ele também pode consultar as transações, faturas e contratar novos cartões adicionais.
 
 Ex:
 ```json
 {
-"data": {
-  "id": "a7834dcG456",
-  "status": "válido",
-  "produto": "Platinum",
-  "bandeira": "mastercard",
-  "numero": "5461********7965",
-  "dataMelhorCompra": {
-    "data": "2016-02-28",
-    "quantidadeDiasParaPagar": 12
-  }
-},
-"links":[
-   {
-    "rel": "faturas",
-    "href": "/cartoes/a7834dcG456/faturas",
-    "title": "Retorna todas as faturas",
-    "method": "GET"
-  },
-  {
-    "rel": "adicionais",
-    "href": "/cartoes/a7834dcG456/adicionais",
-    "title": "Retorna a lista de cartões adicionais",
-    "method": "GET"
-  },
-  {
-    "rel": "upgrade",
-    "href": "/cartoes/a7834dcG456/ofertas-upgrade",
-    "title": "Retorna a lista de ofertas para fazer upgrade do cartão.",
-    "method": "GET"
-  }
-]
+   "data": {
+      "id": "a7834dcG456",
+      "status": "válido",
+      "produto": "Platinum",
+      "bandeira": "mastercard",
+      "numero": "5461********7965",
+      "dataMelhorCompra": {
+         "data": "2016-02-28",
+         "quantidadeDiasParaPagar": 12
+      }
+   },
+   "links":[
+      {
+         "rel": "faturas",
+         "href": "/cartoes/a7834dcG456/faturas",
+         "title": "Retorna todas as faturas",
+         "method": "GET"
+      },
+      {
+         "rel": "adicionais",
+         "href": "/cartoes/a7834dcG456/adicionais",
+         "title": "Retorna a lista de cartões adicionais",
+         "method": "GET"
+      },
+      {
+         "rel": "upgrade",
+         "href": "/cartoes/a7834dcG456/ofertas-upgrade",
+         "title": "Retorna a lista de ofertas para fazer upgrade do cartão.",
+         "method": "GET"
+      }
+   ]
 }
 ```
 Apesar de existir propostas para o formato da declaração dos hyperlinks como o [HAL](https://en.wikipedia.org/wiki/Hypertext_Application_Language), não há uma rigidez quanto à adoção do padrão. Por simplicidade de facilidade de entendimento, o padrão do exemplo expõe bem os links relacionados.
@@ -1259,27 +1275,27 @@ Com o uso de HATEOAS, o cliente pode implementar funcionalidades na tela, confor
 
 A adoção do HATEOAS atinge o nível mais alto no [Richardson Maturity Model](https://martinfowler.com/articles/richardsonMaturityModel.html).
 
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
+
 ### Response > HTTP Status Codes
 
-No HTTP existem os [códigos de status](#[https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status)). Eles de forma padronizada reportam se a requisição foi processada com sucesso ou não. Existem muitos códigos e nem todos são adotados pelo REST. A adoção veio com o uso do do mercado e alguns códigos são amplamente usados e outros nem tanto.
+No HTTP existem os [códigos de status](#[https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status)). Eles, de forma padronizada, reportam se a requisição foi processada com sucesso ou não. Existem vários HTTP Status Codes e nem todos são adotados pelo mercado para uso com REST.
 
-Abaixo, coloco os que adoto como padrão nas empresas onde trabalho.
-
-Basicamente, os códigos de resposta são agrupados: 1xx, 2xx, 3xx, 4xx e 5xx. 
+Basicamente, os códigos de resposta são agrupados: 1xx, 2xx, 3xx, 4xx e 5xx. Abaixo, seguem os mais usuais.
 
 **Grupo 1xx**
 
-Este é o grupo de status que dá respostas informativas. Respostas com este status são raramente utilizadas.
+Este é o grupo de status que dá respostas informativas. Respostas com este status são raramente utilizadas. Por isso, não listo nenhum deste grupo aqui.
 
 **Grupo 2xx**
 
 Os códigos deste grupo são usado em caso de sucesso na requisição. Os mais utilizados são:
 
-- **200 OK**:  Código mais utilizado e que indica que a requisição foi processada com sucesso. Esta resposta pode ser usada em todos os [verbos](#request--verbs). Os dados solicitados serão retornados no Body.
+- **200 OK**:  Código mais utilizado e que indica que a requisição foi processada com sucesso. Esta resposta pode ser usada em todos os verbos. Os dados solicitados serão retornados no Body.
 
 - **201 Created**:  Indica que a requisição foi bem sucedida e que um novo recursos foi criado como resultado. Esta resposta é utilizada em requisições do método POST.
 
-- **202 Accepted**:	O recurso será atualizado/criado de forma assíncrona. Veja [processamento assíncrono] para mais detalhes.
+- **202 Accepted**:	O recurso será atualizado/criado de forma assíncrona. Veja [processamento assíncrono](#processamento-ass%C3%ADncrono) para mais detalhes.
 
 - **204 No Content**: A requisição aconteceu com sucesso, no entanto, não há body na resposta. O 204 não é utilizado para o verbo GET. Nos casos de GET cujos critérios na requisição provocaram uma resposta vazia, utilizamos o HTTP code 200 com o envelope "data" vazio.
 
@@ -1287,15 +1303,15 @@ Os códigos deste grupo são usado em caso de sucesso na requisição. Os mais u
 
 **Grupo 3xx**
 
-Este grupo define respostas de redirecionamento. Servem para informar o cliente sobre mudanças na requisição e redirecionamento para uma nova URL. Para saber mais sobre estes status codes, veja [requisições assíncronas](#). Os mais utilizados são:
+Este grupo define respostas de redirecionamento. Servem para informar o cliente sobre mudanças na requisição e redirecionamento para uma nova URL. Para saber mais sobre estes status codes, veja [requisições assíncronas](#processamento-ass%C3%ADncrono). Os mais utilizados são:
 
 TODO: exemplificar melhor isso aqui!
 
 - **301 Moved Permanently**: Informa que o recurso A agora é o recurso B, de forma que quando o cliente solicitar o recurso A ele será automaticamente encaminhado ao recurso B.
 
-- **303 See Other**: A resposta para a requisição encontra-se em outra URL definida no header **Location**. Veja [Tarefas Assíncronas](#) para mais informações.
+- **303 See Other**: A resposta para a requisição encontra-se em outra URL definida no header **Location**. Veja [processamento assíncrono](#processamento-ass%C3%ADncrono) para mais informações.
 
-- **304 Not Modified**:  Resposta utilizada quando o recurso está em [cache](#), informando ao cliente que a resposta não foi modificada, e que o cliente pode usar a mesma versão em cache da resposta.
+- **304 Not Modified**:  Resposta utilizada quando o recurso está em [cache](#performance-cache-e-compress%C3%A3o), informando ao cliente que a resposta não foi modificada, e que o cliente pode usar a mesma versão em cache da resposta.
 
 - **307 Temporary redirect**:  Se trata de um redirecionamento de uma página para outro endereço, porém que é com caráter temporário, e não permanente. Provavelmente por conta de alguma manutenção no sistema.
 
@@ -1305,11 +1321,11 @@ Esse grupo informa os erros cometidos pelo cliente durante o request. São eles:
 
 - **400 Bad Request**: Significa que o servidor não consegue entender a requisição, pois existe uma sintaxe ou estrutura inválida, pode ser caracteres não permitidos na URL, falta de cabeçalhos obrigatórios, cabeçalhos mal formados, falta de query strings obrigatórias, falta de atributos obrigatórios, body com estrutura inválida, etc.
 
-- **401 Unauthorized**: A camada de segurança do recurso solicitado ao servidor, apontou que não está sendo utilizada as credenciais corretas nessa requisição (token, por exemplo). É um erro de autenticação.
+- **401 Unauthorized**: A camada de segurança do recurso solicitado ao servidor, apontou que não está sendo utilizada as credenciais corretas nessa requisição (token, por exemplo). É um erro de [autenticação](#seguran%C3%A7a).
 
-- **403 Forbidden**: As credenciais (token) estão corretos, mas o usuário não tem permissão para acessar aquele recurso.
+- **403 Forbidden**: As credenciais (token) estão corretos, mas o usuário não tem permissão para acessar aquele recurso. É um erro de [autorização](#seguran%C3%A7a).
 
-- **404 Not Found**: O servidor não encontrou o recurso solicitado pelo cliente. Provavelmente a URL está mau formada ou está sendo feita a busca com um [Path Parameter](#) inválido.
+- **404 Not Found**: O servidor não encontrou o recurso solicitado pelo cliente. Provavelmente a URL está mau formada ou está sendo feita a busca com um Path Parameter inválido.
 Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não exista.
  
 - **405 Method Not Allowed**: O recurso (URL) existe mas o verbo usado não foi definido para ela.
@@ -1318,13 +1334,13 @@ Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não ex
 
 - **414 URI Too Long**: O tamanho da URL pode ser limitado pelo servidor. Assim, este erro é lançado quando uma URL ultrapassa o tamanho máximo permitido. [+ info](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/414)
 
-- **418 I'm a teapot**: O servidor se recusa a servir um café porque o bule é chá. Código de resposta do Hyper Text Coffee Pot Control Protocol ([HTCPCP/1.0](https://tools.ietf.org/html/rfc2324#section-2.3.2)).  #AprilFoolsJoke #1998 :-) [+ info](https://sitesdoneright.com/blog/2013/03/what-is-418-im-a-teapot-status-code-error)
+- **418 I'm a teapot**: O servidor se recusa a servir um café porque o bule é chá. Código de resposta do Hyper Text Coffee Pot Control Protocol ([HTCPCP/1.0](https://tools.ietf.org/html/rfc2324#section-2.3.2)).  Este código é só uma brincadeira de primeiro de abril. :-) [+ info](https://sitesdoneright.com/blog/2013/03/what-is-418-im-a-teapot-status-code-error)
 
-- **422 Unprocessable Entity**:	Quando a requisição está correta ao nível sintático, mas existem erros de negócio na requisição. Por exemplo, se existe regra que o uso de um query parameter está condicionado a outro e eles não foram preenchidos, ou uma data informada é inválida, ou uma requisição de transferência de dinheiro é feita e a conta não tem fundo, etc.
+- **422 Unprocessable Entity**:	Ocorre quando a requisição está correta ao nível sintático, mas existem erros de negócio na requisição. Por exemplo, se existe regra que o uso de um query parameter está condicionado a outro e eles não foram preenchidos, ou uma data informada é inválida para uma determinada ação, ou uma requisição de transferência financeira é feita e a conta não tem fundo, etc.
 
 - **428 Precondition Required**: O recurso faz parte de um processo composto de vários passos. Foi feita uma tentativa de acessar um passo sem antes ter passado pelo passo anterior.
 
-- **429 Too Many Requests**: Informa ao cliente que ele excedeu o limite permitido de requisições. Veja [throttling](#) para entender mais sobre este código de retorno.
+- **429 Too Many Requests**: Informa ao cliente que ele excedeu o limite permitido de requisições. Leia sobre [segurança](#seguran%C3%A7a) para entender mais sobre este código de retorno.
 
 **Grupo 5xx**
 
@@ -1332,13 +1348,15 @@ São códigos que retornam erros que aconteceram por culpa do servidor. Ou seja,
 
 - **500 Internal Server Error**: Erro mais genérico para informar que o servidor encontrou um cenário inesperado de erro que não soube tratar, e por isso não conseguiu retornar uma resposta na requisição do cliente.
 
-- **501 Not Implemented**: O verbo HTTP não foi disponibilizado na API ou a URL informada não existe, não por conta de [URI Parameters](#) inválidos, mas por conta de ter um recurso ainda não implementado. Normalmente isto acontece quando existe a previsão de se fazer a implementação em breve, mas versão atual ainda não suporta.
+- **501 Not Implemented**: O verbo HTTP não foi disponibilizado na API ou a URL informada não existe, não por conta de Path Parameters inválidos, mas por conta de ter um recurso ainda não implementado. Normalmente isto acontece quando existe a previsão de se fazer a implementação em breve, mas versão atual ainda não suporta.
 
-- **503 Service Unavailable**: O servidor não está respondendo por que está fora do ar, em manutenção ou sobrecarregado.
+- **503 Service Unavailable**: O servidor não está respondendo por que está fora do ar, em manutenção ou sobrecarregado. É um problema temporário.
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ## Tipos de dados
 
-No [JSON](#), são definidos os seguintes tipos de dados: string, number, object, array, boolean, null. Datas, por exemplo, são trafegadas strings, logo é necessário adotar alguns padrões para o formato delas, geralmente respeitando ISOs.
+No body da requisição, trafegam-se dados estruturados. No JSON (notação mais usada para isso), são definidos os seguintes tipos de dados: string, number, object, array, boolean, null. Datas, por exemplo, são trafegadas como strings, logo é necessário adotar alguns padrões para o formato delas, geralmente respeitando ISOs.
 
 Abaixo, seguem algumas formatações padrões para os tipos de dados:
 
@@ -1356,7 +1374,7 @@ Abaixo, seguem algumas formatações padrões para os tipos de dados:
 | Idiomas | String com o formato [ISO 693(https://en.wikipedia.org/wiki/Lists_of_ISO_639_codes) |por (Portuguese)<br>eng (English)<br>spa (Spanish) |
 | Países | String com o formato [ISO 3166-2](https://en.wikipedia.org/wiki/ISO_3166)|BR (Brasil)<br>PT (Portugal)
 
-<sub>ir para: [índice](#conte%C3%BAdo)</sub>
+<sub>ir para: [índice](#conte%C3%BAdo) | [body](#request--body)</sub>
 
 ## Processamento Assíncrono
 
@@ -1374,7 +1392,7 @@ POST  http://api.exemplo.com/contas/v1/contas
 {
 	"agencia": 2153,
 	"cliente": "José da Silva",
-	...
+	"...": "..."
 }
 ```
 Response
@@ -1389,12 +1407,12 @@ Response
 HTTP 200 Ok
 ```json
 {
-	"data":{
-	  "id":"1",
-	  "situacao": "processando",
-	  "TTC": "2019-07-16T19:20:30.00-03:00"
-      "mensagens":[
-		 {
+   "data":{
+      "id":"1",
+      "situacao": "processando",
+      "TTC": "2019-07-16T19:20:30.00-03:00"
+       "mensagens":[
+         {
 		   "codigo": "103",
 		   "mensagem" : "Sua requisicao está esperando pela verificação de um operador.",
 		   "tipo": "info"
@@ -1413,6 +1431,7 @@ HTTP 200 Ok
 - **mensagens.tipo**: [info, aviso, erro] o tipo de informação na mensagem.
 
 3. Em algum momento, o processamento estará completo, seja com erro ou não. Em caso de sucesso, a resposta será um HTTP Status Code 303 See Other que indicará que o recurso foi criado e está na URL indicada no Location.
+Ex:
 Request
 GET http://api.exemplo.com/contas/v1/contas-processamento/1
 Response
@@ -1435,7 +1454,7 @@ Content-Location: http://api.exemplo.com/contas/v1/contas-processamento/1
 	}
 }
 ```
-4. Agora já é possível fazer a requisição no endereço do Location http://api.exemplo.com/contas/v1/contas/21531234567 e consultar o recurso criado.
+5. Agora já é possível fazer a requisição no endereço do Location http://api.exemplo.com/contas/v1/contas/21531234567 e consultar o recurso criado.
 Ex:
 Request
 GET http://api.exemplo.com/contas/v1/contas/21531234567
@@ -1443,13 +1462,15 @@ Response
 HTTP 200 Ok
 ```json
 {
-	"id": 21531234567,
-	"agencia": 2153,
-	"conta": 123456,
-	"dac": 7,
-	"segmento": "premium",
-	"cliente": "José da Silva",
-	...
+   "data":{
+      "id": 21531234567,
+      "agencia": 2153,
+      "conta": 123456,
+      "dac": 7,
+      "segmento": "premium",
+      "cliente": "José da Silva",
+      "...": "..."
+   }
 }
 ```
 
@@ -1462,18 +1483,18 @@ HTTP 200 Ok
 Content-Location: http://api.exemplo.com/contas/v1/contas-processamento/1
 ```json
 {
-	"data":{
-	  "id":"1",
-	  "situacao": "falha",
-	  "TTC": null
+   "data":{
+      "id":"1",
+      "situacao": "falha",
+      "TTC": null
       "mensagens":[
-		 {
-		   "codigo": "ERR135",
-		   "mensagem" : "A conta não foi criada por conta de restrição de crédito.",
-		   "tipo": "erro"
-		  }
-		]
-	}
+         {
+            "codigo": "ERR135",
+            "mensagem" : "A conta não foi criada por conta de restrição de crédito.",
+            "tipo": "erro"
+         }
+      ]
+   }
 }
 ```
 
@@ -1484,7 +1505,7 @@ Ao término do processamento:
 
 #### Callbacks
 
-Além da possibilidade do cliente fazer consultas recorrentes no passo 2 para verificar o andamento do processamento, pode-se optar por fazer callback do servidor para o cliente quando a requisição estiver terminada. Neste caso, o cliente deverá chamar o recurso cujo processamento se dá assincronament informando o header **Empresa-Callback**.
+Além da possibilidade do cliente fazer consultas recorrentes no passo 2 para verificar o andamento do processamento, pode-se optar por fazer callback do servidor para o cliente quando a requisição estiver terminada. Neste caso, o cliente deverá chamar o recurso cujo processamento se dá assincronament informando o header **[Empresa]-Callback**.
 
 Ex:
 Request
@@ -1495,8 +1516,8 @@ HTTP 200 OK
 Location:  http://api.exemplo.com/contas/v1/contas-processamento/1
 ```json
 {
-	"data":{
-	  "id":"1",
+   "data":{
+      "id":"1",
 	  "situacao": "processando",
 	  "TTC": "2019-07-16T19:20:30.00-03:00"
       "mensagens":[
@@ -1516,37 +1537,38 @@ Neste caso, o cliente pode optar por não chamar mais a API de processamento par
 
 ## Processamento em lotes
 
-Hoje existem ferramentas que permitem grande performance para atender grandes volumes de requisições online, sem a necessidade de precisar acumular requisições para processar de uma só vez. Quando se fala em REST API, normalmente busca-se este cenário de processamento em tempo real. No entanto, principalmente em REST APIs de uso interno, existem situações onde o processamento é feito em lotes. Neste cenário, pode-se seguir o seguinte padrão:
+Hoje existem ferramentas que permitem alta performance para atender grandes volumes de requisições online, sem a necessidade de precisar acumular requisições para processar de uma só vez. Quando se fala em REST API, normalmente busca-se este cenário de processamento em tempo real. No entanto, principalmente em REST APIs de uso interno, existem situações onde o processamento é feito em lotes. Neste cenário, pode-se seguir o seguinte padrão:
 
-1.	O cliente define um array de objetos, sendo cada deles um request HTTP declarado com todos os seus componentes (incluindo URI, [verbos](#request--verbs) e headers);
+1.	O cliente define um array de objetos, sendo cada deles um request HTTP declarado com todos os seus componentes (incluindo URL, verbos e headers);
 2.	O cliente submete o array mensagem para o servidor usando o verbo POST para um recurso de API preparado para receber a requisição do passo 1;
-
+Ex:
+Request:
 POST .../batch
 Content-Type: application/xml
 ```json
 {
 "requests":[
-		{
-			"method": "PUT",
-			"url": "http://api.exemplo.com/recurso/123"
-			"headers":[
-				{"name": "Content-Type", "value": "application/json"}
-			],
-			"body": {
-				...
-			}
-		},
-		{
-			"method": "POST",
-			"url": "http://api.exemplo.com/recurso"
-			"headers":[
-				{"name": "Content-Type", "value": "application/json"}
-			],
-			"body": {
-				...
-			}
-		}
-	]
+      {
+         "method": "PUT",
+         "url": "http://api.exemplo.com/recurso/123"
+         "headers":[
+            {"name": "Content-Type", "value": "application/json"}
+         ],
+         "body": {
+            "...": "..."
+         }
+      },
+      {
+         "method": "POST",
+         "url": "http://api.exemplo.com/recurso"
+         "headers":[
+            {"name": "Content-Type", "value": "application/json"}
+         ],
+         "body": {
+            "...": "..."
+         }
+      }
+   ]
 }
 ```
 3.	O servidor quando receber a requisição, deve processar o array separando cada item do array e despachando-os para as respectivas APIs que fazem o processamento individual de cada item.
@@ -1559,29 +1581,29 @@ Content-Type: application/json
 ```json
 {
 "responses":[
-		{
-			"httpStatus": "200",
-			"message": "OK",
-			"headers":[
-				{"name": "Content-Type", "value": "application/json"},
-				{"name": "Content-Location", "value": "http://api.exemplo.com/recurso/123"}
-			],
-			"body": {
-				...
-			}
-		},
-		{
-			"httpStatus": "412",
-			"message": "Precondition Failed",
-			"headers":[
-				{"name": "Content-Type", "value": "application/json"},
-				{"name": "Content-Location", "value": "http://api.exemplo.com/recurso"}
-			],
-			"body": {
-				...
-			}
-		}
-	]
+      {
+         "httpStatus": "200",
+         "message": "OK",
+         "headers":[
+            {"name": "Content-Type", "value": "application/json"},
+            {"name": "Content-Location", "value": "http://api.exemplo.com/recurso/123"}
+         ],
+         "body": {
+            "...": "..."
+         }
+      },
+      {
+         "httpStatus": "412",
+         "message": "Precondition Failed",
+         "headers":[
+            {"name": "Content-Type", "value": "application/json"},
+            {"name": "Content-Location", "value": "http://api.exemplo.com/recurso"}
+         ],
+         "body": {
+            "...": "..."
+         }
+      }
+   ]
 }
 ```
 ## Recursividade
@@ -1608,66 +1630,67 @@ Por exemplo, estruturando os sócios em URLs como recursos, teríamos o cenário
 Esta abordagem traz as seguintes dificuldades:
 •	todos os sócios da rota é a entidade sócio, então ao tentar acessar os URI parameters, teremos vários com o mesmo identificador "id-socio", ficando menos óbvia a recuperação destas informações no servidor.
 •	não é possível definir previamente a quantidade de aninhamentos (recursos do tipo sócio)
-•	um mesmo recurso (o sócio número JOSÉ) poderia estar representado em duas rotas diferentes, ora como sócio da empresa "abc123Xyz", ora como sócio do sócio "Empresas Verdes". O ideal no REST é que o recurso seja acessado apenas em uma rota.
+•	um mesmo recurso (o sócio id JOSÉ) poderia estar representado em duas rotas diferentes, ora como sócio da empresa "abc123Xyz", ora como sócio do sócio "Empresas Verdes". O ideal no REST é que o recurso seja acessado apenas em uma rota.
 
 Caso a opção fosse definir estes sócios não como recursos, mas como estruturas aninhadas dentro de um único recurso "sócio", teríamos algo assim:
-GET .../empresas/abc123Xyz/**socios**/JOSE e o retorno ficaria algo:
+GET .../empresas/abc123Xyz/**socios**/JOSE e o retorno ficaria algo assim:
 ```json
 {
-	"data":[
-		{ 
-			"id": "JOSE", 
-			"outrosDados": "...",
-			"socios": [
-				{
-					"id": "MARIA", 
-					"outrosDados": "..."
-					"socios": [
-						{
-	  						"id": "EMPRESASAZUL", 
-	  						"outrosDados": "..."
-	  						"socios": [
-	  							{
-	  								"id": "CARLOS", 
-	  								"outrosDados": "..."
-	  								"socios": [
-	  									"outrosSocios": "..."
-	  								]
-	  							},
-	  							{
-	  								"id": "JOAO", 
-	  								"socios": [
-		  								"outrosSocios": "..."
-	  								]
-	  							}
-	  						]
-						}
-	  				]
-				}
-			]
-		}
-	]
+   "data":[
+      { 
+         "id": "JOSE", 
+         "outrosDados": "...",
+         "socios": [
+            {
+               "id": "MARIA", 
+               "outrosDados": "..."
+	           "socios": [
+                  {
+                     "id": "EMPRESASAZUL", 
+                     "outrosDados": "..."
+                     "socios": [
+                        {
+                           "id": "CARLOS", 
+                           "outrosDados": "..."
+                           "socios": [
+                              "outrosSocios": "..."
+                           ]
+                        },
+                        {
+                           "id": "JOAO", 
+                           "socios": [
+	                           "outrosSocios": "..."
+                           ]
+                        }
+                     ]
+                  }
+               ]
+            }
+         ]
+      }
+   ]
 } 
 ```
 
 Esta abordagem traz as seguintes dificuldades:
-•	Caso eu queira trocar o telefone do sócio Maria, por exemplo, eu não teria uma rota para fazer um PATCH diretamente no recurso. Seria necessário enviar o .../socios/JOSE completo com todos os seus aninhamentos para alterar uma informação pequena.
-•	Não temos como saber previamente a quantidade de sócios para aninhar e definir no contrato do recurso (json) que representa a sociedade.
+•	Caso seja necessário trocar o telefone do sócio Maria, por exemplo, não haveria uma URL para fazer um PATCH diretamente no recurso. Seria necessário enviar o .../socios/JOSE completo com todos os seus aninhamentos para alterar uma informação pequena.
+•	Não temos como saber previamente a quantidade de sócios para aninhar e definir no contrato do recurso (JSON) que representa essa entidade de socios.
 
 ### Solução
 
 Para contornar os problemas explicados acima, podemos separar o recurso sócio do relacionamento entre eles. Ex:
 Recurso **sócio**:
+Request
 GET .../empresas/abc123Xyz/**socios**/JOSE
 Response:
 ```json
 {
-	"data": {
-		"id": "JOSE",
-		"nome": "José"
-		"cpf": "11122233344",
-		"...": "..."
-	}
+   "data": {
+      "id": "JOSE",
+      "nome": "José"
+      "cpf": "11122233344",
+      "...": "..."
+   }
 }
 ```
 Recurso **associacoes** (unitário):
@@ -1675,55 +1698,53 @@ GET .../empresas/abc123Xyz/**associacoes**/123
 Response:
 ```json
 {
-	"data": {
-		"id": 123,
-		"idSocio": "MARIA",
-		"associacaoPai": "JOSE"
+   "data": {
+      "id": 123,
+      "idSocio": "MARIA",
+      "associacaoPai": "JOSE"
 	}
 }
 ```
 
 Recurso **associacoes** (array):
+Request:
 GET .../empresas/abc123Xyz/**associacoes**
 Response:
 ```json
 {
-	"data": [
-		{
-		"id": 123,
-		"idSocio": "MARIA",
-		"associacaoPai": "JOSE"
-		},
-		{
-		"id": 124,
-		"idSocio": "EMPRESAAZUL",
-		"associacaoPai": "MARIA"
-		},
-	]
+   "data": [
+      {
+         "id": 123,
+         "idSocio": "MARIA",
+         "associacaoPai": "JOSE"
+      },
+      {
+         "id": 124,
+         "idSocio": "EMPRESAAZUL",
+         "associacaoPai": "MARIA"
+      },
+   ]
 }
 ```
 
-Dessa forma, separando a associação do recurso em uma rota separada, a implementação fica em um nível de granularidade que reduz problemas de concorrência, pois cada associação pode ser adicionada ou removida independentemente das outras associações do mesmo sócio.
-E as buscas nestas rotas seguiriam as práticas já utilizadas pela modelagem. Ex:
+Dessa forma, deixando a associação do recurso "sócios" em uma rota separada, a implementação fica em um nível de granularidade que também reduz problemas de concorrência, pois cada associação pode ser adicionada ou removida independentemente das outras associações do mesmo sócio.
+As buscas nestas rotas seguem as mesmas práticas já explicadas neste guia. Ex:
 - GET .../empresas/abc123Xyz/socios
-(traria um array com todos os sócios da empresa abc123Xyz) 
+*(traria um array com todos os sócios da empresa abc123Xyz)*
 - GET .../empresas/abc123Xyz/associacoes/123
-(traria uma associação específica em que já conhecemos o ID)  
+*(traria uma associação específica em que já conhecemos o ID)* 
 - GET .../empresas/abc123Xyz/associacoes?id_socio=CARLOS
-(traria as associações do sócio CARLOS)
+*(traria as associações do sócio CARLOS)*
 - GET .../empresas/abc123Xyz/associacoes?associacaoPai=MARIA
-(traria as associações de sócios cujo "sócio pai" seja o sócio MARIA)
+*(traria as associações de sócios cujo "sócio pai" seja o sócio MARIA)*
 - DELETE .../empresas/abc123Xyz/associacoes/123
-(apagaria a associação com o id 123)
+*(apagaria a associação com o id 123)*
 - DELETE .../empresas/abc123Xyz/associacoes?associacaoPai=MARIA
-(apagaria a associação cujo pai é o sócio MARIA)
+*(apagaria a associação cujo pai é o sócio MARIA)*
 
 ## Versionamento
 
-TODO: pesquisar melhor as vantagens e desvantagens de cada abordagem.
-
-Versionamento acontece quanto ocorrem alterações no contrato da API. Contrato é a definição de todo o conjunto de [verbos](#request--verbs), códigos de resposta, recursos, etc. feita em uma notação padrão para isso como o RAML, Swagger, etc. O ideal é que estes documentos sejam armazenados em um repositório de código fonte e a cada alteração, versionados.
-Assim, existirão dois tipos de versão: aquela do contrato no repositório e aquela que repassamos para o cliente (consumidor da API).
+Versionamento acontece quanto ocorrem alterações no contrato da API. Contrato é a definição de todo o conjunto de verbos, códigos de resposta, recursos, etc. feita em uma notação padrão para isso como o RAML, Open API Specification, etc. O ideal é que estes documentos sejam armazenados em um repositório de código fonte e a cada alteração, versionados. Assim, existirão dois tipos de versão: aquela do contrato no repositório e aquela que repassamos para o cliente (consumidor da API).
 
 Para realizar o versionamento dos contratos das APIs podemos fazer uso do [Semantic Versioning 2.0.0](https://semver.org/). Esta definição utiliza a seguinte estrutura **MAJOR.MINOR.PATCH**. Onde se incrementa os valores conforme a seguinte regra:
 - **MAJOR**: implica mudanças incompatíveis para a API. Ou seja, que faz com que os consumidores atuais não consigam mais utilizar a API sem ter de alterar seus softwares.
@@ -1736,7 +1757,7 @@ Ex (era 2.**0**.0 e vira 2.**1**.0):
 	- adição de novos recursos;
 	- em recursos já existentes, adição de novos atributos ou parâmetros não obrigatórios na requisição;
 	- adição de novos atributos no response;
-	- adição de novos [verbos](#request--verbs);
+	- adição de novos verbos;
 	- adição de novos status codes;
 - **PATCH**: implica em mudanças que não alteram a API.
 Ex (era 2.0.**0** e vira 2.1.**1**):
@@ -1744,11 +1765,11 @@ Ex (era 2.0.**0** e vira 2.1.**1**):
 	- alterações nos exemplos;
 	- alterações em arquivos extras ao contrato que contém metadados usados por governança ou deploy.
 
-A versão incial do contrato da API será a 1.0.0. O valor definido no MAJOR, no caso **1** é o valor que mostramos para o cliente, dado que é a alteração no MAJOR que obriga-o a alterar o seu software.
+A versão incial do contrato da API é a 1.0.0. O valor definido no MAJOR, no caso **1** é o valor que mostramos para o cliente, dado que é a alteração no MAJOR que obriga-o a alterar o seu software.
 
 Existem algumas formas diferentes de se versionar a API para o cliente. Nenhuma é totalmente certa, nem errada e a especificação do REST não define este item. O que existe são tendências maiores ou menores de adoção de alguns padrões por conta dos prós e contras que cada um oferece.
 
-Do ponto de vista do cliente, também é interessante alguns cuidados. Para minimizar os impactos de qualquer alteração, mesmo aquelas que não quebram o contrato, os clientes destas APIs devem evitar consumir mais campos do que o necessário ao chamar uma API. Eles devem usar apenas aqueles campos que o cliente realmente precisa e deve ignorar os que não precisa. Este conceito é abordado em [Tolerant Reader (Martin Fowler)](https://martinfowler.com/bliki/TolerantReader.html).
+Do ponto de vista do cliente, também é interessante tomar alguns cuidados: para minimizar os impactos de qualquer alteração, mesmo aquelas que não quebram o contrato, os clientes destas APIs devem evitar consumir mais campos do que o necessário ao chamar uma API. Eles devem usar apenas aqueles campos que o cliente realmente precisa e deve ignorar os que não precisa. Este conceito é abordado em [Tolerant Reader (Martin Fowler)](https://martinfowler.com/bliki/TolerantReader.html).
 
 
 #### Versionamento pelo host
@@ -1757,7 +1778,7 @@ Na estrutura de host da URL, coloca-se a versão como parte dele. Por exemplo:
 https://api-v2.empresaexemplo.com/clientes
 Observe o "-v2", que específica que esta é a versão 2 da API.
 
-O ponto negativo desta abordagem é que do ponto de vista de deploy, é mais difícil criar um novo nome do host do que outras abordagens.
+O ponto negativo desta abordagem é que do ponto de vista de deploy, é mais difícil criar um novo nome no host do que outras abordagens em que se cria pastas (recursos), por exemplo.
 
 #### Versionamento pela query string
 
@@ -1766,7 +1787,7 @@ Define-se a versão a versão via  **query string**, por exemplo:
 https://api.empresaexemplo.com/clientes?version=2.0
 Observe o version=2.0, que especifica que essa é a versão 2.0 dessa API.
 
-O ponto negativo dessa abordagem é que prejudica a definição de contrato para outras versões, e prejudica a legibilidade da URL em cenários de muitos parâmetros. Além de facilitar com que o cliente esqueça de definir a versão ao chamar a API e talvez tome erro por estar chamando a versão default.
+O ponto negativo dessa abordagem é que prejudica a definição de contrato para outras versões e prejudica a legibilidade da URL em cenários de muitos parâmetros. Além de facilitar com que o cliente esqueça de definir a versão ao chamar a API e talvez tome erro por estar chamando a versão default.
 
 #### Versionamento pelo Content-Type (com o header Accept)
 
@@ -1774,7 +1795,7 @@ Define-se um tipo customizado de conteúdo com a versão dele. Por exemplo:
 GET https://api.empresaexemplo.com/clientes
 Accept: application/vnd.clientes.v2+json
 
-O ponto positivo é que a URL fica mais clena, no entanto não é dev-friendly, pois a requisição tem que ser feita com muito mais cuidado, dada a passagens de mais parâmetros.
+O ponto positivo é que a URL fica mais clean, no entanto não é dev-friendly, pois a requisição tem que ser feita com muito mais cuidado, dada a passagens de mais parâmetros.
 
 #### Versionamento por header customizado
 
@@ -1789,138 +1810,15 @@ O ponto positivo é que a URL fica mais clena, no entanto não é dev-friendly, 
 Define-se a versão no Path como se fosse um recurso, por exemplo:
 https://api.empresaexemplo.com/v1/clientes
 
-Esta é a minha forma preferencial de versionar pois, fazendo parte da URL você força sempre o cliente a informá-la. A versão está sempre visível. Em processo de deploy, é muito mais simples criar uma pasta do que definir um novo [host](#). Mantém um visual clean na URL e facilita na definição de contratos para versões novas.
+Esta é a minha forma preferencial de versionar pois, fazendo parte da URL você força sempre o cliente a informá-la; a versão está sempre visível; em processo de deploy, é muito mais simples criar uma pasta do que definir um novo host; mantém um visual clean na URL e facilita na definição de contratos para versões novas.
 
 <sub>ir para: [índice](#conte%C3%BAdo)</sub>
+
 ## Segurança
 
-(o conjunto das implementações garante a segurança)
+TODO: Aguarde! Este capítulo será escrito em breve. :-)
 
-Sua API pode perger o engajamento da comunidade, caso a implementação de segurança seja muito complicada. Assim, busque a simplicidade e utilização de padrões conhecidos de mercado.
-
-### Segurança > Autenticação e Autorização
-
-Autenticação é o processo de garantir que um consumidor da API é quem ele diz que é. De forma simplificada isto se dá através do envio de "login" e "senha".
-
-Autorização acontece após a autenticação e serve para verificar se o consumidor da API tem acesso a um determinado recurso.
-
-Fazendo uma analogia à vida real, ao ir a um show, você passa pela bilheteria e recebe a pulseira (autenticação), passa pela catraca (autorização) e tenta entrar na pista VIP (sendo que você comprou pista comum), neste caso, você não terá acesso a este espaço (autorização).
-
-### Segurança > Autenticação > Basic Authentication
-
-**Basic authentication** é um meios de autenticação mais simples especificado no protocolo HTTP.
-
-O cliente envia uma requisição com o header **"Authorization: "Basic"** + **usuário** + **":"** + senha, sendo "usuário:senha" em base64.
-
-Por exemplo, para autorizar o usuário  **michel** com senha  **abc123**, o client enviaria na requisição, o seguinte header:
-
-**Authorization**: Basic bWljaGVsOmFiYzEyMw==
-
-Como essa é uma das formas menos segura de autenticação, normalmente é usada apenas em APIs internas, cujo escopo de acesso é limitado pela rede.
-
-### Segurança > Autenticação > API Keys
-
-Quando se usa API Keys, ao invés de enviar usuário e senha, o servidor fornece uma única chave de acesso e o cliente usa esta chave de acesso em todas as requisições.
-
-A API Key é passada em um header customizado (varia de acordo com a empresa), assim para eu me autenticar na API - supondo que a empresa se chame "Amarelo" - eu faria uma requisição com o seguinte header:
-
-**Amarelo-Api-Key**: d9bfb805-aea2-4647-acc7-36e91337f50a
-
-Assim como o Basic Authentication, essa é uma forma pouco segura, devendo ser usada no pior dos casos, apenas na rede interna.
-
-### Segurança > HTTPS
-
-A utilização do HTTPS mantém as mensagens seguras e criptografadas, dificultando a interceptação da requisição. Busque configurar suas aplicações para utilizar as versões mais recentes dos protocolos do HTTPS (como o [TLS](https://pt.wikipedia.org/wiki/Transport_Layer_Security)).
-
-### Segurança > OAuth
-
-TODO: ARRUMAR
-```
-O OAuth está na sua versão 2.0, e não é apenas um método de autenticação, e sim um protocolo completo com diversas especificações de segurança.
-
-Ele é extremamente útil para o processo de autenticação e autorização, e por isso, atualmente é o método mais recomendado para o cenário de APIs.
-
-Vamos entender alguns conceitos básicos do OAuth 2:
-
--   Resource Owner: entidade dona do recurso, ou seja, que é capaz de controlar o acesso a um recurso. Normalmente é o próprio usuário.
--   Resource Server: servidor que possui os recursos, e por sua vez, recebe as requisições.
--   Authorization Server: servidor que gera tokens de acesso para permitir que o client acesse os recursos autorizados pelo resource owner.
--   Client: aplicação que acessa os recursos do resource server.
-
-Para entender melhor, vamos supor que você desenvolveu uma aplicação que utiliza dados do usuário do Facebook, então vamos simular como seria um fluxo básico de autenticação via OAuth 2.0:
-
-1.  O usuário acessa seu site ou app que teria um botão de "integre ao facebook", sendo que o seu site ou app seria o  **client**.
-2.  Ao clicar no botão, o usuário é redirecionado para a tela de login do Facebook (**authorization server**).
-3.  Após o usuário informar as credenciais, o Facebook fornece um código de acesso ao  **client**.
-4.  Então o  **client**  solicita autorização aos recursos (endpoints da API do Facebook) para o  **resource owner** (que é o próprio usuário)  enviando  o código de acesso recebido anteriormente.
-5.  O  **authorization server**  por sua vez, verifica se o código de acesso é valido, e caso positivo, ele gera um token de acesso para retornar ao  **client**.
-6.  Por último, agora que o  **client**  já tem o token de acesso e autorização aos recursos, então a cada requisição, o  **resource server (API do facebook)**  irá responder com os dados protegidos.
-
-Como é um assunto denso, vou deixar aqui o  [link](https://nordicapis.com/api-security-oauth-openid-connect-depth/)  de um ótimo artigo que explica em detalhes esse protocolo.
-
-Outros assuntos acerca da especificação do oAuth e que são interessantes para implementação:
-
-[OpenID Connect](https://openid.net/connect/)**:** Extensão da funcionalidade de  **autenticação**do OAuth. Como o OAuth foi projetado para autorização, o OpenID Connect acaba sendo um ótimo complemento na segurança de APIs, conseguindo ajudar no sentido de provar que o usuário é realmente quem ele diz que é.
-
-[JWT](https://jwt.io/)**:** Formato de token seguro que utiliza JSON como base.
-```
-
-### Segurança > Dados sensíveis na URL
-
-A URL é uma informação que trafega entre as diversas camadas de comunicação sem nenhum tipo de encriptação e normalmente, é gravada em logs ou caches por todas as camadas. Assim, nunca se coloca dados sensíveis como informações pessoais ou de credenciais na URL.
-
-Ex:
-GET https://api.exemploempresa.com/pedidos?apiKey=abcd123
-GET https://api.exemploempresa.com/pedidos?login=joao&senha=1234
-
-(material do magnani!!!!)
-
-### Segurança > Throttling, Rate Limiting e Quotas
-
-Excesso de requisições podem deixar a API indisponível, sejam por conta de ataques ou até mesmo por excesso de  chamadas vindas naturalmente dos clientes. É interessante implementar travas para evitar que as requisições ultrapassem a capacidade de processamento da sua API.
-
-Com o uso de alguns headers, você consegue limitar a quantidade de requisições e informar o cliente sobre o uso dela:
-
-- **Empresa-RateLimit-Limit**: Quantidade de requisições permitidas durante um período específico (dia, hora, minuto, segundo. etc).
-- **Empresa-RateLimit-Period**: Definição do período, sendo:
-	- y   = ano
-	- M   = mês
-	- d   = dia
-	- h   = hora
-	- m   = minuto
-	- s   = segundo
-- **Empresa-RateLimit-Remaining**: Quantidade de requisições restantes do período corrente.
-- **Empresa-RateLimit-Reset**:  Quantidade de segundos restantes até o término período corrente.
-
-Ex, assumindo o nome da empresa como "Amarelo":
-- **Amarelo-RateLimit-Limit**: 200
-- **Amarelo-RateLimit-Period**: m
-- **Amarelo-RateLimit-Remaining**: 84
-- **Amarelo-RateLimit-Reset**:  28
-
-E nos casos em que o cliene casos que o client ultrapasse o limite de requisições, a API  deve retornar o [status code](#status-code) 429 -Too Many Requests.
-
-> Exemplo de uso de Rate Limit no GitHub:[https://developer.github.com/v3/#rate-limiting](https://developer.github.com/v3/#rate-limiting)
-
-### Segurança > Validações
-
-Sempre valide a estrutura e tipos de dados recebidos em [URI Parameters](#), [Query Strings](#) e [Body](#) da mensagem antes de executar qualquer lógica dentro da API.
-
-Parâmetros não especificados no contrato, podem ser indício de um ataque malicioso. 
-
-### Segurança > API Gateway
-
-Quando utilizamos um API Gateway, criamos uma camada especializada entre o cliente e as APIs. Um API gateway centraliza e implementa os padrões de autenticação, segurança, validações, throtlling, roteamento, tradução de protocolo, logs, auditoria, cache, etc. barrando acessos indevidos antes mesmo da requisição atingir a API.
-
-```mermaid
-graph LR
-A[Cliente A] --> D[Gateway]
-B[Cliente B] --> D[Gateway]
-C[Cliente C] --> D[Gateway]
-D[Gateway] --> E[API Pagamentos]
-D[GatGateway] --> F[API Seguros]
-D[Gateway] --> G[API Cartões]
-```
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ## Performance, Cache e compressão
 
