@@ -948,15 +948,15 @@ Quando se utiliza a abordagem de page e page size, a requisição pode ser feita
 	"data": [
 		{
 			"id": 3,
-			...
+			"...": "..."
 		},
 		{
 			"id": 4,
-			...
+			"...": "..."
 		},
 		{
 			"id": 5,
-			...
+			"...": "..."
 		}
 	],
 	"pagination":{
@@ -1026,19 +1026,19 @@ Response
 			"id": 456985,
 			"dataPagamento": "2019-06-05",
 			"dataPedido": "2019-06-02",
-			...
+			"...": "..."
 		},
 		{
 			"id": 457231,
 			"dataPagamento": "2019-06-05",
 			"dataPedido": "2019-06-03",
-			...
+			"...": "..."
 		},
 		{
 			"id": 455125,
 			"dataPagamento": "2019-06-01",
 			"dataPedido": "2019-05-29",
-			...
+			"...": "..."
 		}
 	]
 }
@@ -1213,7 +1213,7 @@ HTTP Status Code 201
    "data":{
       "...": "..."
    },
-   "messages":[
+   "messages": [
       {
          "codigo":"CT0056",
          "mensagem":"Limite do cartão ultrapassou 80%."
@@ -1411,7 +1411,7 @@ HTTP 200 Ok
       "id":"1",
       "situacao": "processando",
       "TTC": "2019-07-16T19:20:30.00-03:00"
-       "mensagens":[
+       "mensagens": [
          {
 		   "codigo": "103",
 		   "mensagem" : "Sua requisicao está esperando pela verificação de um operador.",
@@ -1444,7 +1444,7 @@ Content-Location: http://api.exemplo.com/contas/v1/contas-processamento/1
 	  "id":"1",
 	  "situacao": "sucesso",
 	  "TTC": null
-      "mensagens":[
+      "mensagens": [
 		 {
 		   "codigo": "001",
 		   "mensagem" : "A conta foi criada com sucesso.",
@@ -1487,7 +1487,7 @@ Content-Location: http://api.exemplo.com/contas/v1/contas-processamento/1
       "id":"1",
       "situacao": "falha",
       "TTC": null
-      "mensagens":[
+      "mensagens": [
          {
             "codigo": "ERR135",
             "mensagem" : "A conta não foi criada por conta de restrição de crédito.",
@@ -1520,7 +1520,7 @@ Location:  http://api.exemplo.com/contas/v1/contas-processamento/1
       "id":"1",
 	  "situacao": "processando",
 	  "TTC": "2019-07-16T19:20:30.00-03:00"
-      "mensagens":[
+      "mensagens": [
 		 {
 		   "codigo": "103",
 		   "mensagem" : "Sua requisicao está esperando pela verificação de um operador.",
@@ -1551,7 +1551,7 @@ Content-Type: application/xml
       {
          "method": "PUT",
          "url": "http://api.exemplo.com/recurso/123"
-         "headers":[
+         "headers": [
             {"name": "Content-Type", "value": "application/json"}
          ],
          "body": {
@@ -1561,7 +1561,7 @@ Content-Type: application/xml
       {
          "method": "POST",
          "url": "http://api.exemplo.com/recurso"
-         "headers":[
+         "headers": [
             {"name": "Content-Type", "value": "application/json"}
          ],
          "body": {
@@ -1584,7 +1584,7 @@ Content-Type: application/json
       {
          "httpStatus": "200",
          "message": "OK",
-         "headers":[
+         "headers": [
             {"name": "Content-Type", "value": "application/json"},
             {"name": "Content-Location", "value": "http://api.exemplo.com/recurso/123"}
          ],
@@ -1595,7 +1595,7 @@ Content-Type: application/json
       {
          "httpStatus": "412",
          "message": "Precondition Failed",
-         "headers":[
+         "headers": [
             {"name": "Content-Type", "value": "application/json"},
             {"name": "Content-Location", "value": "http://api.exemplo.com/recurso"}
          ],
@@ -1643,15 +1643,15 @@ GET .../empresas/abc123Xyz/**socios**/JOSE e o retorno ficaria algo assim:
          "socios": [
             {
                "id": "MARIA", 
-               "outrosDados": "..."
+               "outrosDados": "...",
 	           "socios": [
                   {
                      "id": "EMPRESASAZUL", 
-                     "outrosDados": "..."
+                     "outrosDados": "...",
                      "socios": [
                         {
                            "id": "CARLOS", 
-                           "outrosDados": "..."
+                           "outrosDados": "...",
                            "socios": [
                               "outrosSocios": "..."
                            ]
@@ -1687,7 +1687,7 @@ Response:
 {
    "data": {
       "id": "JOSE",
-      "nome": "José"
+      "nome": "José",
       "cpf": "11122233344",
       "...": "..."
    }
