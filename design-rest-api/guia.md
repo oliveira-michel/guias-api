@@ -1880,4 +1880,10 @@ TO DO: Aguarde! Este capítulo será escrito em breve. :-)
 
 ## Palavras finais
 
-Em breve!
+Quase tudo em REST abre discussões sobre estar mais aderente ou menos a um modelo que é "vago" em vários pontos. Por um lado dá liberdade para evolução de acordo com as necessidades do mercado, por outro, quando você olha o StackOverflow e concorda com as n respostas diferentes para a mesma pergunta, você conclui que o importante é adotar um padrão que faça sentido para sua empresa. Certo ou errado, seguir um padrão é muito melhor do que não seguir nenhum.
+
+A busca deve ser sempre em buscar o RESTful, no entanto, no meio do caminho vai ser normal entregar algumas APIs "quase REST" que adotam a maioria dos padrões mas abandona alguns em prol de timing de projeto, economia de recursos ou satisfação do cliente.
+
+Alguns destes padrões que abandonamos podem não fazer falta e não fará o desenvolvedor passar vergonha ao dizer que fez uma API REST, mas não implementou o HTTP Status Code A ou B; ou talvez não implementou HATEOAS em todas as APIs; ou não implementou paginação em alguma delas. No entanto, alguns anti-patterns são praticamente inadimissíveis, como usar somente o verbo POST para resolver todos os problemas; ignorar os comportamentos de idempotência e seguro; limitar a resposta a 200 para Ok e 500 para todo o resto sem nenhum detalhe adicional ... enfim, o recado é que busquem sempre entregar o melhor contrato possível.
+
+E com a prática, percebe-se que tudo isso aqui é muito simples, pois é técnico, é mais "preto no branco". O real desafio estará em modelar o negócio, entender como ele é e representá-lo bem através de URLs e Atributos. Mas isto é assunto pra um outro guia que será entregue em breve.
