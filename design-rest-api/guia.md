@@ -1653,13 +1653,17 @@ GET .../empresas/abc123Xyz/**socios**/JOSE e o retorno ficaria algo assim:
                            "id": "CARLOS", 
                            "outrosDados": "...",
                            "socios": [
-                              "outrosSocios": "..."
+                              {
+                                 "outrosSocios": "..."
+                              }
                            ]
                         },
                         {
                            "id": "JOAO", 
                            "socios": [
-	                           "outrosSocios": "..."
+                              {
+                                 "outrosSocios": "..."
+                              }
                            ]
                         }
                      ]
