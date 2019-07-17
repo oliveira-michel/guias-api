@@ -1880,5 +1880,4 @@ TO DO: Aguarde! Este capítulo será escrito em breve. :-)
 
 ## Palavras finais
 
-Pragmatic REST 
-[https://nordicapis.com/a-pragmatic-take-on-rest-anti-patterns/](https://nordicapis.com/a-pragmatic-take-on-rest-anti-patterns/)
+Em breve!
