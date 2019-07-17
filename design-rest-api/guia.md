@@ -1410,15 +1410,15 @@ HTTP 200 Ok
    "data":{
       "id":"1",
       "situacao": "processando",
-      "TTC": "2019-07-16T19:20:30.00-03:00"
-       "mensagens": [
+      "TTC": "2019-07-16T19:20:30.00-03:00",
+      "mensagens": [
          {
 		   "codigo": "103",
 		   "mensagem" : "Sua requisicao está esperando pela verificação de um operador.",
 		   "tipo": "info"
-		  }
-		]
-	}
+         }
+      ]
+   }
 }
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sendo:
@@ -1443,7 +1443,7 @@ Content-Location: http://api.exemplo.com/contas/v1/contas-processamento/1
 	"data":{
 	  "id":"1",
 	  "situacao": "sucesso",
-	  "TTC": null
+	  "TTC": null,
       "mensagens": [
 		 {
 		   "codigo": "001",
@@ -1486,7 +1486,7 @@ Content-Location: http://api.exemplo.com/contas/v1/contas-processamento/1
    "data":{
       "id":"1",
       "situacao": "falha",
-      "TTC": null
+      "TTC": null,
       "mensagens": [
          {
             "codigo": "ERR135",
@@ -1550,7 +1550,7 @@ Content-Type: application/xml
 "requests":[
       {
          "method": "PUT",
-         "url": "http://api.exemplo.com/recurso/123"
+         "url": "http://api.exemplo.com/recurso/123",
          "headers": [
             {"name": "Content-Type", "value": "application/json"}
          ],
@@ -1560,7 +1560,7 @@ Content-Type: application/xml
       },
       {
          "method": "POST",
-         "url": "http://api.exemplo.com/recurso"
+         "url": "http://api.exemplo.com/recurso",
          "headers": [
             {"name": "Content-Type", "value": "application/json"}
          ],
