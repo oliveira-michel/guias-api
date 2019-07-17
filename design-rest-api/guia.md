@@ -1,4 +1,3 @@
-
 # Guia de Design REST
 
 ## _Abstract_
@@ -1048,7 +1047,50 @@ Ordernar de forma ascendente é o comportamento padrão quando a forma de ordena
 
 ### Response > Body > Fields
 
-TO DO: Fazer este tópico
+Quando uma requisição vem com a Query String **fields**, o body de retorno deve trazer apenas os atributos definidos na Query String.
+Ex:
+*Request*
+GET https://api.lojaexemplo.com/clientes/jose-da-silva123/endereços/residencial-1?fields=nome,situacao,logradouro.rua,logradouro.numero
+
+*Response*
+HTTP/1.1 200 OK
+```json
+{
+   "data": {
+      "nome": "Residencial",
+      "situacao": "ativo",
+      "logradouro": {
+         "rua": "Rua das Oliveiras",
+         "numero": "123"
+      }   
+   }
+}
+```
+
+Enquanto uma chamada ao mesmo recurso sem o fields, deve retornar o recurso com todos os seus atributos.
+Ex:
+*Request*
+GET https://api.lojaexemplo.com/clientes/jose-da-silva123/endereços/residencial-1
+
+*Response*
+HTTP/1.1 200 OK
+```json
+{
+   "data": {
+      "nome": "Residencial",
+      "situacao": "ativo",
+      "dataAtualizacao": "2019-07-17T19:27:00-03:00",
+      "logradouro": {
+         "cep": "11001253"
+         "rua": "Rua das Oliveiras",
+         "numero": "123",
+         "complemento": "Apto 18",
+         "cidade": "Santos",
+         "uf": "São Paulo"
+      }   
+   }
+}
+```
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [request fields](#request--url--query-strings--fields)</sub>
 
@@ -1303,9 +1345,7 @@ Os códigos deste grupo são usado em caso de sucesso na requisição. Os mais u
 
 Este grupo define respostas de redirecionamento. Servem para informar o cliente sobre mudanças na requisição e redirecionamento para uma nova URL. Para saber mais sobre estes Status Codes, veja [requisições assíncronas](#processamento-ass%C3%ADncrono). Os mais utilizados são:
 
-TO DO: exemplificar melhor isso aqui!
-
-- **301 Moved Permanently**: Informa que o recurso A agora é o recurso B, de forma que quando o cliente solicitar o recurso A ele será automaticamente encaminhado ao recurso B.
+- **301 Moved Permanently**: Informa que o recurso foi definitivamente movido para uma outra URL definida no header **Location**.
 
 - **303 See Other**: A resposta para a requisição encontra-se em outra URL definida no header **Location**. Veja [processamento assíncrono](#processamento-ass%C3%ADncrono) para mais informações.
 
