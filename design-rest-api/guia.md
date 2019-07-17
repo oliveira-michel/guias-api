@@ -73,6 +73,7 @@ Este é um documento "vivo" em que o autor está atualizando com a experiência 
 - [Versionamento](#versionamento)
 - [Segurança](#seguran%C3%A7a)
 - [Performance, Cache e compressão](#performance-cache-e-compress%C3%A3o)
+- [Palavras Finais](#palavras-finais)
 <!-- /TOC -->
 
 ## Introdução e conceitos básicos
