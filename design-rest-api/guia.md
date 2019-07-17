@@ -762,122 +762,141 @@ Para DELETE, não se utiliza Body.
 
 Quando não se retorna nada no body de uma requisição que foi processada com sucesso, é importante atentar-se em usar o HTTP Status Code correto. Para GET, utiliza-se 200, para POST 204, PUT, PATCH ou DELETE 204. Leia mais sobre o [HTTP Status Code 204](#response--http-status-codes) para mais informações.
  
-Quanto são usados [verbos](#request--verbs) que enviam body no request (POST, PUT e PATCH), é importante notar que o body de request e o de response não precisam ser idênticos. Há casos em que a criação de um recurso implica que se populem atributos do mesmo em tempo de criação. Um exemplo muito recorrente é o identificador (id) que normalmente é gerado pelo servidor e não precisa estar definido no body de request.
-
-------------TODO: Continuar daqui---------------
+Quando são usados [verbos](#request--verbs) que enviam body no request (POST, PUT e PATCH), é importante notar que o body de request e o de response não precisam ser idênticos. Há casos em que a criação de um recurso implica que se populem atributos do mesmo em tempo de criação. Um exemplo muito recorrente é o identificador (id) que normalmente é gerado pelo servidor e não precisa estar definido no body de request.
 
 ### Response > Body > Envelope "Data"
-Quando nos referimos ao body de request, apenas passamos os atributos sem nenhum tipo de envelope. Ex:
+
+Chamamos de **envelope** alguns **atributos que separam conteúdos importantes na resposta**. Quando nos referimos ao body de request, apenas passamos os atributos sem nenhum tipo de envelope. Ex:
 ```json
 {
-	"id": 123,
-	"nome": "Carlos",
-	"data": "2019-06-04"
+   "id": 123,
+   "nome": "Carlos",
+   "data": "2019-06-04"
 }
 ```
-No body de response, colocamos a informação do recurso dentro de um envelope "data". Chamamos de envelope alguns atributos que separam conteúdos importantes na resposta. Esse separação é necessária porque no response podemos ter pagination, warnings, links, summary, etc. Exemplo de Body de response:
+No body de response, colocamos a informação do recurso dentro de um envelope "data".  Esse separação é necessária porque no response podemos ter outros envelopes como pagination, messages, links, summary, etc. Exemplo de Body de response:
 ```json
-"data": [{
-    {
-		"id": 123,
-		"nome": "Carlos",
-		"data": "2019-06-04"
-	}
-}],
-"pagination": {
-	"page": 1,
-	"page-size": 10,
-	...
-}
-"_links": {
-	...
+{
+   "data": [{
+      "id": 123,
+      "nome": "Carlos",
+      "data": "2019-06-04"
+      }],
+   "pagination": {
+      "page": 1,
+      "pageSize": 10,
+      "...": "..."
+   },
+   "_links": {
+      "...": "..."
+   }
 }
 ```
+
+TODO: padronizar o HTTP-CODE XXX em cada resposta
+TODO: padronizar o maiúsculo ou minúsculo em termos como query strings, Path Parameters, http status code, etc.
+TODO: rever {id-entidade} vs idEntidade :: definir qual melhor modelo.
+TODO: rever atributosEmCamel vs query-strings que podem estar sem camel.
 
 ### Response > Body > Recurso unitário, array ou nenhum
 
-Quando se faz uma requisição por um elemento com um ID especificado no [URI Parameter](#), por exemplo, GET .../pessoa/{id-pessoa}, o retorno da resposta será um único elemento. Assim, coloca-se o recurso diretamente no envelope "data". Ex:
+Quando se faz uma requisição por um elemento com um ID especificado no Path Parameter, por exemplo, GET .../pessoas/{id-pessoa}, o retorno da resposta será um único elemento. Assim, coloca-se o recurso unitário diretamente no envelope "data". Ex:
 
 Request:
 GET .../pessoas/456
 
 Response:
 ``HTTP-CODE 200``
-``content-location: .../pessoas/456``
+``Content-Location: .../pessoas/456``
 ```json
-"data": {
-    {
-		"id": 456,
-		"nome": "José",
-		"data": "2019-06-09"
-	}
+{
+   "data": {
+      "id": 456,
+      "nome": "José",
+      "data": "2019-06-09"
+   }
 }
 ```
 
-Quando se faz uma requisição sem o ID, filtrando apenas com [query strings](#), pode-se ter como retorno um ou mais elementos. Neste cenário, retornamos com um array do referido recurso. Ex:
+Quando se faz uma requisição sem o ID, filtrando apenas com query strings, pode-se ter como retorno um ou mais elementos. Neste cenário, retornamos com um array do referido recurso (mesmo que só retorne um). Ex:
 
 Request:
 GET .../pessoas?from-data=2019-06-01
 
 Response:
 ``HTTP-CODE 200``
-``content-location: .../pessoas/456``
+``Content-Location: .../pessoas/456``
 ```json
-"data": [{
-    {
-		"id": 123,
-		"nome": "Carlos",
-		"data": "2019-06-04"
-	},
-    {
-		"id": 456,
-		"nome": "José",
-		"data": "2019-06-09"
-	},
-	{
-		"id": 789,
-		"nome": "Maria",
-		"data": "2019-07-12"
-	}
-}]
+{
+   "data": [
+      {
+         "id": 123,
+         "nome": "Carlos",
+         "data": "2019-06-04"
+      },
+      {
+         "id": 456,
+         "nome": "José",
+         "data": "2019-06-09"
+      },
+      {
+         "id": 789,
+         "nome": "Maria",
+         "data": "2019-07-12"
+      }
+   ]
+}
 ```
 
-Também é possível se obter resposta vazia quando a busca não retorna nenhum resultado. No caso do GET, retorna-se um envelope "data" vazio. Veja mais sobre o [código de resposta HTTP](#)  204 para mais informações. 
+Também é possível obter resposta vazia quando a busca não retorna nenhum resultado. No caso do GET, retorna-se um envelope "data" com o array vazio mais qualquer outro envelope que faça sentido naquela resposta. Ex:
+```json
+{
+   "data": [],
+   "messages": [
+      {
+         "...":"..."
+      }
+   ]
+}
+```
+Veja mais sobre o [HTTP Status Code](#response--http-status-codes) 204 para mais informações. 
 
 ### Response > Body > Full text search
 
-Quando é definido um query string para buscas gerais, o termo defindo na busca deve ser aplicado como filtro em todos os campos pesquisáveis daquele recurso. Por exemplo, uma requisição com a seguinte estrutura GET http://api.empresarh.com/candidatos?q=Paulo deveria retornar um array de resultados como este:
+Quando é definido um query string para buscas gerais, o termo definido na busca deve ser aplicado como filtro em todos os campos pesquisáveis daquele recurso. Por exemplo, uma requisição com a seguinte estrutura GET http://api.empresarh.com/candidatos?q=Paulo deveria retornar um array de resultados como este:
 ```json
 {
-	"data": [
-		{
-			"id": "87426",
-			"nome": "Paulo Ferreira de Araújo",
-			"pai": "José de Araújo",
-			"mãe": "Patrícia Silva Ferreira",
-			"cidade": "Santos"
-			...
-		},
-		{
-			"id": "87426",
-			"nome": "Américo Guedes Oliveira",
-			"pai": "Roberto Carvalho de Oliveira",
-			"mãe": "Maria José Oliveira",
-			"cidade": "São Paulo"
-			...
-		},
-		{
-			"id": "87426",
-			"nome": "Carla Mendes Pinheiros",
-			"pai": "Carlos Gosmes de Pinheiros",
-			"mãe": "Lívia de Paulo Pinheiros",
-			"cidade": "Vitória"
-			...
-		}
-	]
+   "data": [
+      {
+         "id": "87426",
+         "nome": "Paulo Ferreira de Araújo",
+         "pai": "José de Araújo",
+         "mãe": "Patrícia Silva Ferreira",
+         "cidade": "Santos",
+         "...": "..."
+      },
+      {
+         "id": "87426",
+         "nome": "Américo Guedes Oliveira",
+         "pai": "Roberto Carvalho de Oliveira",
+         "mãe": "Maria José Oliveira",
+         "cidade": "São Paulo",
+         "...": "..."
+      },
+      {
+         "id": "87426",
+         "nome": "Carla Mendes Pinheiros",
+         "pai": "Carlos Gosmes de Pinheiros",
+         "mãe": "Lívia de Paulo Pinheiros",
+         "cidade": "Vitória",
+         "...": "..."
+      }
+   ]
 }
 ```
 <sub>ir para: [índice](#conte%C3%BAdo) | [request  full text search](#request--url--query-strings--full-text-search)</sub>
+
+-----TODO Continuar daqui-----
 
 ### Response > Body > Paginação
 
