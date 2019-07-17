@@ -1,3 +1,4 @@
+
 # Guia de Design REST
 
 ## _Abstract_
@@ -65,7 +66,6 @@ Este é um documento "vivo" em que o autor está atualizando com a experiência 
 		- [Errors e Warnings](#response--body--errors-e-warnings)
 		- [HATEOAS](#response--body--hateoas)
 	- [HTTP Status Code](#response--http-status-codes)
-- [Tipo de case]
 - [Tipos de dados](#tipos-de-dados)
 - [Processamento assíncrono](#processamento-ass%C3%ADncrono)
 - [Processamento em lotes](#processamento-em-lotes)
@@ -167,7 +167,7 @@ Ex:
 
 Repare que existe um Base Path se repetindo em cada um dos endereços (https://api.spotify.com) e um "/v1" também. Ele representa a versão da API e também é exposto como um recurso. Há mais informações sobre versionamento no capítulo [Versionamento](#versionamento).
 
-Observe que algumas URLs têm recursos como artists ou albums que não têm o {id} na frente. Elas deverão retornar listas, pois não se especifica nenhum "artist" ou "album" específico através de um {id}. Outras URLs têm o {id} e retornação apenas um item cujo id seja o id definido naquela URL. Este {id} é um [Path Parameter](#request--url--resources--path-parameters).
+Observe que algumas URLs têm recursos como artists ou albums que não têm o {id} na frente. Elas deverão retornar listas, pois não se especifica nenhum "artist" ou "album" específico através de um {id}. Outras URLs têm o {id} e retornarão apenas um item cujo id seja o id definido naquela URL. Este {id} é um [Path Parameter](#request--url--resources--path-parameters).
 
 Quando os recursos forem formados por duas palavras, é boa prática separar com hífen. E assim como no [Base Path](#request--url--base), escreve-se tudo em minúsculo. 
 
