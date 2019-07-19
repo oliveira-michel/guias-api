@@ -272,7 +272,7 @@ Além dos Path Parameters, Query Strings também permite passar parâmetros na U
 
 Assim, uma API que busque restaurantes de comida japonesa na cidade de são paulo, teria uma URL semelhante a esta:
 
-<pre>https://api.empresaturismo.com.br/locais/v1/restaurantes?tipo-comida=japonesa&cidade=S%C3%A3o%20Paulo</pre>
+<pre>https://api.empresaturismo.com.br/locais/v1/restaurantes?tipoComida=japonesa&cidade=S%C3%A3o%20Paulo</pre>
 
 Sempre respeitando o conjunto caracteres permitidos em URLs. Para mais informações sobre esses valores, veja [URL Encode](https://www.w3schools.com/tags/ref_urlencode.asp).
 
