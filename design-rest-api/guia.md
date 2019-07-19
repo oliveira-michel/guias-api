@@ -201,7 +201,7 @@ Para estes casos, tratamos essas funções como recursos e para facilitar a iden
 Ex:
 - GET .../**calcular-distancia**?from-latitude=48,8584&from-longitude=2,2945&to-latitude=-22.951916&to-longitude=-43.2104872
 - POST .../**validar-cartao**
-```json
+```
 {
 	"numero": "5346931596124410",
 	"nomeTitular": "JOSE A OLIVEIRA",
@@ -560,7 +560,7 @@ O **POST** é usado para criar novos recursos. Ele é utilizado em conjunto com 
 Exemplo utilizando o verbo POST para criar uma nova cidade:
 Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}
 **POST** http://api.exemplo.com/estados/sp/cidades/
-```json
+```
 {
    "nome": "São Vicente",
    "DDD": 13,
@@ -579,7 +579,7 @@ Quando usamos **PUT** normalmente estamos atualizando um recurso existente, por 
 Ex:
 Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}
 **PUT** http://api.exemplo.com/estados/sp/cidades/sao-vicente
-```json
+```
 {
    "nome": "São Vicente",
    "DDD": 13,
@@ -596,7 +596,7 @@ O verbo **PATCH**  serve para fazer atualizações parciais no recurso. Neste ca
 Ex:
 Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}_
 **PATCH** http://api.exemplo.com/estados/sp/cidades/sao-vicente
-```json
+```
 {
    "populacao": 500000
 }
@@ -632,7 +632,7 @@ Os atributos podem ser definidos em diversos formatos, os mais tradicionais são
 
 Ex:
 POST http://api.fabricacarros.com/carros
-```json
+```
 {
   "modelo": "Kicknegade Freestyle HR AT",
   "cor": "Branco Branquinho",
@@ -719,7 +719,7 @@ Quando uma requisição é feita com o verbo POST, por exemplo, o cliente ainda 
 Ex:
 *Request*
 POST http://api.exemplo.com/estados/sp/cidades/
-```json
+```
 {
    "nome": "São Vicente",
    "DDD": 13,
@@ -771,7 +771,7 @@ Quando são usados [verbos](#request--verbs) que enviam body no request (POST, P
 ### Response > Body > Envelope "Data"
 
 Chamamos de **envelope** alguns **atributos que separam conteúdos importantes na resposta**. Quando nos referimos ao body de request, apenas passamos os atributos sem nenhum tipo de envelope. Ex:
-```json
+```
 {
    "id": 123,
    "nome": "Carlos",
@@ -779,7 +779,7 @@ Chamamos de **envelope** alguns **atributos que separam conteúdos importantes n
 }
 ```
 No body de response, colocamos a informação do recurso dentro de um envelope "data".  Esse separação é necessária porque no response podemos ter outros envelopes como pagination, messages, links, summary, etc. Exemplo de Body de response:
-```json
+```
 {
    "data": [{
       "id": 123,
@@ -809,7 +809,7 @@ GET .../pessoas/456
 *Response*
 HTTP/1.1 200 OK
 Content-Location: .../pessoas/456
-```json
+```
 {
    "data": {
       "id": 456,
@@ -827,7 +827,7 @@ GET .../pessoas?from-data=2019-06-01
 *Response*
 HTTP/1.1 200 Ok
 Content-Location: .../pessoas/456
-```json
+```
 {
    "data": [
       {
@@ -850,7 +850,7 @@ Content-Location: .../pessoas/456
 ```
 
 Também é possível obter resposta vazia quando a busca não retorna nenhum resultado. No caso do GET, retorna-se um envelope "data" com o array vazio mais qualquer outro envelope que faça sentido naquela resposta. Ex:
-```json
+```
 {
    "data": [],
    "messages": [
@@ -867,7 +867,7 @@ Veja mais sobre o [HTTP Status Code](#response--http-status-codes) 204 para mais
 ### Response > Body > Full text search
 
 Quando é definido um query string para buscas gerais, o termo definido na busca deve ser aplicado como filtro em todos os campos pesquisáveis daquele recurso. Por exemplo, uma requisição com a seguinte estrutura GET http://api.empresarh.com/candidatos?q=Paulo deveria retornar um array de resultados como este:
-```json
+```
 {
    "data": [
       {
@@ -911,7 +911,7 @@ Existem algumas técnicas diferentes para fazer a paginação. Serão explicadas
 
 Uma das formas de se limitar a quantidade de registros retornados é através de um filtro em algum atributo que represente um intervalo. Assim, quando se recebe um filtro nas Query Strings, deve-se retornar o resultado respeitando os critérios do filtro.
 Por exemplo, em uma requisição GET .../...?from-id=3&to-id=6, possuindo o banco de dados uma coleção de 8 registros, e os ids sendo sequenciais, o retorno devem ser os registros 3, 4, 5 e 6:
-```json
+```
 {
    "data": [
       {
@@ -939,7 +939,7 @@ Por exemplo, em uma requisição GET .../...?from-id=3&to-id=6, possuindo o banc
 
 Quando se utiliza a abordagem de page e page size, a requisição pode ser feita informando a página e o tamanho dela como query string (GET .../...?page=10&pageSize=50). A API deve recortar do total de respostas apenas as páginas solicitadas conforme solicitação do cliente ou, caso não tenha sido informado, à partir de valores padrões. Por exemplo, em uma requisição GET .../...?page=2&pageSize=3, possuindo o banco de dados uma coleção de 8 registros, o retorno devem ser os registros 4, 5 e 6 mais o envelope "pagination" com seguinte estrutura:
 
-```json
+```
 {
 	"data": [
 		{
@@ -986,7 +986,7 @@ Muitas vezes, criamos APIs para sistemas legados e com isso, precisamos nos ajus
 
 Quando se usa o query string **limit** para limitar a quantidade de registros, o retorno deve trazer apenas a quantidade de registros definida no query string. Ex:
 GET .../...?limit=3
-```json
+```
 {
    "data": [
       {
@@ -1017,7 +1017,7 @@ Ex:
 GET .../pedidos?sort=dataPagamento:desc,dataPedido
 
 *Response*
-```json
+```
 {
    "data":[
          {
@@ -1055,7 +1055,7 @@ GET https://api.lojaexemplo.com/clientes/jose-da-silva123/endereços/residencial
 
 *Response*
 HTTP/1.1 200 OK
-```json
+```
 {
    "data": {
       "nome": "Residencial",
@@ -1075,7 +1075,7 @@ GET https://api.lojaexemplo.com/clientes/jose-da-silva123/endereços/residencial
 
 *Response*
 HTTP/1.1 200 OK
-```json
+```
 {
    "data": {
       "nome": "Residencial",
@@ -1101,7 +1101,7 @@ Quando a requisição recebe o query string **view**, o response deve devolver a
 Ex:
 - GET .../cartoes/a7834dcG456?view=basico
 *Response*
-```json
+```
 {
    "data": {
       "id": "a7834dcG456",
@@ -1114,7 +1114,7 @@ Ex:
 ```
 - GET .../cartoes/a7834dcG456?view=limites
 *Response*
-```json
+```
 {
    "data": {
       "id": "a7834dcG456",
@@ -1129,7 +1129,7 @@ Ex:
 ```
 - GET .../cartoes/a7834dcG456
 *Response*
-```json
+```
 {
    "data": {
       "id": "a7834dcG456",
@@ -1163,7 +1163,7 @@ GET .../cartoes/{idCartao}/faturas/{idFatura}
 *Request*
 GET .../cartoes/a7834dcG456?expand=faturas&faturas.id=ago18
 *Response*
-```json
+```
 {
 	"data": {
 	  "id": "a7834dcG456",
@@ -1203,7 +1203,7 @@ O detalhamento do erro, é algo mais do que simplesmente o que o HTTP Status Cod
 
 Ex:
 HTTP/1.1 422 Unprocessable Entity
-```json
+```
 {
    "codigo": "ER0059",
    "mensagem": "Operação não permitida fora do horário comercial.",
@@ -1211,7 +1211,7 @@ HTTP/1.1 422 Unprocessable Entity
 }
 ```
 HTTP/1.1 428 Preconditional Required
-```json
+```
 {
    "codigo": "err-pto-A320",
    "mensagem": "Não é possível fazer o lançamento de horas extras sem pré-aprovação do gerente.",
@@ -1221,7 +1221,7 @@ HTTP/1.1 428 Preconditional Required
 Quando a API retorna HTTP Status Code 400 e 422, muito provavelmente o erro foi causado por algum atributo específico. Nestes casos, deve-se especificar as informações sobre cada um dos atributos envolvidos no erro.
 
 HTTP/1.1 Status Code 400 Bad Request
-```json
+```
 {
    "codigo": "10023",
    "mensagem": "Alguns campos estão preenchidos incorretamente.",
@@ -1249,7 +1249,7 @@ Durante requisições com retorno de sucesso ([HTTP Status Code](#response--http
 O alerta se dá através de um envelope **messages** com a estrutura semelhante às das mensagens de erro.
 Ex:
 HTTP/1.1 201 Created
-```json
+```
 {
    "data":{
       "...": "..."
@@ -1275,7 +1275,7 @@ A implementação é a disponibilização de um envelope **links** na resposta d
 Por exemplo, em um serviço de consulta de cartões, podemos informar ao cliente que ele também pode consultar as transações, faturas e contratar novos cartões adicionais.
 
 Ex:
-```json
+```
 {
    "data": {
       "id": "a7834dcG456",
@@ -1427,7 +1427,7 @@ Assim, quando sistemas deste tipo são expostos via API, o processamento segue a
 Ex:
 *Request*
 POST  http://api.exemplo.com/contas/v1/contas
-```json
+```
 {
 	"agencia": 2153,
 	"cliente": "José da Silva",
@@ -1444,7 +1444,7 @@ Ex:
 GET http://api.exemplo.com/contas/v1/contas-processamento/1
 *Response*
 HTTP/1.1 200 Ok
-```json
+```
 {
    "data":{
       "id":"1",
@@ -1477,7 +1477,7 @@ Response
 HTTP 303 See Other
 Location: http://api.exemplo.com/contas/v1/contas/21531234567
 Content-Location: http://api.exemplo.com/contas/v1/contas-processamento/1
-```json
+```
 {
 	"data":{
 	  "id":"1",
@@ -1499,7 +1499,7 @@ Ex:
 GET http://api.exemplo.com/contas/v1/contas/21531234567
 *Response*
 HTTP/1.1 200 Ok
-```json
+```
 {
    "data":{
       "id": 21531234567,
@@ -1520,7 +1520,7 @@ GET http://api.exemplo.com/contas/v1/contas-processamento/1
 *Response*
 HTTP/1.1 200 Ok
 Content-Location: http://api.exemplo.com/contas/v1/contas-processamento/1
-```json
+```
 {
    "data":{
       "id":"1",
@@ -1554,7 +1554,7 @@ EmpresaExemplo-Callback: http://api.clienteexemplo.com/contas-callback
 *Response*
 HTTP/1.1 200 OK
 Location:  http://api.exemplo.com/contas/v1/contas-processamento/1
-```json
+```
 {
    "data":{
       "id":"1",
@@ -1585,7 +1585,7 @@ Ex:
 *Request*
 POST .../batch
 Content-Type: application/xml
-```json
+```
 {
 "requests":[
       {
@@ -1618,7 +1618,7 @@ Content-Type: application/xml
 *Response*
 HTTP/1.1 200 OK
 Content-Type: application/json
-```json
+```
 {
 "responses":[
       {
@@ -1680,7 +1680,7 @@ GET .../empresas/abc123Xyz/**socios**/JOSE
 *Response*
 HTTP/1.1 200 OK
 
-```json
+```
 {
    "data":[
       { 
@@ -1733,7 +1733,7 @@ Recurso **sócio**:
 *Request*
 GET .../empresas/abc123Xyz/**socios**/JOSE
 *Response*
-```json
+```
 {
    "data": {
       "id": "JOSE",
@@ -1747,7 +1747,7 @@ Recurso **associacoes** (unitário):
 *Request*
 GET .../empresas/abc123Xyz/**associacoes**/123
 *Response*
-```json
+```
 {
    "data": {
       "id": 123,
@@ -1761,7 +1761,7 @@ Recurso **associacoes** (array):
 *Request*
 GET .../empresas/abc123Xyz/**associacoes**
 *Response*
-```json
+```
 {
    "data": [
       {
