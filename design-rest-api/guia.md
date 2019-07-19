@@ -90,7 +90,7 @@ A maioria dos softwares nos quais nós interagimos são construídos para atende
 **REST API** (**R**epresentational **S**tate **T**ransfer **A**pplication **P**rogramming **I**nterface) é um estilo de arquitetura que define um conjunto de restrições e propriedades baseadas em HTTP fornecendo interoperabilidade entre sistemas de computadores na internet (ou rede local). REST permite que os sistemas consumidores acessem e manipulem o estado de representações textuais de recursos usando um conjunto pré definido de operações. As "coisas" da vida real em REST se chamam recursos. O conjunto de valores dos atributos de um determinado recurso em um determinado momento, se chama estado.
 Por colocar mais restrições do que WebServices - que é uma outra forma de integrar sistemas - e utilizar mais recursos do HTTP do que WebServices, acabou padronizando melhor a forma de comunicação e isso agilizou o desenvolvimento das integrações.
 O REST enfatiza simplicidade, extensibilidade, confiabilidade e performance: 
-- **Simplicidade** porque a forma como se interage com REST APIs é bem definida e de certa forma restritiva e a interação é stateless, ou seja, todos as informações necessárias para o processamento de uma requisição (no REST, alteração do estado de um recurso) deve estar contida naquela requisição. 
+- **Simplicidade** porque a forma como se interage com REST APIs é bem definida e de certa forma restritiva e a interação é stateless, ou seja, todas as informações necessárias para o processamento de uma requisição (no REST, alteração do estado de um recurso) deve estar contida naquela requisição. 
 - **Extensibilidade** porque um determinado recurso pode ser representado em diferentes formatos e até mesmo versões, além da possibilidade de se adicionar novos recursos sem precisar alterar os já existentes. 
 - **Confiabilidade** porque existe uma separação clara das ações que podem ser feitas e dos seus efeitos colaterais.
 - **Performance** porque faz parte dos principais pilares do REST o uso de cache através de uma semântica bem definida, além de uma arquitetura baseada em separação de camadas, permitindo que partes diferentes do sistema possam ser escaladas de forma independente e isolada. 
@@ -170,14 +170,14 @@ Observe que algumas URLs têm recursos como artists ou albums que não têm o {i
 
 Quando os recursos forem formados por duas palavras, é boa prática separar com hífen. E assim como no [Base Path](#request--url--base), escreve-se tudo em minúsculo. 
 
-Os recursos na maioria dos casos serão substantivos no plural, pois geralmente definem coleções (ex: cartões, usuários, clientes, carros, endereços, etc.) Ao pensar no nome do recurso, é importante verificar se o nome não conflitará com alguma possível implementação parecida no futuro. Por exemplo, imagina um recurso que se chamaria ofertas_credito. Neste caso, a deve-se perguntar: "este serviço ofertará todos os tipos de crédito no domínio de crédito?" Se a reposta for: "Não, apenas consignado", deve-se especificar o nome da entidade como ofertas-credito-consignado porque no futuro uma nova rota que oferte todos os tipos de crédito poderá ser criada com o nome oferta-credito.
+Os recursos na maioria dos casos serão substantivos no plural, pois geralmente definem coleções (ex: cartões, usuários, clientes, carros, endereços etc.) Ao pensar no nome do recurso, é importante verificar se o nome não conflitará com alguma possível implementação parecida no futuro. Por exemplo, imagina um recurso que se chamaria ofertas_credito. Neste caso, a deve-se perguntar: "este serviço ofertará todos os tipos de crédito no domínio de crédito?" Se a reposta for: "Não, apenas consignado", deve-se especificar o nome da entidade como ofertas-credito-consignado porque no futuro uma nova rota que oferte todos os tipos de crédito poderá ser criada com o nome oferta-credito.
 Ex:
 http://api.exmpresaexemplo.com/creditos/v1/ofertas-credito-consignado
 
 Recursos criados no singular são menos frequentes e pode acontecer quando:
 -	Haver requerimentos de segurança ou permissão específicos para um atributo. Neste caso, o atributo se torna um recurso na URL, podendo ser aplicadas políticas específicas de segurança naquela rota.
 -	No recurso existir um [atributo](#request--body) complexo com um número elevado de "sub-atributos". Por conta da complexidade, pode-se optar por tornar este atributo um recurso.
--	Haver recursos que não existam no plural, como saldo, extrato, etc.
+-	Haver recursos que não existam no plural, como saldo, extrato etc.
 
 Quando definir os recursos a serem expostos, deve-se **evitar**:
 - Utilizar termos que não façam parte do nome da entidade de negócio, por exemplo: <s>detalhes_</s>lancamentos-cheque. A entidade de negócio se chama lancamentos_cheque, exibir todos os atributos ou não, fica a cargo de filtros na [query string](#request--url--query-strings), não na exposição como um recurso.
@@ -191,7 +191,7 @@ Quando definir os recursos a serem expostos, deve-se **evitar**:
 Uma das restrições do REST é que ele se aplica a recursos que representam as "entidades" de um [Domínio Funcional](#request--url--resources--dom%C3%ADnios-funcionais). Para alterar o estado dessas entidades, usamos os verbos GET, POST, PATCH, PUT e DELETE, que basicamente fazem o CRUD.
  
 No entanto, existem alguns cenários em que não temos "entidades" de um domínio, mas sim, ações e que não fazem parte do conjunto restrito de [verbos](#request--verbs) do HTTP. Aqui estão alguns exemplos:
-- Distância entre dois pontos (via coordenadas de GPS, CEP, etc.)
+- Distância entre dois pontos (via coordenadas de GPS, CEP etc.)
 - Validação de dados de cartão de crédito
 - Cálculos em geral
 
