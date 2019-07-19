@@ -15,7 +15,6 @@ Este é um documento "vivo" em que o autor está atualizando com a experiência 
 
 ## Conteúdo
 
-<!-- TOC -->
 - [Introdução e conceitos básicos](#introdução-e-conceitos-básicos)
 - [Request](#request)
 	- [URL](#request--url)
@@ -74,7 +73,6 @@ Este é um documento "vivo" em que o autor está atualizando com a experiência 
 - [Segurança](#seguran%C3%A7a)
 - [Performance, Cache e compressão](#performance-cache-e-compress%C3%A3o)
 - [Palavras Finais](#palavras-finais)
-<!-- /TOC -->
 
 ## Introdução e conceitos básicos
 
@@ -201,6 +199,7 @@ Para estes casos, tratamos essas funções como recursos e para facilitar a iden
 Ex:
 - GET .../**calcular-distancia**?from-latitude=48,8584&from-longitude=2,2945&to-latitude=-22.951916&to-longitude=-43.2104872
 - POST .../**validar-cartao**
+
 ```
 {
 	"numero": "5346931596124410",
@@ -392,7 +391,7 @@ para retornar todos os atributos.
 
 Dependendo da complexidade do recurso, as visões podem ser combinadas na mesma requisição e ela pode ser usada em conjunto com o [fields](#request--url--query-strings--fields) e [expand](#request--url--query-strings--expand).
 
-<sub>ir para: [índice](#conte%C3%BAdo) | [response  views](#response--body--views)</sub>
+<sub>ir para: [índice](#conte%C3%BAdo) | [response views](#response--body--views)</sub>
 
 ### Request > URL > Query Strings > Expand
 
@@ -400,17 +399,23 @@ Quando é necessário em uma única chamada retornar um determinado recurso mais
 
 Ex:
 Tome como referência as seguintes APIs
-GET .../cartoes/{idCartao}
-GET .../cartoes/{idCartao}/faturas/{idFatura}
+
+- GET .../cartoes/{idCartao}
+- GET .../cartoes/{idCartao}/faturas/{idFatura}
 
 Para retornar os dados do cartão com id = a7834dcG456 mais o recurso de faturas associado a ele, especificamente a de agosto de 2018,  com o expand, faz-se a seguinte chamada:
+
 GET .../cartoes/a7834dcG456?**expand**=faturas&faturas.id=ago18
+
 Observe que há a definição do recurso a ser expandido (expand=faturas) e também um filtro (faturas.id=ago18), sendo que no filtro, utilizou-se um padrão de recurso+"."+atributo.
 
 Caso vários recursos precisem ser expandidos, define-se separando-os por vírgulas.
+
 Ex: GET .../cartoes/a7834dcG456?expand=faturas,adicionais,ofertas-upgrade
 
-Caso seja necessário especificar paginação ou ordenação em um recurso expandido, deve-se definir estes Query Strings assim como se definem filtros. Ex:
+Caso seja necessário especificar paginação ou ordenação em um recurso expandido, deve-se definir estes Query Strings assim como se definem filtros.
+
+Ex:
 GET .../cartoes/a7834dcG456?expand=faturas&faturas.limit=5&faturas.sort=dataVencimento:desc
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [response  expand](#response--body--expand)</sub>
@@ -421,8 +426,11 @@ GET .../cartoes/a7834dcG456?expand=faturas&faturas.limit=5&faturas.sort=dataVenc
 No entanto, é importante que uma entidade de negócio (recurso) se mantenha a mesma, independente da forma com que a consulta é feita.
  
 Por exemplo, em uma APIs de cartões, o time da TI cria o recurso de busca de transações da seguinte forma:
+
 GET .../transacoes?idCartao=123
+
 Em um segundo momento, novos recursos surgiram e com o amadurecimento, entenderam que a estrutura mais adequada seria essa:
+
 GET .../cartoes/123/transacoes
 
 Ambas implementam a mesma busca, apesar das diferentes abordagens de modelagem.
@@ -452,8 +460,7 @@ Dentre os vários headers do protocolo [HTTP](https://developer.mozilla.org/en-U
 
 O Content-Type é um header que define qual o formato da estrutura de dados presente no Body. Existem muitos tipos de dados, como "text/plain", "application/xml", "text/html", "application/json", "image/gif", "image/jpeg", etc. Quando falamos de REST API, na maior parte das implementações é disponibilizado apenas o "application/json".
 
-Ex:
-**Content-Type**: application/json
+Ex: **Content-Type**: application/json
 
 Obs: Não utilizado no DELETE, pois o DELETE não tem Body.
 
@@ -463,8 +470,7 @@ Obs: Não utilizado no DELETE, pois o DELETE não tem Body.
 
 O cliente da REST API pode expressar qual o tipo de informação que ele deseja receber a resposta através do hearder **Accept** . Nota-se que nem todos os content-types são implementados pelos servidores.
 
-Ex:
-**Accept**: application/json
+Ex: **Accept**: application/json
 
 <sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
@@ -479,6 +485,7 @@ O comportamento esperado de qualquer camada é: se o Correlation ID vier preench
 Quando a arquitetura das aplicações está baseada em microsserviço, o Correlation ID percorre uma tragetória mais ampla do que simplesmente algo que inicia no canal e termina na API. Quando um cliente preenche um formulário e clica em gravar, podem ocorrer validações de cartão de crédito, acionamento do sistema de pagamento, comunicação com sistema de envio postal, serviço de e-mails, serviço de geolocalização, etc. sendo cada um desses um microsserviço diferente, com suas camadas de gateway, API, sistema produto, LOGs, etc. Em todos esses sistemas, o mesmo Correlation ID deve ser compartilhado.
 
 Ex:
+
 Uma aplicação client faz uma chamada à API, neste momento ele cria um Correlation ID para esta chamada, acrescenta o no header e grava o seu log na sua estrutura de log com este Correlation ID. Um Gateway de API recebe este Correlation ID e grava o seu log em outra estrutura utilizando o mesmo identificador. O sistema que responde ao produto que está exposto via API recebe o Correlation ID, grava o seu log e chama outro sistema que responde a uma parte da requisição e assim todos os demais envolvidos nesta chamada mantém o mesmo comportamento. 
 No momento em que se faz necessário mapear a chamada de ponta-a-ponta, basta unir os logs vindos de diversos fontes através deste identificador.
 
@@ -546,11 +553,15 @@ Se ao codificar a API, o desenvolvedor da API codificar um GET que não seja seg
 Este verbo é o mais utilizado e serve para buscar dados nas APIs. Ele é utilizado em conjunto com uma URL com seus Path Parameters e/ou Query Strings para enviar uma consulta e o servidor retorna os dados em caso de sucesso. Em requisições do tipo GET, não se envia [Body](#request--body).
 
 Exemplo de utilização de GET para fazer uma consulta por cidades no estado de São Paulo com população maior do que 20000 habitantes:
+
 Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades
+
 **GET** http://api.exemplo.com/estados/sp/cidades?from-populacao=20000
 
 Exemplo de utilização de GET para fazer uma consulta pela cidade de Santos:
+
 Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}
+
 **GET** http://api.exemplo.com/estados/sp/cidades/santos
 
 ### Request > Verbs > POST
@@ -558,7 +569,9 @@ Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCid
 O **POST** é usado para criar novos recursos. Ele é utilizado em conjunto com uma URL com seus Path Parameters e um [Body](#request--body) para enviar um conjunto de atributos que represente o estado do novo recurso no momento que você está criando ele.
 
 Exemplo utilizando o verbo POST para criar uma nova cidade:
+
 Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}
+
 **POST** http://api.exemplo.com/estados/sp/cidades/
 ```
 {
@@ -575,9 +588,13 @@ Obs: O POST também pode ser usado em casos especiais onde se faz necessário pr
 ### Request > Verbs > PUT
 
 O verbo  **PUT** atualiza ou cria um recurso, ou seja, se eu utilizar o PUT para enviar novamente a cidade de São Vicente (como no exemplo do POST), o servidor iria sobrepor completamente o recurso com os dados definidos no Body. Portanto, caso algum campo não seja informado, o valor dele será apagado. Caso seja utilizado um PUT e o recurso não exista, a API deveria criá-lo.
+
 Quando usamos **PUT** normalmente estamos atualizando um recurso existente, por isso é importante definir qual é especificamente o recurso através do ID no Path Parameter.
+
 Ex:
+
 Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}
+
 **PUT** http://api.exemplo.com/estados/sp/cidades/sao-vicente
 ```
 {
@@ -594,7 +611,11 @@ No exemplo, passamos dois Path Parameters, o {idEstado} com o valor "sp" e o {id
 O verbo **PATCH**  serve para fazer atualizações parciais no recurso. Neste caso, ele se comporta de forma semelhante ao PUT, no entanto, define-se no Body apenas os parâmetros que serão alterados.
 
 Ex:
-Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}_
+
+Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}
+
+*Request*
+
 **PATCH** http://api.exemplo.com/estados/sp/cidades/sao-vicente
 ```
 {
@@ -611,11 +632,11 @@ Caso a requisição seja em um recurso específico, o recurso será deletado, ca
 
 Ex:
 Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}
-- **DELETE** http://api.exemplo.com/estados/sp/cidades?to-populacao=5000
+- **DELETE** http://api.exemplo.com/estados/sp/cidades?to-populacao=5000<br>
 Apaga todas as cidades com população até 5000 habitantes.
-- **DELETE** http://api.exemplo.com/estados/sp/cidades
+- **DELETE** http://api.exemplo.com/estados/sp/cidades<br>
 Apaga todas as cidades do estado de São Paulo.
-- **DELETE** http://api.exemplo.com/estados/sp/cidades/sorocaba
+- **DELETE** http://api.exemplo.com/estados/sp/cidades/sorocaba<br>
 Apaga a cidade de Sorocaba.
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [response body](#response--body)</sub>
@@ -631,6 +652,7 @@ O Body é o espaço da requisição HTTP onde se trafega as informações refere
 Os atributos podem ser definidos em diversos formatos, os mais tradicionais são XML e [JSON]([https://www.json.org/](https://www.json.org/)), sendo este o mais adotado atualmente.
 
 Ex:
+
 POST http://api.fabricacarros.com/carros
 ```
 {
@@ -682,7 +704,7 @@ Exemplos fora do padrão:
 -	"flag_casado": true
 
 Os tipos de atributos devem ser declarados e convencionados no contrato da REST API.
-As linguagens de definição de contrato como Swagger e RAML documentam os data types suportados: [RAML DataTypes](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#raml-data-types) e [Swagger Data Types]([https://swagger.io/docs/specification/data-models/data-types/](https://swagger.io/docs/specification/data-models/data-types/)). E [aqui](#tipos-de-dados), tem um resumo já agregando boas práticas.
+As linguagens de definição de contrato como Swagger e RAML documentam os data types suportados: [RAML DataTypes](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#raml-data-types) e [Swagger Data Types]([https://swagger.io/docs/specification/data-models/data-types/](https://swagger.io/docs/specification/data-models/data-types/)). E [aqui](#tipos-de-dados) tem um resumo já agregando boas práticas.
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [response body](#response--body)</sub>
 
@@ -703,8 +725,8 @@ Assim como na requisição, o retorno da resposta pode trazer um conjunto de hea
 ### Response > Headers > Content-Type
 
 Assim como na requisição, o header **Content-Type** define qual é o formato da estrutura de dados presente no Body.
-Ex:
-**Content-Type**: application/json
+
+Ex:  **Content-Type**: application/json
 
 Obs: Este header não é utilizado no DELETE, pois não é enviado no body de retorno.
 
@@ -717,7 +739,9 @@ O header **Content-Location** expõe a URL relativa (somente dos recursos para f
 Quando uma requisição é feita com o verbo POST, por exemplo, o cliente ainda não sabe o Id do recurso que ele está criando: muitas vezes são identificadores gerados no momento da gravação. Assim, quando o servidor retorna a resposta, além de preencher a propriedade id no body da requisição, deve-se preencher o header Content-Location.
 
 Ex:
+
 *Request*
+
 POST http://api.exemplo.com/estados/sp/cidades/
 ```
 {
@@ -728,7 +752,9 @@ POST http://api.exemplo.com/estados/sp/cidades/
 }
 ```
 *Response*
+
 HTTP/1.1 201 Created
+
 **Content-Location**: http://api.exemplo.com/estados/sp/cidades/saovic001
 ```
 {
@@ -747,8 +773,7 @@ Obs: Não utilizado no DELETE, pois depois de um DELETE com sucesso, não existe
 
 O header Location expõe a URL relativa (somente dos recursos para frente) ou absoluta (desde o início incluindo o Base Path) que expõe **outra** localização para um determinado recurso. Normalmente é utilizado em processamento assíncrono.
 
-Ex:
-**Location**: http://api.exemplo.com/contas/v1/tarefas/1
+Ex: **Location**: http://api.exemplo.com/contas/v1/tarefas/1
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [processamento assíncrono](#processamento-ass%C3%ADncrono)</sub>
 
@@ -804,10 +829,13 @@ No body de response, colocamos a informação do recurso dentro de um envelope "
 Quando se faz uma requisição por um elemento com um ID especificado no Path Parameter, por exemplo, GET .../pessoas/{idPessoa}, o retorno da resposta será um único elemento. Assim, coloca-se o recurso unitário diretamente no envelope "data". Ex:
 
 *Request*
+
 GET .../pessoas/456
 
 *Response*
+
 HTTP/1.1 200 OK
+
 Content-Location: .../pessoas/456
 ```
 {
@@ -822,10 +850,13 @@ Content-Location: .../pessoas/456
 Quando se faz uma requisição sem o ID, filtrando apenas com Query Strings, pode-se ter como retorno um ou mais elementos. Neste cenário, retornamos com um array do referido recurso (mesmo que só retorne um). Ex:
 
 *Request*
+
 GET .../pessoas?from-data=2019-06-01
 
 *Response*
+
 HTTP/1.1 200 Ok
+
 Content-Location: .../pessoas/456
 ```
 {
@@ -910,6 +941,7 @@ Existem algumas técnicas diferentes para fazer a paginação. Serão explicadas
 #### Response > Body > Paginação > Range
 
 Uma das formas de se limitar a quantidade de registros retornados é através de um filtro em algum atributo que represente um intervalo. Assim, quando se recebe um filtro nas Query Strings, deve-se retornar o resultado respeitando os critérios do filtro.
+
 Por exemplo, em uma requisição GET .../...?from-id=3&to-id=6, possuindo o banco de dados uma coleção de 8 registros, e os ids sendo sequenciais, o retorno devem ser os registros 3, 4, 5 e 6:
 ```
 {
@@ -985,6 +1017,7 @@ Muitas vezes, criamos APIs para sistemas legados e com isso, precisamos nos ajus
 #### Response > Body > Paginação > Limit
 
 Quando se usa o query string **limit** para limitar a quantidade de registros, o retorno deve trazer apenas a quantidade de registros definida no query string. Ex:
+
 GET .../...?limit=3
 ```
 {
@@ -1012,8 +1045,11 @@ No caso do exemplo, a API deve retornar apenas os 3 primeiros registros (recurso
 ### Response > Body > Ordenação
 
 Quando se recebe uma solicitação contendo Query Strings de ordenação (**sort**), deve-se retornar os resultados respeitando os critérios da query.
+
 Ex:
+
 *Request*
+
 GET .../pedidos?sort=dataPagamento:desc,dataPedido
 
 *Response*
@@ -1049,11 +1085,15 @@ Ordernar de forma ascendente é o comportamento padrão quando a forma de ordena
 ### Response > Body > Fields
 
 Quando uma requisição vem com a Query String **fields**, o body de retorno deve trazer apenas os atributos definidos na Query String.
+
 Ex:
+
 *Request*
+
 GET https://api.lojaexemplo.com/clientes/jose-da-silva123/endereços/residencial-1?fields=nome,situacao,logradouro.rua,logradouro.numero
 
 *Response*
+
 HTTP/1.1 200 OK
 ```
 {
@@ -1069,11 +1109,16 @@ HTTP/1.1 200 OK
 ```
 
 Enquanto uma chamada ao mesmo recurso sem o fields, deve retornar o recurso com todos os seus atributos.
+
 Ex:
+
 *Request*
-GET https://api.lojaexemplo.com/clientes/jose-da-silva123/endereços/residencial-1
+
+GET 
+https://api.lojaexemplo.com/clientes/jose-da-silva123/endereços/residencial-1
 
 *Response*
+
 HTTP/1.1 200 OK
 ```
 {
@@ -1098,8 +1143,11 @@ HTTP/1.1 200 OK
 ### Response > Body > Views
 
 Quando a requisição recebe o query string **view**, o response deve devolver apenas os atributos convencionados (e documentados) como pertencentes àquela view.
+
 Ex:
+
 - GET .../cartoes/a7834dcG456?view=basico
+
 *Response*
 ```
 {
@@ -1113,6 +1161,7 @@ Ex:
 }
 ```
 - GET .../cartoes/a7834dcG456?view=limites
+
 *Response*
 ```
 {
@@ -1128,6 +1177,7 @@ Ex:
 }
 ```
 - GET .../cartoes/a7834dcG456
+
 *Response*
 ```
 {
@@ -1156,12 +1206,17 @@ Ex:
 Quando a requisição traz um query string **expand**, o body deverá retornar o recurso definido na URL mais os recursos definidos no expand aninhados no recurso principal.
 
 Ex:
+
 Sendo uma API com o formato
+
 GET .../cartoes/{idCartao} e 
+
 GET .../cartoes/{idCartao}/faturas/{idFatura}
 
 *Request*
+
 GET .../cartoes/a7834dcG456?expand=faturas&faturas.id=ago18
+
 *Response*
 ```
 {
@@ -1202,6 +1257,7 @@ Quando ocorrem requisições cujo retorno seja um erro ([HTTP Status Code](#resp
 O detalhamento do erro, é algo mais do que simplesmente o que o HTTP Status Code já expressa por si, mesmo. Ele deve ser suficiente para que o cliente entenda o que aconteceu e saiba o que fazer diante daquele problema.
 
 Ex:
+
 HTTP/1.1 422 Unprocessable Entity
 ```
 {
@@ -1244,10 +1300,13 @@ HTTP/1.1 Status Code 400 Bad Request
 ```
 
 #### Warnings
+
 Durante requisições com retorno de sucesso ([HTTP Status Code](#response--http-status-codes) 2xx e 3xx) pode haver situações que um alerta deve ser enviado ao cliente. Por exemplo, alertar que uma transação no cartão de crédito atingiu o 80% do limite disponível ou até mesmo, tendo atingido o limite do cartão, alertar que será cobrada uma taxa pelo uso do limite emergencial.
 
 O alerta se dá através de um envelope **messages** com a estrutura semelhante às das mensagens de erro.
+
 Ex:
+
 HTTP/1.1 201 Created
 ```
 {
@@ -1425,7 +1484,9 @@ Assim, quando sistemas deste tipo são expostos via API, o processamento segue a
 1. Na primeira requisição, o cliente receberá como resposta um HTTP Status Code **202 - Accepted**. Ou seja, a requisição foi aceita, mas ainda não foi processada. E será informado no header [Location](#response--headers--location) uma URL onde é possível consultar o andamento deste processamento.
 
 Ex:
+
 *Request*
+
 POST  http://api.exemplo.com/contas/v1/contas
 ```
 {
@@ -1435,14 +1496,21 @@ POST  http://api.exemplo.com/contas/v1/contas
 }
 ```
 *Response*
+
 HTTP/1.1 202 Accepted
+
 Location: http://api.exemplo.com/contas/v1/contas-processamento/1
 
 2. Na segunda requisição, o cliente deverá consultar a URL informada no Location para acompanhar o andamento da requisição.
+
 Ex:
+
 *Request*
+
 GET http://api.exemplo.com/contas/v1/contas-processamento/1
+
 *Response*
+
 HTTP/1.1 200 Ok
 ```
 {
@@ -1470,12 +1538,19 @@ HTTP/1.1 200 Ok
 - **mensagens.tipo**: [info, aviso, erro] o tipo de informação na mensagem.
 
 3. Em algum momento, o processamento estará completo, seja com erro ou não. Em caso de sucesso, a resposta será um HTTP Status Code 303 See Other que indicará que o recurso foi criado e está na URL indicada no Location.
+
 Ex:
-Request
+
+*Request*
+
 GET http://api.exemplo.com/contas/v1/contas-processamento/1
-Response
+
+*Response*
+
 HTTP 303 See Other
+
 Location: http://api.exemplo.com/contas/v1/contas/21531234567
+
 Content-Location: http://api.exemplo.com/contas/v1/contas-processamento/1
 ```
 {
@@ -1493,11 +1568,16 @@ Content-Location: http://api.exemplo.com/contas/v1/contas-processamento/1
 	}
 }
 ```
-5. Agora já é possível fazer a requisição no endereço do Location http://api.exemplo.com/contas/v1/contas/21531234567 e consultar o recurso criado.
+4. Agora já é possível fazer a requisição no endereço do Location http://api.exemplo.com/contas/v1/contas/21531234567 e consultar o recurso criado.
+
 Ex:
+
 *Request*
+
 GET http://api.exemplo.com/contas/v1/contas/21531234567
+
 *Response*
+
 HTTP/1.1 200 Ok
 ```
 {
@@ -1514,11 +1594,17 @@ HTTP/1.1 200 Ok
 ```
 
 Caso a situação no retorno no passo 2 seja falha,  deve-se retornar o motivo e o processamento é encerrado.
+
 Ex:
+
 *Request*
+
 GET http://api.exemplo.com/contas/v1/contas-processamento/1
+
 *Response*
+
 HTTP/1.1 200 Ok
+
 Content-Location: http://api.exemplo.com/contas/v1/contas-processamento/1
 ```
 {
@@ -1547,12 +1633,17 @@ Ao término do processamento:
 Além da possibilidade do cliente fazer consultas recorrentes no passo 2 para verificar o andamento do processamento, pode-se optar por fazer callback do servidor para o cliente quando a requisição estiver terminada. Neste caso, o cliente deverá chamar o recurso cujo processamento se dá assincronament informando o header **[Empresa]-Callback**.
 
 Ex:
+
 *Request*
+
 POST  http://api.exemplo.com/contas/v1/contas
+
 EmpresaExemplo-Callback: http://api.clienteexemplo.com/contas-callback
 
 *Response*
+
 HTTP/1.1 200 OK
+
 Location:  http://api.exemplo.com/contas/v1/contas-processamento/1
 ```
 {
@@ -1581,10 +1672,14 @@ Hoje existem ferramentas que permitem alta performance para atender grandes volu
 
 1.	O cliente define um array de objetos, sendo cada deles um request HTTP declarado com todos os seus componentes (incluindo URL, verbos e headers);
 2.	O cliente submete o array mensagem para o servidor usando o verbo POST para um recurso de API preparado para receber a requisição do passo 1;
+
 Ex:
+
 *Request*
+
 POST .../batch
-Content-Type: application/xml
+
+Content-Type: application/json
 ```
 {
 "requests":[
@@ -1616,8 +1711,11 @@ Content-Type: application/xml
 4. O servidor coleta a resposta de cada request e devolve para o cliente através de um array respeitando a sequência da requisição. 
 
 *Response*
+
 HTTP/1.1 200 OK
+
 Content-Type: application/json
+
 ```
 {
 "responses":[
@@ -1670,14 +1768,18 @@ Por exemplo, estruturando os sócios em URLs como recursos, teríamos o cenário
 .../empresas/abc123Xyz/**socios**/JOSÉ/**socios**/Maria/**socios**/EmpresasAzul/**socios**/...
 
 Esta abordagem traz as seguintes dificuldades:
-•	todos os sócios da rota é a entidade sócio, então ao tentar acessar os Path Parameters, teremos vários com o mesmo identificador "idSocio", ficando menos óbvia a recuperação destas informações no servidor.
-•	não é possível definir previamente a quantidade de aninhamentos (recursos do tipo sócio)
-•	um mesmo recurso (o sócio id JOSÉ) poderia estar representado em duas rotas diferentes, ora como sócio da empresa "abc123Xyz", ora como sócio do sócio "Empresas Verdes". O ideal no REST é que o recurso seja acessado apenas em uma rota.
+- todos os sócios da rota é a entidade sócio, então ao tentar acessar os Path Parameters, teremos vários com o mesmo identificador "idSocio", ficando menos óbvia a recuperação destas informações no servidor.
+- não é possível definir previamente a quantidade de aninhamentos (recursos do tipo sócio)
+- um mesmo recurso (o sócio id JOSÉ) poderia estar representado em duas rotas diferentes, ora como sócio da empresa "abc123Xyz", ora como sócio do sócio "Empresas Verdes". O ideal no REST é que o recurso seja acessado apenas em uma rota.
 
 Caso a opção fosse definir estes sócios não como recursos, mas como estruturas aninhadas dentro de um único recurso "sócio", teríamos algo assim:
+
 *Request*
+
 GET .../empresas/abc123Xyz/**socios**/JOSE
+
 *Response*
+
 HTTP/1.1 200 OK
 
 ```
@@ -1723,15 +1825,19 @@ HTTP/1.1 200 OK
 ```
 
 Esta abordagem traz as seguintes dificuldades:
-•	Caso seja necessário trocar o telefone do sócio Maria, por exemplo, não haveria uma URL para fazer um PATCH diretamente no recurso. Seria necessário enviar o .../socios/JOSE completo com todos os seus aninhamentos para alterar uma informação pequena.
-•	Não temos como saber previamente a quantidade de sócios para aninhar e definir no contrato do recurso (JSON) que representa essa entidade de socios.
+- Caso seja necessário trocar o telefone do sócio Maria, por exemplo, não haveria uma URL para fazer um PATCH diretamente no recurso. Seria necessário enviar o .../socios/JOSE completo com todos os seus aninhamentos para alterar uma informação pequena.
+- Não temos como saber previamente a quantidade de sócios para aninhar e definir no contrato do recurso (JSON) que representa essa entidade de socios.
 
 ### Solução
 
 Para contornar os problemas explicados acima, podemos separar o recurso sócio do relacionamento entre eles. Ex:
+
 Recurso **sócio**:
+
 *Request*
+
 GET .../empresas/abc123Xyz/**socios**/JOSE
+
 *Response*
 ```
 {
@@ -1744,8 +1850,11 @@ GET .../empresas/abc123Xyz/**socios**/JOSE
 }
 ```
 Recurso **associacoes** (unitário):
+
 *Request*
+
 GET .../empresas/abc123Xyz/**associacoes**/123
+
 *Response*
 ```
 {
@@ -1758,8 +1867,11 @@ GET .../empresas/abc123Xyz/**associacoes**/123
 ```
 
 Recurso **associacoes** (array):
+
 *Request*
+
 GET .../empresas/abc123Xyz/**associacoes**
+
 *Response*
 ```
 {
@@ -1829,6 +1941,7 @@ Do ponto de vista do cliente, também é interessante tomar alguns cuidados: par
 
 Na estrutura de host da URL, coloca-se a versão como parte dele. Por exemplo:
 https://api-v2.empresaexemplo.com/clientes
+
 Observe o "-v2", que específica que esta é a versão 2 da API.
 
 O ponto negativo desta abordagem é que do ponto de vista de deploy, é mais difícil criar um novo nome no host do que outras abordagens em que se cria pastas (recursos), por exemplo.
@@ -1838,6 +1951,7 @@ O ponto negativo desta abordagem é que do ponto de vista de deploy, é mais dif
 Define-se a versão a versão via  **query string**, por exemplo:
 
 https://api.empresaexemplo.com/clientes?version=2.0
+
 Observe o version=2.0, que especifica que essa é a versão 2.0 dessa API.
 
 O ponto negativo dessa abordagem é que prejudica a definição de contrato para outras versões e prejudica a legibilidade da URL em cenários de muitos parâmetros. Além de facilitar com que o cliente esqueça de definir a versão ao chamar a API e talvez tome erro por estar chamando a versão default.
@@ -1845,7 +1959,9 @@ O ponto negativo dessa abordagem é que prejudica a definição de contrato para
 #### Versionamento pelo Content-Type (com o header Accept)
 
 Define-se um tipo customizado de conteúdo com a versão dele. Por exemplo:
+
 GET https://api.empresaexemplo.com/clientes
+
 Accept: application/vnd.clientes.v2+json
 
 O ponto positivo é que a URL fica mais clean, no entanto não é dev-friendly, pois a requisição tem que ser feita com muito mais cuidado, dada a passagens de mais parâmetros.
@@ -1853,7 +1969,9 @@ O ponto positivo é que a URL fica mais clean, no entanto não é dev-friendly, 
 #### Versionamento por header customizado
 
 Define-se um header customizado para requisitar a versão da API. Por exemplo:
+
 GET https://api.empresaexemplo.com/clientes
+
 api-version: 2
 
 O ponto positivo é que a URL fica mais clena, no entanto não é dev-friendly, pois a requisição tem que ser feita com muito mais cuidado, dada a passagens de mais parâmetros.
@@ -1861,6 +1979,7 @@ O ponto positivo é que a URL fica mais clena, no entanto não é dev-friendly, 
 #### Versionamento pelo Path (Resources)
 
 Define-se a versão no Path como se fosse um recurso, por exemplo:
+
 https://api.empresaexemplo.com/v1/clientes
 
 Esta é a minha forma preferencial de versionar pois, fazendo parte da URL você força sempre o cliente a informá-la; a versão está sempre visível; em processo de deploy, é muito mais simples criar uma pasta do que definir um novo host; mantém um visual clean na URL e facilita na definição de contratos para versões novas.
