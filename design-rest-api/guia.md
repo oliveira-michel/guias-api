@@ -81,11 +81,11 @@ Os conteúdos abaixo cobrem alguns conceitos aliados às boas práticas no desig
 > Para fazer o entendimento das necessidades de negócio e definição das entidades, recomendamos o uso de Domain Driven Design.
 > TO DO: Em breve será disponibilizado um guia explorando toda a fase de entendimento e transformação dos conceitos de negócio em entidades para serem expostas como recursos via REST API.
 
-> O conteúdo deste material contempla os conceitos para especificação do contrato de REST APIs de forma genérica, não abordando necessariamente nenhuma linguagem específica de definição de contrato: como RAML, Open API, etc.
+> O conteúdo deste material contempla os conceitos para especificação do contrato de REST APIs de forma genérica, não abordando necessariamente nenhuma linguagem específica de definição de contrato: como RAML, Open API etc.
 > TO DO: Em breve serão disponibilizados exemplos dos conceitos deste guia em uma destas linguagens.
 
-**API** (**A**pplication **P**rogramming **I**nterface) é um software que permite comunicação entre sistemas onde há um fornecedor e um ou mais consumidores de informação, serviços, etc.  Para consumir uma API respeita-se um contrato que deve incluir o protocolo de comunicação, as operações (consultas e atualizações) e os formatos de dados para entradas, saídas e erros.
-A maioria dos softwares nos quais nós interagimos são construídos para atender às necessidades humanas e normalmente referenciam as "coisas" reais das quais esses softwares tratam. Por exemplo, um software de biblioteca vai representar livros, seções, autores, etc. e, através de alguma interface, permitir que um usuário interaja com estas representações. Uma API difere-se deste tipo de software no que tange o usuário: quem interage com o software é outro software, não diretamente o usuário final. No entanto, quem desenvolve o software que interage com a API é um programador - e até a data deste documento, a maioria ainda são humanos - e para que a experiência deste usuário programador e do usuário do software que ele desenvolve seja a melhor possível, princípios de design devem ser respeitados. 
+**API** (**A**pplication **P**rogramming **I**nterface) é um software que permite comunicação entre sistemas onde há um fornecedor e um ou mais consumidores de informação, serviços etc.  Para consumir uma API respeita-se um contrato que deve incluir o protocolo de comunicação, as operações (consultas e atualizações) e os formatos de dados para entradas, saídas e erros.
+A maioria dos softwares nos quais nós interagimos são construídos para atender às necessidades humanas e normalmente referenciam as "coisas" reais das quais esses softwares tratam. Por exemplo, um software de biblioteca vai representar livros, seções, autores etc. e, através de alguma interface, permitir que um usuário interaja com estas representações. Uma API difere-se deste tipo de software no que tange o usuário: quem interage com o software é outro software, não diretamente o usuário final. No entanto, quem desenvolve o software que interage com a API é um programador - e até a data deste documento, a maioria ainda são humanos - e para que a experiência deste usuário programador e do usuário do software que ele desenvolve seja a melhor possível, princípios de design devem ser respeitados. 
 
 **REST API** (**R**epresentational **S**tate **T**ransfer **A**pplication **P**rogramming **I**nterface) é um estilo de arquitetura que define um conjunto de restrições e propriedades baseadas em HTTP fornecendo interoperabilidade entre sistemas de computadores na internet (ou rede local). REST permite que os sistemas consumidores acessem e manipulem o estado de representações textuais de recursos usando um conjunto pré definido de operações. As "coisas" da vida real em REST se chamam recursos. O conjunto de valores dos atributos de um determinado recurso em um determinado momento, se chama estado.
 Por colocar mais restrições do que WebServices - que é uma outra forma de integrar sistemas - e utilizar mais recursos do HTTP do que WebServices, acabou padronizando melhor a forma de comunicação e isso agilizou o desenvolvimento das integrações.
@@ -181,7 +181,7 @@ Recursos criados no singular são menos frequentes e pode acontecer quando:
 
 Quando definir os recursos a serem expostos, deve-se **evitar**:
 - Utilizar termos que não façam parte do nome da entidade de negócio, por exemplo: <s>detalhes_</s>lancamentos-cheque. A entidade de negócio se chama lancamentos_cheque, exibir todos os atributos ou não, fica a cargo de filtros na [query string](#request--url--query-strings), não na exposição como um recurso.
-- Utilizar termos que representam as ações básicas do CRUD (consultar, gravar, atualizar, apagar, etc). Por exemplo: <s>consultar-</s>fatura. As ações básicas do CRUD são representadas pelos [verbos HTTP](#request--verbs) (GET, POST, PUT, PATCH e DELETE).
+- Utilizar termos que representam as ações básicas do CRUD (consultar, gravar, atualizar, apagar etc). Por exemplo: <s>consultar-</s>fatura. As ações básicas do CRUD são representadas pelos [verbos HTTP](#request--verbs) (GET, POST, PUT, PATCH e DELETE).
 - Expor representações de detalhes do backend na entidade, por exemplo: /<s>servico-</s>transferencias. O termo "servico" neste caso está representando, por exemplo, o "serviço" do sistema que processa uma transferência. Este tipo de informação deve ser abstraída no nome do recurso. Nomeie-o apenas como .../transferencias. Ou um exemplo pior, chamar um recurso de .../X0PSD002, sendo X0PSD002 o nome interno de um serviço que processa boletos. Nomeie-o apenas como /boletos.
 
 <sub>ir para: [índice](#conte%C3%BAdo)</sub>
@@ -239,7 +239,7 @@ Nos caso acima, o Banco BBVA agrupa todos os recursos referentes ao assunto "car
 
 A mesma abordagem de agrupamento provavelmente será útil para APIs expostas apenas internamente nas empresas para integrações entre diferentes sistemas. Isso porque definir um recurso na URL envolve menos mudanças na implantação do que criar um Base Path para cada um dos produtos/assuntos da empresa. 
 
-Em algumas empresas, esses grandes assuntos são conhecidos como domínios funcionais. Eles agrupam entidades relacionadas por um contexto funcional como produtos (cartões, contas, etc.), processos (contratações, on-boarding, etc.) ou serviços (comunicações, chat, etc.). É boa prática, usar nomes em minúsculo e se composto, separar com hífen. Os domínios funcionais na maioria dos casos serão substantivos no plural.
+Em algumas empresas, esses grandes assuntos são conhecidos como domínios funcionais. Eles agrupam entidades relacionadas por um contexto funcional como produtos (cartões, contas etc.), processos (contratações, on-boarding etc.) ou serviços (comunicações, chat etc.). É boa prática, usar nomes em minúsculo e se composto, separar com hífen. Os domínios funcionais na maioria dos casos serão substantivos no plural.
 
 Também é interessante manter os contratos de cada domínio separados para dar independência para os times que cuidam de cada um deles, além de permitir gerir o ciclo de vida de cada um deles de forma separada.
 
@@ -292,7 +292,7 @@ Como as Query Strings geralmente serão atributos dos recursos, utiliza-se o mes
 
 Geralmente, Query Strings não são utilizadas nos casos em que se busca um recurso cujo ID que já está definido na URL via Path Parameter. Isto porque, normalmente as Query Strings são utilizadas para filtrar dentro de uma coleção de resultados. Quando se tem o ID definido, não temos uma coleção de resultados, mas um específico já especificado pelo cliente.
 
-As query string não são utilizadas somente para filtros, ela pode ser utilizada como parâmetros para paginação, versionamento, ordenação, etc. 
+As query string não são utilizadas somente para filtros, ela pode ser utilizada como parâmetros para paginação, versionamento, ordenação etc. 
 
 >Existem padrões de mercado para filtrar os recursos via query string como [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), [OData](https://www.odata.org/getting-started/basic-tutorial/), [GraphQL](https://graphql.org/) e a adoção de uma delas significa agregar mais uma especificação sobre o REST. Assim, em um primeiro momento, utilizar um conjunto padrão, mais reduzido de Query Strings para fazer filtros básicos vai permitir trazer uma grande flexibilidade às REST APIs e ao mesmo tempo entregar uma curva de aprendizado mais rápida àqueles que estão embarcando no padrão. Com a maturidade do time de TI neste assunto, a adoção futura de um desses frameworks ajudará a entregar APIs ainda mais flexíveis.
 
@@ -443,7 +443,7 @@ O header é um dos componentes que fazem parte do protocolo HTTP. Como o REST é
 
 Por padrão, passamos nos headers informações não relacionadas aos recursos expostos nas URLs (que representam as entidades de negócio). De forma análoga, não colocamos atributos técnicos que não representem o negócio dentro dos recursos.
 
-Nos headers trafegamos somente informações técnicas como informações de acesso e credenciais, tokens, chaves de API, Correlation IDs, metadados, etc. 
+Nos headers trafegamos somente informações técnicas como informações de acesso e credenciais, tokens, chaves de API, Correlation IDs, metadados etc. 
 
 Alguns headers são padrões do protocolo [HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers), outros podem ser definidos de forma personalizada para as necessidades da sua empresa ou por frameworks de mercado que definem conjuntos de headers para necessidades específicas.
 
@@ -458,7 +458,7 @@ Dentre os vários headers do protocolo [HTTP](https://developer.mozilla.org/en-U
 
 ### Request > Headers > Content-Type
 
-O Content-Type é um header que define qual o formato da estrutura de dados presente no Body. Existem muitos tipos de dados, como "text/plain", "application/xml", "text/html", "application/json", "image/gif", "image/jpeg", etc. Quando falamos de REST API, na maior parte das implementações é disponibilizado apenas o "application/json".
+O Content-Type é um header que define qual o formato da estrutura de dados presente no Body. Existem muitos tipos de dados, como "text/plain", "application/xml", "text/html", "application/json", "image/gif", "image/jpeg" etc. Quando falamos de REST API, na maior parte das implementações é disponibilizado apenas o "application/json".
 
 Ex: **Content-Type**: application/json
 
@@ -482,7 +482,7 @@ Correlation ID é um dado geralmente gerado randomicamente (UUIDs é um bom form
 
 O comportamento esperado de qualquer camada é: se o Correlation ID vier preenchido, repassar para a próxima camada, senão, gerar um novo Correlation ID e repassar. O momento mais adequado para que o Correlation ID seja gerado é no início da cadeia de eventos de uma chamada, normalmente é no cliente quando uma requisição é disparada.
 
-Quando a arquitetura das aplicações está baseada em microsserviço, o Correlation ID percorre uma tragetória mais ampla do que simplesmente algo que inicia no canal e termina na API. Quando um cliente preenche um formulário e clica em gravar, podem ocorrer validações de cartão de crédito, acionamento do sistema de pagamento, comunicação com sistema de envio postal, serviço de e-mails, serviço de geolocalização, etc. sendo cada um desses um microsserviço diferente, com suas camadas de gateway, API, sistema produto, LOGs, etc. Em todos esses sistemas, o mesmo Correlation ID deve ser compartilhado.
+Quando a arquitetura das aplicações está baseada em microsserviço, o Correlation ID percorre uma tragetória mais ampla do que simplesmente algo que inicia no canal e termina na API. Quando um cliente preenche um formulário e clica em gravar, podem ocorrer validações de cartão de crédito, acionamento do sistema de pagamento, comunicação com sistema de envio postal, serviço de e-mails, serviço de geolocalização etc. sendo cada um desses um microsserviço diferente, com suas camadas de gateway, API, sistema produto, LOGs etc. Em todos esses sistemas, o mesmo Correlation ID deve ser compartilhado.
 
 Ex:
 
@@ -647,7 +647,7 @@ O envio de informações com o objetivo de filtrar informações existentes, se 
 
 Quando se utiliza os verbos POST, PUT ou PATCH, estamos enviando informações para serem persistidas no servidor. Neste caso, enviamos as informações no Body.
 
-O Body é o espaço da requisição HTTP onde se trafega as informações referentes ao recurso endereçado pela URL. Ao definir o contrato de uma REST API, cada recurso deve ser declarado como um conjunto de atributos com seus tipos definidos (números, datas, textos, booleanos, etc), descrições, exemplos, obrigatoriedade, etc. O Body trafega o conjunto destes atributos.
+O Body é o espaço da requisição HTTP onde se trafega as informações referentes ao recurso endereçado pela URL. Ao definir o contrato de uma REST API, cada recurso deve ser declarado como um conjunto de atributos com seus tipos definidos (números, datas, textos, booleanos etc), descrições, exemplos, obrigatoriedade etc. O Body trafega o conjunto destes atributos.
 
 Os atributos podem ser definidos em diversos formatos, os mais tradicionais são XML e [JSON]([https://www.json.org/](https://www.json.org/)), sendo este o mais adotado atualmente.
 
@@ -679,11 +679,11 @@ POST http://api.fabricacarros.com/carros
 ```
 Quando se define o contrato da API deve-se atentar para que os atributos presentes do Body sejam relacionados apenas ao recurso definido na URL. Por exemplo, na API de cidades usada em outros exemplos neste guia, quando forem feitas chamadas para "http://api.exemplo.com/estados", devem ser trabalhados apenas atributos que definam um estado; quando forem feitas chamadas para http://api.exemplo.com/estados/{idEstado}/cidades devem ser trabalhados apenas atributos que definam uma cidade.
 
-Ao definir os atributos do contrato da REST API, não existe um consenso de mercado quando ao tipo de caixa a ser adotada (maiúsculo, minúsculo, etc), no entanto, dado que os atributos em algum momento serão associados às propriedades das classes nas linguagens de programação seja no servidor ou no cliente, é uma boa prática adotar o lowerCamelCase, dado que as principais linguagens de programação adotam esta caixa para as propriedades.
+Ao definir os atributos do contrato da REST API, não existe um consenso de mercado quando ao tipo de caixa a ser adotada (maiúsculo, minúsculo etc), no entanto, dado que os atributos em algum momento serão associados às propriedades das classes nas linguagens de programação seja no servidor ou no cliente, é uma boa prática adotar o lowerCamelCase, dado que as principais linguagens de programação adotam esta caixa para as propriedades.
 
 Sobre os termos usados para definir os atributos, deve-se utilizar aqueles que melhor auto-descrevam o atributo, reduzindo a necessidade de consultas às documentações. Portanto, utilize as palavras por extenso, evitando abreviações, exceto para casos amplamente conhecidos como "Id" ou acrônimos como "RG". Ainda assim, o padrão para uso de Acrônimos ou Abreviações é controverso. Dê uma lida neste fórum [acronyms-in-camelcase](https://stackoverflow.com/questions/15526107/acronyms-in-camelcase) para comprovar a complexidade deste assunto.
 
-Também não se usa em REST APIs alguns padrões antigos de definição de variável com o tipo de dado no nome do atributo - por exemplo, dt, int, bool, etc. - dado que os atributos tipos já tão tipados na definição do contrato.
+Também não se usa em REST APIs alguns padrões antigos de definição de variável com o tipo de dado no nome do atributo - por exemplo, dt, int, bool etc. - dado que os atributos tipos já tão tipados na definição do contrato.
 
 Exemplos dentro do padrão:
 -	"id": "12ed58r9"
@@ -782,8 +782,8 @@ Ex: **Location**: http://api.exemplo.com/contas/v1/tarefas/1
 Quando é feita uma requisição na API, na maioria das vezes, espera-se uma resposta com informações. Colocamos estas informações no Body. Assim como no Body do [request](#request--body), é recomendado utilizar lowerCamelCase para definir os atributos e JSON como padrão de notação.
 
 A resposta de uma requisição de gravação (POST, PUT, PATCH) não precisa necessariamente retornar o body com o recurso gravado. O critério para a decisão de retorná-lo ou não fica em ponderar se:
-- Existe transformação da informação no momento da gravação e o cliente precisa saber, então devolve-se o recurso e gasta-se banda, log, etc.
-- Se não existe transformação da informação, então pode-se não enviar um body de retorno e economizar banda, log, etc.
+- Existe transformação da informação no momento da gravação e o cliente precisa saber, então devolve-se o recurso e gasta-se banda, log etc.
+- Se não existe transformação da informação, então pode-se não enviar um body de retorno e economizar banda, log etc.
 
 Para DELETE, não se utiliza Body.
 
@@ -803,7 +803,7 @@ Chamamos de **envelope** alguns **atributos que separam conteúdos importantes n
    "data": "2019-06-04"
 }
 ```
-No body de response, colocamos a informação do recurso dentro de um envelope "data".  Esse separação é necessária porque no response podemos ter outros envelopes como pagination, messages, links, summary, etc. Exemplo de Body de response:
+No body de response, colocamos a informação do recurso dentro de um envelope "data".  Esse separação é necessária porque no response podemos ter outros envelopes como pagination, messages, links, summary etc. Exemplo de Body de response:
 ```
 {
    "data": [{
@@ -1003,7 +1003,7 @@ Os campos são auto-explicativos, só é preciso atenção especial para defini�
 
 No caso do exemplo, para obtenção da página seguinte, o cliente faria a chamada GET .../...?page=3, conforme informado no atributo "next".
 
-Também devem ser mantidos (repetidos) os Query Strings (filtros, ordenação, etc..) que o cliente passar na requisição, ainda porque, caso o cliente altere o filtro, todo o envelope de paginação pode ter seus valores alterados.
+Também devem ser mantidos (repetidos) os Query Strings (filtros, ordenação etc.) que o cliente passar na requisição, ainda porque, caso o cliente altere o filtro, todo o envelope de paginação pode ter seus valores alterados.
 
 Quando se está na primeira página ou na última, os atributos "previous"e "next" devem ficar vazios.
 
@@ -1253,7 +1253,7 @@ Observe que o conteúdo até o atributo limites são atributos do recurso cartã
 ### Response > Body > Errors e Warnings
 
 #### Errors
-Quando ocorrem requisições cujo retorno seja um erro ([HTTP Status Code](#response--http-status-codes) 5xx e 4xx), o body deve retornar o detalhamento do erro. Neste caso, não são retornados os envelopes relacionados às requisições bem sucedidas como "data", "pagination", "links", etc.
+Quando ocorrem requisições cujo retorno seja um erro ([HTTP Status Code](#response--http-status-codes) 5xx e 4xx), o body deve retornar o detalhamento do erro. Neste caso, não são retornados os envelopes relacionados às requisições bem sucedidas como "data", "pagination", "links" etc.
 O detalhamento do erro, é algo mais do que simplesmente o que o HTTP Status Code já expressa por si, mesmo. Ele deve ser suficiente para que o cliente entenda o que aconteceu e saiba o que fazer diante daquele problema.
 
 Ex:
@@ -1417,7 +1417,7 @@ Este grupo define respostas de redirecionamento. Servem para informar o cliente 
 
 Esse grupo informa os erros cometidos pelo cliente durante o request. São eles:
 
-- **400 Bad Request**: Significa que o servidor não consegue entender a requisição, pois existe uma sintaxe ou estrutura inválida, pode ser caracteres não permitidos na URL, falta de cabeçalhos obrigatórios, cabeçalhos mal formados, falta de Query Strings obrigatórias, falta de atributos obrigatórios, body com estrutura inválida, etc.
+- **400 Bad Request**: Significa que o servidor não consegue entender a requisição, pois existe uma sintaxe ou estrutura inválida, pode ser caracteres não permitidos na URL, falta de cabeçalhos obrigatórios, cabeçalhos mal formados, falta de Query Strings obrigatórias, falta de atributos obrigatórios, body com estrutura inválida etc.
 
 - **401 Unauthorized**: A camada de segurança do recurso solicitado ao servidor, apontou que não está sendo utilizada as credenciais corretas nessa requisição (token, por exemplo). É um erro de [autenticação](#seguran%C3%A7a).
 
@@ -1434,7 +1434,7 @@ Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não ex
 
 - **418 I'm a teapot**: O servidor se recusa a servir um café porque o bule é chá. Código de resposta do Hyper Text Coffee Pot Control Protocol ([HTCPCP/1.0](https://tools.ietf.org/html/rfc2324#section-2.3.2)).  Este código é só uma brincadeira de primeiro de abril. :-) [+ info](https://sitesdoneright.com/blog/2013/03/what-is-418-im-a-teapot-status-code-error)
 
-- **422 Unprocessable Entity**:	Ocorre quando a requisição está correta ao nível sintático, mas existem erros de negócio na requisição. Por exemplo, se existe regra que o uso de um query parameter está condicionado a outro e eles não foram preenchidos, ou uma data informada é inválida para uma determinada ação, ou uma requisição de transferência financeira é feita e a conta não tem fundo, etc.
+- **422 Unprocessable Entity**:	Ocorre quando a requisição está correta ao nível sintático, mas existem erros de negócio na requisição. Por exemplo, se existe regra que o uso de um query parameter está condicionado a outro e eles não foram preenchidos, ou uma data informada é inválida para uma determinada ação, ou uma requisição de transferência financeira é feita e a conta não tem fundo etc.
 
 - **428 Precondition Required**: O recurso faz parte de um processo composto de vários passos. Foi feita uma tentativa de acessar um passo sem antes ter passado pelo passo anterior.
 
@@ -1909,12 +1909,12 @@ As buscas nestas rotas seguem as mesmas práticas já explicadas neste guia. Ex:
 
 ## Versionamento
 
-Versionamento acontece quanto ocorrem alterações no contrato da API. Contrato é a definição de todo o conjunto de verbos, códigos de resposta, recursos, etc. feita em uma notação padrão para isso como o RAML, Open API Specification, etc. O ideal é que estes documentos sejam armazenados em um repositório de código fonte e a cada alteração, versionados. Assim, existirão dois tipos de versão: aquela do contrato no repositório e aquela que repassamos para o cliente (consumidor da API).
+Versionamento acontece quanto ocorrem alterações no contrato da API. Contrato é a definição de todo o conjunto de verbos, códigos de resposta, recursos etc. feita em uma notação padrão para isso como o RAML, Open API Specification etc. O ideal é que estes documentos sejam armazenados em um repositório de código fonte e a cada alteração, versionados. Assim, existirão dois tipos de versão: aquela do contrato no repositório e aquela que repassamos para o cliente (consumidor da API).
 
 Para realizar o versionamento dos contratos das APIs podemos fazer uso do [Semantic Versioning 2.0.0](https://semver.org/). Esta definição utiliza a seguinte estrutura **MAJOR.MINOR.PATCH**. Onde se incrementa os valores conforme a seguinte regra:
 - **MAJOR**: implica mudanças incompatíveis para a API. Ou seja, que faz com que os consumidores atuais não consigam mais utilizar a API sem ter de alterar seus softwares.
 Ex (era **1**.0.0 e vira **2**.0.0):
-	- remoção de qualquer item que faz parte do HTTP e do REST (Status Code, Verbo, Recursos, Parâmetros, Atributos, etc);
+	- remoção de qualquer item que faz parte do HTTP e do REST (Status Code, Verbo, Recursos, Parâmetros, Atributos etc);
 	- tornar campos já existentes - antes não obrigatórios - como obrigatórios;
 	- alteração de tipos de dados.
 - **MINOR**: implica adicionar funcionalidades que mantém compatibilidade com a versão atual. Ou seja, os consumidores atuais não terão que alterar seu software para continuar usando a API. 
