@@ -2,3 +2,5 @@
 Material de referência para modelagem de serviços expostos via REST API
 
 https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/guia.md
+
+Em breve: novos capítulos e exemplos em Swagger.
