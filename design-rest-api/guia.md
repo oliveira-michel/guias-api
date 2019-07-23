@@ -1480,7 +1480,11 @@ O HTTP é um protocolo síncrono, logo, quando um cliente faz uma requisição, 
 
 No entanto, em determinadas situações os servidores não processam as requisições de forma imediata, seja porque o processamento necessita de mais tempo do que o habitual, ou porque estará esperando que chegue a sua vez para ser executado, ou ainda porque depende de um agendamento batch para completar a operação.
 
-Assim, quando sistemas deste tipo são expostos via API, o processamento segue alguns passos a mais:
+Para dar um comportamento assíncrono em um protocolo síncrono, existem duas técnicas muito adotadas: **pooling** e **webhook**. No pooling, o cliente consulta o estado do andamento do processamento de tempos em tempos até encerrar. No webhook, o cliente fornece um endereço de retorno para a API e a API faz uma chamada neste endereço ao terminar o processamento. Nesse caso, o cliente tem que ser também um servidor para poder hospedar este endereço.
+
+Implementar as duas técnicas ao mesmo tempo na API traz mais flexibilidade aos clientes, dado que não há abordagem mais ou menos correta: existem cenários para cada uma delas.
+
+Assim, quando processamentos deste tipo são expostos via API, eles seguem alguns passos a mais:
 1. Na primeira requisição, o cliente receberá como resposta um HTTP Status Code **202 - Accepted**. Ou seja, a requisição foi aceita, mas ainda não foi processada. E será informado no header [Location](#response--headers--location) uma URL onde é possível consultar o andamento deste processamento.
 
 Ex:
@@ -1630,7 +1634,7 @@ Ao término do processamento:
 
 #### Callbacks
 
-Além da possibilidade do cliente fazer consultas recorrentes no passo 2 para verificar o andamento do processamento, pode-se optar por fazer callback do servidor para o cliente quando a requisição estiver terminada. Neste caso, o cliente deverá chamar o recurso cujo processamento se dá assincronament informando o header **[Empresa]-Callback**.
+Além da possibilidade do cliente fazer consultas recorrentes no passo 2 (**pooling**) para verificar o andamento do processamento, pode-se optar por fazer callback do servidor para o cliente quando a requisição estiver terminada (**webhook**). Neste caso, o cliente deverá fazer uma requisição ao recurso informando o header **[Empresa]-Callback**.
 
 Ex:
 
@@ -1662,7 +1666,7 @@ Location:  http://api.exemplo.com/contas/v1/contas-processamento/1
 }
 ```
 
-Neste caso, o cliente pode optar por não chamar mais a API de processamento para verificar o andamento, pois o servidor enviará a resposta via POST para a URL informada pelo cliente (http://api.clienteexemplo.com/contas-callback) ao término do processamento. No Body enviado para o cliente, deverá conter todas informações referentes ao processamento.
+O cliente pode optar por não chamar mais a API de processamento para verificar o andamento, pois o servidor enviará a resposta via POST para a URL informada pelo cliente (http://api.clienteexemplo.com/contas-callback) ao término do processamento. No Body enviado para o cliente, deverá conter todas informações referentes ao processamento.
 
 <sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
