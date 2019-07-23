@@ -1469,7 +1469,7 @@ Abaixo, seguem algumas formatações padrões para os tipos de dados:
 | Array | Lista de objetos de um dos tipos anteriores | ["a", "b", "c"]
 | null	| Valores nulos | null |
 | Moeda | String com formato [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217) | EUR (Euro Member Countries)<br>USD (United State Dollar)<br>BRL (Brazillian Real)|
-| Idiomas | String com o formato [ISO 693(https://en.wikipedia.org/wiki/Lists_of_ISO_639_codes) |por (Portuguese)<br>eng (English)<br>spa (Spanish) |
+| Idiomas | String com o formato [ISO 693](https://en.wikipedia.org/wiki/Lists_of_ISO_639_codes) |por (Portuguese)<br>eng (English)<br>spa (Spanish) |
 | Países | String com o formato [ISO 3166-2](https://en.wikipedia.org/wiki/ISO_3166)|BR (Brasil)<br>PT (Portugal)
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [body](#request--body)</sub>
@@ -1482,7 +1482,7 @@ No entanto, em determinadas situações os servidores não processam as requisi�
 
 Para dar um comportamento assíncrono em um protocolo síncrono, existem duas técnicas muito adotadas: **pooling** e **webhook**. No pooling, o cliente consulta o estado do andamento do processamento de tempos em tempos até encerrar. No webhook, o cliente fornece um endereço de retorno para a API e a API faz uma chamada neste endereço ao terminar o processamento. Nesse caso, o cliente tem que ser também um servidor para poder hospedar este endereço.
 
-Implementar as duas técnicas ao mesmo tempo na API traz mais flexibilidade aos clientes, dado que não há abordagem mais ou menos correta: existem cenários para cada uma delas.
+Implementar as duas técnicas ao mesmo tempo na API traz mais flexibilidade aos clientes, pois existem cenários para uso de cada uma delas.
 
 Assim, quando processamentos deste tipo são expostos via API, eles seguem alguns passos a mais:
 1. Na primeira requisição, o cliente receberá como resposta um HTTP Status Code **202 - Accepted**. Ou seja, a requisição foi aceita, mas ainda não foi processada. E será informado no header [Location](#response--headers--location) uma URL onde é possível consultar o andamento deste processamento.
