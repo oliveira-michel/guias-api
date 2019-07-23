@@ -301,8 +301,11 @@ As query string não são utilizadas somente para filtros, ela pode ser utilizad
 ### Request > URL > Query Strings > Full text search
 
 Algumas APIs podem implementar a capacidade de buscar em vários atributos ao mesmo tempo. Quando se tem essa capacidade, utiliza-se o query string **q** (de query) com o termo a ser pesquisado.
+
 Ex:
+
 GET http://api.empresarh.com/candidatos?q=Paulo
+
 No caso, o resultado tratá todos os recursos candidatos onde algum atributo pesquisável contém o texto Paulo.
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [response  full text search](#response--body--full-text-search)</sub>
