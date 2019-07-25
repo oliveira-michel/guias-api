@@ -1453,6 +1453,8 @@ São códigos que retornam erros que aconteceram por culpa do servidor. Ou seja,
 
 - **503 Service Unavailable**: O servidor não está respondendo por que está fora do ar, em manutenção ou sobrecarregado. É um problema temporário.
 
+- **504 Gateway Timeout**: O servidor, enquanto atuando como gateway ou proxy, não conseguiu responder em tempo. 
+
 <sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ## Tipos de dados
