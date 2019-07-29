@@ -355,8 +355,11 @@ https://api.lojaexemplo.com/ofertas-noturnas?limit=10
 
 Em APIs que retornem conjuntos de registros, é interessante permitir alguma ordenação básica.
 A ordenação pode ser especificada através das query string **sort=[{atributo}:{asc|desc}]**.
+
 Ex:
+
 GET .../pedidos?sort=dataPagamento:desc,dataPedido
+
 No exemplo, desejo que a lista de pedidos venha ordenada de forma decrescente pela dataPagamento e de forma ascendente (valor default) pela dataPedido.
 
 No caso de não ser especificada uma ordem {asc|desc}, será utilizada a ascendente como padrão.
