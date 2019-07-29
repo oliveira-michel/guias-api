@@ -540,8 +540,8 @@ Os verbos têm características importantes que devem ser conhecidas e respeitad
 
 Abaixo a tabela exibe a relação entre Verbo HTTP e os conceitos de Idempotência e método Seguro:
  
- | Verbo | Idempotente | Seguro |
- | --- | --- | --- |
+| Verbo | Idempotente | Seguro |
+| --- | --- | --- |
 |GET|Sim|Sim|
 |PUT|Sim|Não|
 |DELETE|Sim|Não|
