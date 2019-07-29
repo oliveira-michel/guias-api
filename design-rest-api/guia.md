@@ -122,7 +122,7 @@ Dado que URLs são case sensitive, é uma boa prática usar tudo em minúsculo p
 - I <- isto é um i maiúsculo
 - l <- isto é um L minúsculo
 
-Quando na URL existirem palavras compostas, é indicado o uso de hífen para separá-las. Nos interpretadores de texto, o hífen é um separador de palavras, ao contrário do underscore e de CamelCase). Por exemplo, dê um clique duplo nas palavras abaixo e veja como apenas no caso do hífen é feita a seleção correta:
+Quando na URL existirem palavras compostas, é indicado o uso de hífen para separá-las. Nos interpretadores de texto, o hífen é um separador de palavras, ao contrário do underscore e de CamelCase. Por exemplo, dê um clique duplo nas palavras abaixo (apenas em PCs, pois no celular, ele só separa via espaços) e veja como apenas no caso do hífen é feita a seleção correta:
 - CamelCase: primeiraSegunda 
 - Underscore: primeira_segunda
 - Hífen: primeira-segunda
@@ -1264,17 +1264,17 @@ Ex:
 HTTP/1.1 422 Unprocessable Entity
 ```
 {
-   "codigo": "ER0059",
-   "mensagem": "Operação não permitida fora do horário comercial.",
-   "detalhes": "https://developer.empresa.com/apis/cartoes/erros/ER0059"
+   "code": "ER0059",
+   "message": "Operação não permitida fora do horário comercial.",
+   "details": "https://developer.empresa.com/apis/cartoes/erros/ER0059"
 }
 ```
 HTTP/1.1 428 Preconditional Required
 ```
 {
-   "codigo": "err-pto-A320",
-   "mensagem": "Não é possível fazer o lançamento de horas extras sem pré-aprovação do gerente.",
-   "detalhes": "https://developer.empresa.com/apis/rh/erros/err-pto-A320"
+   "code": "err-pto-A320",
+   "message": "Não é possível fazer o lançamento de horas extras sem pré-aprovação do gerente.",
+   "details": "https://developer.empresa.com/apis/rh/erros/err-pto-A320"
 }
 ```
 Quando a API retorna HTTP Status Code 400 e 422, muito provavelmente o erro foi causado por algum atributo específico. Nestes casos, deve-se especificar as informações sobre cada um dos atributos envolvidos no erro.
@@ -1282,21 +1282,21 @@ Quando a API retorna HTTP Status Code 400 e 422, muito provavelmente o erro foi 
 HTTP/1.1 Status Code 400 Bad Request
 ```
 {
-   "codigo": "10023",
-   "mensagem": "Alguns campos estão preenchidos incorretamente.",
-   "detalhes": "https://developer.empresa.com/apis/erros/10023",
-   "atributos":[
+   "code": "10023",
+   "message": "Alguns campos estão preenchidos incorretamente.",
+   "details": "https://developer.empresa.com/apis/erros/10023",
+   "fields":[
       {
-         "nome":"dataPedido",
-         "mensagem":"O formato de data é inválido. Utilize data no padrão yyyy-MM-DD.",
-         "valor":"01-05-2019",
-         "detalhes": "https://developer.empresa.com/apis/erros/err-gen-086"
+         "name": "dataPedido",
+         "message": "O formato de data é inválido. Utilize data no padrão yyyy-MM-DD.",
+         "value": "01-05-2019",
+         "details": "https://developer.empresa.com/apis/erros/err-gen-086"
       },
       {
-         "nome":"valorPagamento",
-         "mensagem":"Valor não é number.",
-         "valor":"R$ 27.568,90",
-          "detalhes": "https://developer.empresa.com/apis/erros/err-gen-073"
+         "name": "valorPagamento",
+         "message": "Valor não é number.",
+         "value": "R$ 27.568,90",
+         "details": "https://developer.empresa.com/apis/erros/err-gen-073"
       }
    ]
 }
@@ -1318,8 +1318,8 @@ HTTP/1.1 201 Created
    },
    "messages": [
       {
-         "codigo":"CT0056",
-         "mensagem":"Limite do cartão ultrapassou 80%."
+         "code": "CT0056",
+         "message": "Limite do cartão ultrapassou 80%."
       }
    ]
 }
