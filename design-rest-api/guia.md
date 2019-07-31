@@ -172,17 +172,17 @@ Quando os recursos forem formados por duas palavras, é boa prática separar com
 
 Os recursos na maioria dos casos serão substantivos no plural, pois geralmente definem coleções (ex: cartões, usuários, clientes, carros, endereços etc.) Ao pensar no nome do recurso, é importante verificar se o nome não conflitará com alguma possível implementação parecida no futuro. Por exemplo, imagina um recurso que se chamaria ofertas_credito. Neste caso, a deve-se perguntar: "este serviço ofertará todos os tipos de crédito no domínio de crédito?" Se a reposta for: "Não, apenas consignado", deve-se especificar o nome da entidade como ofertas-credito-consignado porque no futuro uma nova rota que oferte todos os tipos de crédito poderá ser criada com o nome oferta-credito.
 Ex:
-http://api.exmpresaexemplo.com/creditos/v1/ofertas-credito-consignado
+http://api.empresaexemplo.com/creditos/v1/ofertas-credito-consignado
 
 Recursos criados no singular são menos frequentes e pode acontecer quando:
--	Haver requerimentos de segurança ou permissão específicos para um atributo. Neste caso, o atributo se torna um recurso na URL, podendo ser aplicadas políticas específicas de segurança naquela rota.
--	No recurso existir um [atributo](#request--body) complexo com um número elevado de "sub-atributos". Por conta da complexidade, pode-se optar por tornar este atributo um recurso.
--	Haver recursos que não existam no plural, como saldo, extrato etc.
+- Houver requerimentos de segurança ou permissão específicos para um atributo. Neste caso, o atributo se torna um recurso na URL, podendo ser aplicadas políticas específicas de segurança naquela rota.
+- No recurso existir um [atributo](#request--body) complexo com um número elevado de "sub-atributos". Por conta da complexidade, pode-se optar por tornar este atributo um recurso.
+- Houver recursos que não existam no plural, como saldo, extrato etc.
 
 Quando definir os recursos a serem expostos, deve-se **evitar**:
 - Utilizar termos que não façam parte do nome da entidade de negócio, por exemplo: <s>detalhes_</s>lancamentos-cheque. A entidade de negócio se chama lancamentos_cheque, exibir todos os atributos ou não, fica a cargo de filtros na [query string](#request--url--query-strings), não na exposição como um recurso.
 - Utilizar termos que representam as ações básicas do CRUD (consultar, gravar, atualizar, apagar etc). Por exemplo: <s>consultar-</s>fatura. As ações básicas do CRUD são representadas pelos [verbos HTTP](#request--verbs) (GET, POST, PUT, PATCH e DELETE).
-- Expor representações de detalhes do backend na entidade, por exemplo: /<s>servico-</s>transferencias. O termo "servico" neste caso está representando, por exemplo, o "serviço" do sistema que processa uma transferência. Este tipo de informação deve ser abstraída no nome do recurso. Nomeie-o apenas como .../transferencias. Ou um exemplo pior, chamar um recurso de .../X0PSD002, sendo X0PSD002 o nome interno de um serviço que processa boletos. Nomeie-o apenas como /boletos.
+- Expor representações de detalhes do backend na entidade, por exemplo: /<s>servico-</s>transferencias. O termo "servico" neste caso está representando, por exemplo, o "serviço" do sistema que processa uma transferência. Este tipo de informação deve ser abstraída no nome do recurso. Nomeie-o apenas como .../transferencias. Ou um exemplo pior, chamar um recurso de .../X0PSD0054, sendo X0PSD0054 o nome interno de um serviço que processa boletos. Nomeie-o apenas como /boletos.
 
 <sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
@@ -210,10 +210,11 @@ Ex:
 ```
 - GET .../**somar**?primeiro-valor=72&segundo-valor=28
   
-Observem que algumas chamadas representam consultas seguras e idempotentes. Portanto, o verbo HTTP que foi utilizado foi o GET.
-No exemplo da validação de cartão, trafegamos **dados sensíveis**. Mesmo sendo uma consulta segura e idempotente, por questões de segurança, o tráfego de dados sensíveis são feitos sempre via POST para permitir a encriptação do Body.
+Observe que algumas chamadas representam consultas seguras (que não alteram o estado do recurso) e idempotentes (que podem ser repetidas retornando o mesmo resultado). Portanto, o verbo HTTP utilizado nelas foi o GET. Repare que o GET trafega a requisição via Query Strings: que são visíveis a todos. Os dados das Query Strings ou dos Path Parameters não são encriptados em uma conexão HTTPS.
 
 Nos casos em que a chamada não é segura, nem idempotente (por exemplo, em uma API de login, em que depois de algumas tentativas o login será bloqueado) devemos usar verbos como o POST. 
+
+No exemplo da validação de cartão, trafegamos **dados sensíveis**. Mesmo sendo uma consulta segura (sem alterações de estado) e idempotente, por questões de segurança da informação, o tráfego de dados sensíveis é feito sempre via POST, pois no POST os dados são trafegados no Body e o Body pode ser encriptado.
 
 Para saber mais sobre idempotência, leia sobre os [verbos](#request--verbs) HTTP.
 
@@ -484,11 +485,11 @@ Ex: **Accept**: application/json
 
 Não há um header padronizado para Correlation ID, mas é de grande valor que todas as chamadas tenham um Correlation Id. 
 
-Correlation ID é um dado geralmente gerado randomicamente (UUIDs é um bom formato para isso) que deve ser repassado em cada camada de software pelo qual a comunicação trafega. Como cada camada gera o seu próprio log e muitas vezes em banco de dados diferentes, através do Correlation ID, é possível identificar uma chamada específica entre estes diferentes bancos de dados, permitindo um mapeamento da chamada de ponta-a-ponta.
+Correlation ID é um dado geralmente gerado randomicamente (UUIDs é um bom formato para isso) que deve ser repassado em cada camada de software pelo qual a comunicação trafega. Como cada camada gera o seu próprio log e muitas vezes em repositórios diferentes. Através do Correlation ID, é possível identificar uma chamada específica entre estes diferentes repositórios, permitindo um mapeamento da chamada de ponta-a-ponta.
 
 O comportamento esperado de qualquer camada é: se o Correlation ID vier preenchido, repassar para a próxima camada, senão, gerar um novo Correlation ID e repassar. O momento mais adequado para que o Correlation ID seja gerado é no início da cadeia de eventos de uma chamada, normalmente é no cliente quando uma requisição é disparada.
 
-Quando a arquitetura das aplicações está baseada em microsserviço, o Correlation ID percorre uma tragetória mais ampla do que simplesmente algo que inicia no canal e termina na API. Quando um cliente preenche um formulário e clica em gravar, podem ocorrer validações de cartão de crédito, acionamento do sistema de pagamento, comunicação com sistema de envio postal, serviço de e-mails, serviço de geolocalização etc. sendo cada um desses um microsserviço diferente, com suas camadas de gateway, API, sistema produto, LOGs etc. Em todos esses sistemas, o mesmo Correlation ID deve ser compartilhado.
+Quando a arquitetura das aplicações está baseada em microsserviço, o Correlation ID percorre uma trajetória mais ampla do que simplesmente algo que inicia no canal e termina na API. Quando um cliente preenche um formulário e clica em gravar, podem ocorrer validações de cartão de crédito, acionamento do sistema de pagamento, comunicação com sistema de envio postal, serviço de e-mails, serviço de geolocalização etc. sendo cada um desses um microsserviço diferente, com suas camadas de gateway, API, sistema produto, LOGs etc. Em todos esses sistemas, o mesmo Correlation ID deve ser compartilhado.
 
 Ex:
 
@@ -541,7 +542,7 @@ Os verbos têm características importantes que devem ser conhecidas e respeitad
 
 - **Seguros** são todos os verbos que não podem provocam alterações no estado dos recursos. Ou seja, os verbos apenas de consulta (HEAD, GET, OPTIONS). Destes três, somente o GET é mais utilizado.
 
-Abaixo a tabela exibe a relação entre Verbo HTTP e os conceitos de Idempotência e método Seguro:
+A tabela abaixo exibe a relação entre Verbo HTTP e os conceitos de Idempotência e método Seguro:
  
 | Verbo | Idempotente | Seguro |
 | --- | --- | --- |
@@ -589,11 +590,11 @@ Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCid
 ```
 Dando tudo certo, uma nova cidade será criada na coleção de cidades.
 
-Obs: O POST também pode ser usado em casos especiais onde se faz necessário proteger as informações que seriam usadas em uma consulta, pois com o uso de POST, podemos enviar um [Body](#request--body) que segue encriptado, ao contrário do GET que passa os parâmetros na URL que não é encriptada. Ex: login. 
+Obs: O POST também pode ser usado em casos especiais onde se faz necessário encriptar as informações que seriam usadas em uma **consulta**, pois ao contrário do GET, com o uso de POST podemos enviar as informações no [Body](#request-body) e o Body pode ser encriptado, já o GET passa os parâmetros de consulta de forma aberta na URL.
 
 ### Request > Verbs > PUT
 
-O verbo  **PUT** atualiza ou cria um recurso, ou seja, se eu utilizar o PUT para enviar novamente a cidade de São Vicente (como no exemplo do POST), o servidor iria sobrepor completamente o recurso com os dados definidos no Body. Portanto, caso algum campo não seja informado, o valor dele será apagado. Caso seja utilizado um PUT e o recurso não exista, a API deveria criá-lo.
+O verbo **PUT** atualiza ou cria um recurso, ou seja, se eu utilizar o PUT para enviar novamente a cidade de São Vicente (como no exemplo do POST), o servidor irá sobrepor completamente o recurso com os dados definidos no Body. Portanto, caso algum campo não seja informado, o valor dele será apagado. Caso seja utilizado um PUT e o recurso não exista, a API deveria criá-lo.
 
 Quando usamos **PUT** normalmente estamos atualizando um recurso existente, por isso é importante definir qual é especificamente o recurso através do ID no Path Parameter.
 
@@ -610,7 +611,7 @@ Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCid
    "populacao": 400000
 }
 ```
-No exemplo, passamos dois Path Parameters, o {idEstado} com o valor "sp" e o {idCidade} com o valor "santos".
+No exemplo, passamos dois Path Parameters, o {idEstado} com o valor "sp" e o {idCidade} com o valor "sao-vicente".
 
 ### Request > Verbs > PATCH
 
@@ -680,7 +681,7 @@ POST http://api.fabricacarros.com/carros
     ],
   "valorTabela": 83590.00,
   "valorVenda": 82000.00,
-  "adaptacaoPDC": false
+  "adaptacaoPCD": false
 }
 ```
 Quando se define o contrato da API deve-se atentar para que os atributos presentes do Body sejam relacionados apenas ao recurso definido na URL. Por exemplo, na API de cidades usada em outros exemplos neste guia, quando forem feitas chamadas para "http://api.exemplo.com/estados", devem ser trabalhados apenas atributos que definam um estado; quando forem feitas chamadas para http://api.exemplo.com/estados/{idEstado}/cidades devem ser trabalhados apenas atributos que definam uma cidade.
