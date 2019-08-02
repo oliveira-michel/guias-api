@@ -351,7 +351,7 @@ O query string **top** permite limitar a quantidade de registros que a API retor
 Ex:
 https://api.lojaexemplo.com/ofertas-noturnas?top=10
 
-<sub>ir para: [índice](#conte%C3%BAdo) | [response  limit](#response--body--pagina%C3%A7%C3%A3o--limit)</sub>
+<sub>ir para: [índice](#conte%C3%BAdo) | [response top](#response--body--pagina%C3%A7%C3%A3o--top)</sub>
 ### Request > URL > Query Strings > Ordenação
 
 Em APIs que retornem conjuntos de registros, é interessante permitir alguma ordenação básica.
