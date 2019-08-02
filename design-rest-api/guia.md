@@ -1002,7 +1002,6 @@ Quando se utiliza a abordagem de page e limit, a requisição pode ser feita inf
 		"page": 2,
 		"isFirst": false,
 		"isLast": false,
-		"totalPages": 3,
 		"totalElements": 8
 	}
 }
@@ -1019,7 +1018,7 @@ Quando se está na primeira página ou na última, os atributos "previous"e "nex
 Muitas vezes, criamos APIs para sistemas legados e com isso, precisamos nos ajustar a comportamentos  já existentes, por conta disso, a paginação pode ter alguns variantes, por exemplo:
 - O sistema pode informar a página, não por número, mas através de um ID, nestes casos, basta substituir a informação numérica do  "previous"e "next" por string.
 	- Ex: GET .../...?page=fgg12d8bfb4567820c46
-- O sistema pode não ter a informação da quantidade total de registros (ex: totalElements e totalPages),  dessa forma, não temos como devolver todas as propriedades. Neste caso, devolvemos apenas as que são possível de serem informadas.
+- O sistema pode não ter a informação da quantidade total de registros (ex: totalElements e last),  dessa forma, não temos como devolver todas as propriedades. Neste caso, devolvemos apenas as que são possíveis de serem informadas.
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [request  page e limit](#request--url--query-strings--pagina%C3%A7%C3%A3o--page-e-limit)</sub>
 
