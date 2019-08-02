@@ -27,8 +27,8 @@ Este é um documento "vivo" em que o autor está atualizando com a experiência 
 			- [Full text search](#request--url--query-strings--full-text-search)
 			- [Paginação](#request--url--query-strings--pagina%C3%A7%C3%A3o)
 				- [Range](#request--url--query-strings--pagina%C3%A7%C3%A3o--range)
-				- [Page e Page Size](#request--url--query-strings--pagina%C3%A7%C3%A3o--page-e-page-size)
-				- [Limit](#request--url--query-strings--pagina%C3%A7%C3%A3o--limit)
+				- [Page e Limit](#request--url--query-strings--pagina%C3%A7%C3%A3o--page-e-limit)
+				- [Top](#request--url--query-strings--pagina%C3%A7%C3%A3o--top)
 			- [Ordenação](#request--url--query-strings--ordena%C3%A7%C3%A3o)
 			- [Fields](#request--url--query-strings--fields)
 			- [Views](#request--url--query-strings--views)
@@ -56,8 +56,8 @@ Este é um documento "vivo" em que o autor está atualizando com a experiência 
 		- [Full text search](#response--body--full-text-search)
 		- [Paginação](#response--body--pagina%C3%A7%C3%A3o)
 			- [Range](#response--body--pagina%C3%A7%C3%A3o--range)
-			- [Page e Page Size](#response--body--pagina%C3%A7%C3%A3o--page-e-page-size)
-			- [Limit](#response--body--pagina%C3%A7%C3%A3o--limit)
+			- [Page e Limit](#response--body--pagina%C3%A7%C3%A3o--page-e-limit)
+			- [Top](#response--body--pagina%C3%A7%C3%A3o--top)
 		- [Ordenação](#response--body--ordena%C3%A7%C3%A3o)
 		- [Fields](#response--body--fields)
 		- [Views](#response--body--views)
@@ -333,23 +333,23 @@ http://api.empresarh.com/candidatos?from-id=1000&to-id=1099
 - **"to-" + nome-do-atributo**
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [response  range](#response--body--pagina%C3%A7%C3%A3o--range)</sub>
-### Request > URL > Query Strings > Paginação > Page e Page Size
+### Request > URL > Query Strings > Paginação > Page e Limit
 
-A paginação baseada em  **page**  e  **pageSize,**  como o próprio nome já diz, é utilizada através dos parâmetros de número da página a ser navegada e o seu respectivo tamanho (em número de registros).
+A paginação baseada em  **page**  e  **limit,**  como o próprio nome já diz, é utilizada através dos parâmetros de número da página a ser navegada e o seu respectivo tamanho (em número de registros).
 
 Ambos são opcionais e caso não sejam definidos na URL, é esperado que a API retorne todos os registros ou retorne na página 1 com a quantidade de registros padrão da API.
 Ex:
 
-https://api.exemploclassificados.com/veiculos?page=3&pageSize=30
+https://api.exemploclassificados.com/veiculos?page=3&limit=30
 
-<sub>ir para: [índice](#conte%C3%BAdo) | [response  page e pageSize](#response--body--pagina%C3%A7%C3%A3o--page-e-page-size)</sub>
+<sub>ir para: [índice](#conte%C3%BAdo) | [response  page e limit](#response--body--pagina%C3%A7%C3%A3o--page-e-limit)</sub>
 
-### Request > URL > Query Strings > Paginação > Limit
+### Request > URL > Query Strings > Paginação > Top
 
-O query string **limit** permite limitar a quantidade de registros que a API retorna à partir do primeiro registro da coleção.
+O query string **top** permite limitar a quantidade de registros que a API retorna à partir do primeiro registro da coleção.
 
 Ex:
-https://api.lojaexemplo.com/ofertas-noturnas?limit=10
+https://api.lojaexemplo.com/ofertas-noturnas?top=10
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [response  limit](#response--body--pagina%C3%A7%C3%A3o--limit)</sub>
 ### Request > URL > Query Strings > Ordenação
@@ -423,7 +423,7 @@ Ex: GET .../cartoes/a7834dcG456?expand=faturas,adicionais,ofertas-upgrade
 Caso seja necessário especificar paginação ou ordenação em um recurso expandido, deve-se definir estes Query Strings assim como se definem filtros.
 
 Ex:
-GET .../cartoes/a7834dcG456?expand=faturas&faturas.limit=5&faturas.sort=dataVencimento:desc
+GET .../cartoes/a7834dcG456?expand=faturas&faturas.top=5&faturas.sort=dataVencimento:desc
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [response  expand](#response--body--expand)</sub>
 
@@ -820,7 +820,7 @@ No body de response, colocamos a informação do recurso dentro de um envelope "
       }],
    "pagination": {
       "page": 1,
-      "pageSize": 10,
+      "limit": 10,
       "...": "..."
    },
    "_links": {
@@ -974,9 +974,9 @@ Por exemplo, em uma requisição GET .../...?from-id=3&to-id=6, possuindo o banc
 ```
 <sub>ir para: [índice](#conte%C3%BAdo) | [request  range](#request--url--query-strings--pagina%C3%A7%C3%A3o--range)</sub>
 
-#### Response > Body > Paginação > Page e Page Size
+#### Response > Body > Paginação > Page e Limit
 
-Quando se utiliza a abordagem de page e page size, a requisição pode ser feita informando a página e o tamanho dela como query string (GET .../...?page=10&pageSize=50). A API deve recortar do total de respostas apenas as páginas solicitadas conforme solicitação do cliente ou, caso não tenha sido informado, à partir de valores padrões. Por exemplo, em uma requisição GET .../...?page=2&pageSize=3, possuindo o banco de dados uma coleção de 8 registros, o retorno devem ser os registros 4, 5 e 6 mais o envelope "pagination" com seguinte estrutura:
+Quando se utiliza a abordagem de page e limit, a requisição pode ser feita informando a página e o tamanho dela como query string (GET .../...?page=10&limit=50). A API deve recortar do total de respostas apenas as páginas solicitadas conforme solicitação do cliente ou, caso não tenha sido informado, à partir de valores padrões. Por exemplo, em uma requisição GET .../...?page=2&limit=3, possuindo o banco de dados uma coleção de 8 registros, o retorno devem ser os registros 4, 5 e 6 mais o envelope "pagination" com seguinte estrutura:
 
 ```
 {
@@ -995,11 +995,13 @@ Quando se utiliza a abordagem de page e page size, a requisição pode ser feita
 		}
 	],
 	"pagination":{
-		"first": "/exemplo",
-		"last": "/exemplo?page=3",
-		"previous": "/exemplo?page=1",
-		"next": "/exemplo?page=3",
+		"first": "1",
+		"last": "3",
+		"previous": "1",
+		"next": "3",
 		"page": 2,
+		"isFirst": false,
+		"isLast": false,
 		"totalPages": 3,
 		"totalElements": 8
 	}
@@ -1019,13 +1021,13 @@ Muitas vezes, criamos APIs para sistemas legados e com isso, precisamos nos ajus
 	- Ex: GET .../...?page=fgg12d8bfb4567820c46
 - O sistema pode não ter a informação da quantidade total de registros (ex: totalElements e totalPages),  dessa forma, não temos como devolver todas as propriedades. Neste caso, devolvemos apenas as que são possível de serem informadas.
 
-<sub>ir para: [índice](#conte%C3%BAdo) | [request  page e pageSize](#request--url--query-strings--pagina%C3%A7%C3%A3o--page-e-page-size)</sub>
+<sub>ir para: [índice](#conte%C3%BAdo) | [request  page e limit](#request--url--query-strings--pagina%C3%A7%C3%A3o--page-e-limit)</sub>
 
-#### Response > Body > Paginação > Limit
+#### Response > Body > Paginação > Top
 
-Quando se usa o query string **limit** para limitar a quantidade de registros, o retorno deve trazer apenas a quantidade de registros definida no query string. Ex:
+Quando se usa o query string **top** para limitar a quantidade de registros, o retorno deve trazer apenas a quantidade de registros definida no query string. Ex:
 
-GET .../...?limit=3
+GET .../...?top=3
 ```
 {
    "data": [
@@ -1046,7 +1048,7 @@ GET .../...?limit=3
 ```
 No caso do exemplo, a API deve retornar apenas os 3 primeiros registros (recursos) da coleção.
 
-<sub>ir para: [índice](#conte%C3%BAdo) | [request  limit](#request--url--query-strings--pagina%C3%A7%C3%A3o--limit)</sub>
+<sub>ir para: [índice](#conte%C3%BAdo) | [request top](#request--url--query-strings--pagina%C3%A7%C3%A3o--top)</sub>
 
 
 ### Response > Body > Ordenação
