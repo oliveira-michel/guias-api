@@ -995,10 +995,10 @@ Quando se utiliza a abordagem de page e limit, a requisição pode ser feita inf
 		}
 	],
 	"pagination":{
-		"first": "1",
-		"last": "3",
-		"previous": "1",
-		"next": "3",
+		"first": 1,
+		"last": 3,
+		"previous": 1,
+		"next": 3,
 		"page": 2,
 		"isFirst": false,
 		"isLast": false,
