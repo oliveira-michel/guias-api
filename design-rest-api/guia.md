@@ -1274,14 +1274,6 @@ HTTP/1.1 422 Unprocessable Entity
    "details": "https://developer.empresa.com/apis/cartoes/erros/ER0059"
 }
 ```
-HTTP/1.1 428 Preconditional Required
-```
-{
-   "code": "err-pto-A320",
-   "message": "Não é possível fazer o lançamento de horas extras sem pré-aprovação do gerente.",
-   "details": "https://developer.empresa.com/apis/rh/erros/err-pto-A320"
-}
-```
 Quando a API retorna HTTP Status Code 400 e 422, muito provavelmente o erro foi causado por algum atributo específico. Nestes casos, deve-se especificar as informações sobre cada um dos atributos envolvidos no erro.
 
 HTTP/1.1 Status Code 400 Bad Request
@@ -1444,7 +1436,7 @@ Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não ex
 
 - **422 Unprocessable Entity**:	Ocorre quando a requisição está correta ao nível sintático, mas existem erros de negócio na requisição. Por exemplo, se existe regra que o uso de um query parameter está condicionado a outro e eles não foram preenchidos, ou uma data informada é inválida para uma determinada ação, ou uma requisição de transferência financeira é feita e a conta não tem fundo etc.
 
-- **428 Precondition Required**: O recurso faz parte de um processo composto de vários passos. Foi feita uma tentativa de acessar um passo sem antes ter passado pelo passo anterior.
+- **428 Precondition Required**: O servidor exige que a requisição seja condicional usando um dos headers disponíveis para isso. Caso o a condição falhe, devolve-se um **412 Precondition Failed**. Conheça mais sobre este tipo de requisição [aqui](#https://developer.mozilla.org/en-US/docs/Web/HTTP/Conditional_requests) e [aqui](#performance-cache-e-compress%C3%A3o).
 
 - **429 Too Many Requests**: Informa ao cliente que ele excedeu o limite permitido de requisições. Leia sobre [segurança](#seguran%C3%A7a) para entender mais sobre este código de retorno.
 
