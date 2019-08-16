@@ -1436,7 +1436,7 @@ Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não ex
 
 - **422 Unprocessable Entity**:	Ocorre quando a requisição está correta ao nível sintático, mas existem erros de negócio na requisição. Por exemplo, se existe regra que o uso de um query parameter está condicionado a outro e eles não foram preenchidos, ou uma data informada é inválida para uma determinada ação, ou uma requisição de transferência financeira é feita e a conta não tem fundo etc.
 
-- **428 Precondition Required**: O servidor exige que a requisição seja condicional usando um dos headers disponíveis para isso. Caso o a condição falhe, devolve-se um **412 Precondition Failed**. Conheça mais sobre este tipo de requisição [aqui](#https://developer.mozilla.org/en-US/docs/Web/HTTP/Conditional_requests) e [aqui](#performance-cache-e-compress%C3%A3o).
+- **428 Precondition Required**: O servidor exige que a requisição seja condicional usando um dos headers disponíveis para isso. Caso o a condição falhe, devolve-se um **412 Precondition Failed**. Conheça mais sobre este tipo de requisição [aqui](https://developer.mozilla.org/en-US/docs/Web/HTTP/Conditional_requests) e [aqui](#performance-cache-e-compress%C3%A3o).
 
 - **429 Too Many Requests**: Informa ao cliente que ele excedeu o limite permitido de requisições. Leia sobre [segurança](#seguran%C3%A7a) para entender mais sobre este código de retorno.
 
