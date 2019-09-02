@@ -158,7 +158,7 @@ Identificar ambientes de homologação e produção no Base Path também é inte
 
 No REST, a letra R significa "Representação ". Representação é a forma de apresentar os recursos ("coisas") que existem no sistema. Recursos no REST são nomeados usando substantivos. Eles são as entidades de sistema que serão expostas para outros sistemas. Cada um desses recursos têm um endereço (URL) diferente e são representados por textos separados por barras após o Base Path. É muito importante que os nomes dos recursos sejam estruturados de forma que cumpram uma hierarquia que proporcione sentido próprio à URL. Os nomes escolhidos para os recursos devem ser de fácil entendimento, de modo que ao ler a URL se obtenha rapidamente a informação sobre qual recurso ela representa.
 
-Ex:
+Exemplos do Spotify:
 - Endereço da representação de um recurso chamado "artists" no Spotify: https://api.spotify.com/v1/artists/
 - Endereço da representação de um recurso chamado "albums" do Spotify: https://api.spotify.com/v1/albums 
 - Endereço da representação de um recurso específico chamado dentro dos "albums" do Spotify: https://api.spotify.com/v1/albums/{id}
@@ -167,6 +167,10 @@ Ex:
 Repare que existe um Base Path se repetindo em cada um dos endereços (https://api.spotify.com) e um "/v1" também. Ele representa a versão da API e também é exposto como um recurso. Há mais informações sobre versionamento no capítulo [Versionamento](#versionamento).
 
 Observe que algumas URLs têm recursos como artists ou albums que não têm o {id} na frente. Elas deverão retornar listas, pois não se especifica nenhum "artist" ou "album" específico através de um {id}. Outras URLs têm o {id} e retornarão apenas um item cujo id seja o id definido naquela URL. Este {id} é um [Path Parameter](#request--url--resources--path-parameters).
+
+Apenas para mais referências, seguem outros exemplos de mercado. Observe como os recursos se "anhinham" através das URLs:
+- Endereço da lista de comentários de uma tarefa específica no jBPM da RedHat: https://{host}/server/containers/{containerId}/tasks/{taskInstanceId}/comments
+- Endereço da representação de um database específico no Azure: https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}
 
 Quando os recursos forem formados por duas palavras, é boa prática separar com hífen. E assim como no [Base Path](#request--url--base), escreve-se tudo em minúsculo. 
 
