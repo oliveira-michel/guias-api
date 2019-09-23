@@ -1475,11 +1475,11 @@ Abaixo, seguem alguns dos diversos cenários de requisições e os principais ti
 
 - **GET .../paises/55/estados/11/cidades/100**
 	- Resposta HTTP 200 Ok com o retorno da cidade Santos.
-- **GET .../paises/10/estados/11/cidades**
+- **GET .../paises/55/estados/11/cidades**
 	- Resposta HTTP 200 Ok com um array com as cidades Santos e São Vicente.
-- **GET .../paises/10/estados/11/cidades?nome=Belo%20Horizonte**
+- **GET .../paises/55/estados/11/cidades?nome=Belo%20Horizonte**
 	- Resposta HTTP 200 Ok com um array com a cidade Belo Horitonte. Repare que o retorno é um array, pois a busca foi feita via query strings, não via ID (path parameter) em que teríamos a certeza de que o retorno é de uma só entidade. Quando a busca vem via query strings, podemos ter cenários em que pode vir mais de um item no retorno e, mesmo que a situação atual da API retorne apenas 1 item, é melhor manter o comportamento de retornar array, pois no futuro é possível adicionar novas query strings que poderão alterar a quantidade de resultados.
-- **GET .../paises/10/estados/11/cidades?from_populacao=30000**
+- **GET .../paises/55/estados/11/cidades?from_populacao=30000**
 	- Resposta HTTP 200 Ok com um array com a cidade Belo Horitonte. E o retorno é um array como já explicado acima.
 - **POST .../paises/55/estados/11/cidades**
 	- Resposta HTTP 201 Created, registrando uma nova cidade no banco de dados.
