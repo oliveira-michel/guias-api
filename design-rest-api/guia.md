@@ -65,6 +65,7 @@ Este é um documento "vivo" em que o autor está atualizando com a experiência 
 		- [Errors e Warnings](#response--body--errors-e-warnings)
 		- [HATEOAS](#response--body--hateoas)
 	- [HTTP Status Code](#response--http-status-codes)
+	- [Exemplos de uso dos HTTP Status Codes](#response--exemplos-de-uso-dos-http-status-codes)
 - [Tipos de dados](#tipos-de-dados)
 - [Processamento assíncrono](#processamento-ass%C3%ADncrono)
 - [Processamento em lotes](#processamento-em-lotes)
@@ -1455,6 +1456,47 @@ São códigos que retornam erros que aconteceram por culpa do servidor. Ou seja,
 - **503 Service Unavailable**: O servidor não está respondendo por que está fora do ar, em manutenção ou sobrecarregado. É um problema temporário.
 
 - **504 Gateway Timeout**: O servidor, enquanto atuando como gateway ou proxy, não conseguiu responder em tempo. 
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
+
+### Response > Exemplos de uso dos HTTP Status Codes
+
+Tendo conhecido os HTTP Status Codes, é preciso definí-los nos diferentes cenários das possíveis respostas ao chamar um serviço. Em alguns cenários não é tão óbvio qual deles utilizar. É comum acontecer alguma confusão entre o 200, 201, 204, 400 e 404 principalmente em retornos vazios. Por conta disso, neste capítulo deixo alguns exemplos para referência. 
+
+Imagine que o sistema tem a seguinte massa de dados:
+
+|id|nome|id-estado|estado|id-pais|pais|populacao|outras-informacoes|
+|---|---|---|---|---|---|---|---|
+|100|Santos|11|São Paulo|55|Brasil|10000|...|
+|200|São Vicente|11|São Paulo|55|Brasil|20000|...|
+|300|Belo Horizonte|31|Minas Gerais|55|Brasil|30000|...|
+
+Abaixo, seguem alguns dos diversos cenários de requisições e os principais tipos de respostas HTTP:
+
+- **GET .../paises/55/estados/11/cidades/100**
+	- Resposta HTTP 200 Ok com o retorno da cidade Santos.
+- **GET .../paises/10/estados/11/cidades**
+	- Resposta HTTP 200 Ok com um array com as cidades Santos e São Vicente.
+- **GET .../paises/10/estados/11/cidades?nome=Belo%20Horizonte**
+	- Resposta HTTP 200 Ok com um array com a cidade Belo Horitonte. Repare que o retorno é um array, pois a busca foi feita via query strings, não via ID (path parameter) em que teríamos a certeza de que o retorno é de uma só entidade. Quando a busca vem via query strings, podemos ter cenários em que pode vir mais de um item no retorno e, mesmo que a situação atual da API retorne apenas 1 item, é melhor manter o comportamento de retornar array, pois no futuro é possível adicionar novas query strings que poderão alterar a quantidade de resultados.
+- **GET .../paises/10/estados/11/cidades?from_populacao=30000**
+	- Resposta HTTP 200 Ok com um array com a cidade Belo Horitonte. E o retorno é um array como já explicado acima.
+- **POST .../paises/55/estados/11/cidades**
+	- Resposta HTTP 201 Created, registrando uma nova cidade no banco de dados.
+- **PUT .../paises/55/estados/11/cidades/100**
+	- Resposta HTTP 204 No Content, caso não retorne a cidade Santos atualizada após gravar no banco de dados.
+- **PUT .../paises/55/estados/11/cidades/100**
+	- Resposta HTTP 200 Ok, caso retorne a cidade Santos como resposta após gravar no banco de dados.
+- **GET .../paises/10/estados/11/cidades/100**
+	- Resposta HTTP 404 NotFound porque a URL não existe, dado que não existe o país com código 10 que foi passado como Path Parameter. O erro foi do chamador que acessou diretamente um ID que não existe, formando um URL inexistente.
+- **GET .../paises/55/estados/11/cidades/999**
+	- Resposta HTTP 404 NotFound porque a URL não existe, dado que não existe a cidade com código 999 que foi passada como Path Parameter. O erro foi do chamador que acessou diretamente um ID que não existe, formando um URL inexistente.
+- **GET .../paises/55/estados/11/cidade/100**
+	- Resposta HTTP 404 NotFound porque a URL não existe, dado que na URL não existe o termo "cidade" no singular. O erro foi do chamador da API.
+- **GET .../paises/55/estados/11/cidades?nome=Guarulhos**
+	- Resposta HTTP 200 Ok com um array vazio, dado que não existe a cidade com nome Guarulhos. Não houve erros em nenhuma das partes porque a busca por Query Parameters é um filtro e é perfeitamente aceitável filtros que não dêem match com nenhum registro na base.
+- **GET .../paises/55/estados/11/cidades?nome-prefeito=Maria**
+	- Resposta HTTP 400 Bad Request porque não foi implementado um filtro (query parameter) chamado nome-prefeito. O erro foi do usuário.
 
 <sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
