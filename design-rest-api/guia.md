@@ -115,7 +115,7 @@ Na requisição, existem alguns padrões a serem seguidos e eles serão explicad
 <sub>ir para: [índice](#conte%C3%BAdo) | [response](#response)</sub>
 ### Request > URL
 
-A URL (Universal Resource Location) é endereço onde o cliente vai fazer a requisição. Cada URL identifica um recurso diferente na API. Como no navegador, quando digitamos um endereço de um site e ele nos responde com a página, no REST é enviada uma solicitação para o endereço e ele nos responde com informações sobre o recurso.
+A URL (Universal Resource Location) é o endereço onde o cliente vai fazer a requisição. Cada URL identifica um recurso diferente na API. Como no navegador, quando digitamos um endereço de um site e ele nos responde com a página, no REST é enviada uma solicitação para o endereço e ele nos responde com informações sobre o recurso.
 
 A URL é formada por basicamente 3 partes [Base Path](#request--url--base), [Resources](#request--url--resources) (ou Path) e [Query Strings](#request--url--query-strings). 
 
@@ -175,7 +175,7 @@ Apenas para mais referências, seguem outros exemplos de mercado. Observe como o
 
 Quando os recursos forem formados por duas palavras, é boa prática separar com hífen. E assim como no [Base Path](#request--url--base), escreve-se tudo em minúsculo. 
 
-Os recursos na maioria dos casos serão substantivos no plural, pois geralmente definem coleções (ex: cartões, usuários, clientes, carros, endereços etc.) Ao pensar no nome do recurso, é importante verificar se o nome não conflitará com alguma possível implementação parecida no futuro. Por exemplo, imagina um recurso que se chamaria ofertas_credito. Neste caso, a deve-se perguntar: "este serviço ofertará todos os tipos de crédito no domínio de crédito?" Se a reposta for: "Não, apenas consignado", deve-se especificar o nome da entidade como ofertas-credito-consignado porque no futuro uma nova rota que oferte todos os tipos de crédito poderá ser criada com o nome oferta-credito.
+Os recursos na maioria dos casos serão substantivos no plural, pois geralmente definem coleções (ex: cartões, usuários, clientes, carros, endereços etc.) Ao pensar no nome do recurso, é importante verificar se o nome não conflitará com alguma possível implementação parecida no futuro. Por exemplo, imagina um recurso que se chamaria ofertas-credito. Neste caso, a deve-se perguntar: "este serviço ofertará todos os tipos de crédito no domínio de crédito?" Se a reposta for: "Não, apenas consignado", deve-se especificar o nome da entidade como ofertas-credito-consignado porque no futuro uma nova rota que oferte todos os tipos de crédito poderá ser criada com o nome oferta-credito.
 Ex:
 http://api.empresaexemplo.com/creditos/v1/ofertas-credito-consignado
 
@@ -245,7 +245,7 @@ Nos caso acima, o Banco BBVA agrupa todos os recursos referentes ao assunto "car
 
 A mesma abordagem de agrupamento provavelmente será útil para APIs expostas apenas internamente nas empresas para integrações entre diferentes sistemas. Isso porque definir um recurso na URL envolve menos mudanças na implantação do que criar um Base Path para cada um dos produtos/assuntos da empresa. 
 
-Em algumas empresas, esses grandes assuntos são conhecidos como domínios funcionais. Eles agrupam entidades relacionadas por um contexto funcional como produtos (cartões, contas etc.), processos (contratações, on-boarding etc.) ou serviços (comunicações, chat etc.). É boa prática, usar nomes em minúsculo e se composto, separar com hífen. Os domínios funcionais na maioria dos casos serão substantivos no plural.
+Em algumas empresas, esses grandes assuntos são conhecidos como domínios funcionais. Eles agrupam entidades relacionadas por um contexto funcional como produtos (cartões, contas etc.), processos (contratações, on-boarding etc.) ou serviços (comunicações, chat etc.). É boa prática usar nomes em minúsculo e, se composto, separar com hífen. Os domínios funcionais na maioria dos casos serão substantivos no plural.
 
 Também é interessante manter os contratos de cada domínio separados para dar independência para os times que cuidam de cada um deles, além de permitir gerir o ciclo de vida de cada um deles de forma separada.
 
@@ -370,7 +370,7 @@ No exemplo, desejo que a lista de pedidos venha ordenada de forma decrescente pe
 
 No caso de não ser especificada uma ordem {asc|desc}, será utilizada a ascendente como padrão.
 
-Importante: Quando se define o contrato da API, é importante definir a lista de quais atributos estão disponíveis para ordenação, já quem nem sempre todos eles estarão disponíveis para esse fim.
+Importante: Quando se define o contrato da API, é importante definir a lista de quais atributos estão disponíveis para ordenação. Nem sempre todos eles estarão disponíveis para esse fim.
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [response  ordenação](#response--body--ordena%C3%A7%C3%A3o)</sub>
 
@@ -434,8 +434,8 @@ GET .../cartoes/a7834dcG456?expand=faturas&faturas.top=5&faturas.sort=dataVencim
 
 ### Request > URL > Alias
 
-**Alias** é o conceito de que é possível ter mais de um caminho para fazer a mesma tarefa. Não é ideal, no entanto, muitas APIs nascem com alguns poucos recursos e conforme demandas de negócio, novos recursos vão sendo adicionados. Por falta de visão do todo no início da criação da API, por vezes, é necessário criar outras formas de fazer a mesma tarefa.
-No entanto, é importante que uma entidade de negócio (recurso) se mantenha a mesma, independente da forma com que a consulta é feita.
+Muitas APIs nascem com alguns poucos recursos e conforme demandas de negócio, novos recursos vão sendo adicionados. Por falta de visão do todo no início da criação da API, por vezes, é necessário criar outras formas de fazer a mesma tarefa. **Alias** é o conceito de que é possível ter mais de um caminho para fazer a mesma tarefa. 
+No entanto, é importante que uma entidade de negócio (recurso com seus atributos) se mantenha a mesma, independente da forma com que a consulta é feita.
  
 Por exemplo, em uma APIs de cartões, o time da TI cria o recurso de busca de transações da seguinte forma:
 
@@ -498,7 +498,7 @@ Quando a arquitetura das aplicações está baseada em microsserviço, o Correla
 
 Ex:
 
-Uma aplicação client faz uma chamada à API, neste momento ele cria um Correlation ID para esta chamada, acrescenta o no header e grava o seu log na sua estrutura de log com este Correlation ID. Um Gateway de API recebe este Correlation ID e grava o seu log em outra estrutura utilizando o mesmo identificador. O sistema que responde ao produto que está exposto via API recebe o Correlation ID, grava o seu log e chama outro sistema que responde a uma parte da requisição e assim todos os demais envolvidos nesta chamada mantém o mesmo comportamento. 
+Uma aplicação client faz uma chamada à API, neste momento ele cria um Correlation ID para esta chamada, acrescenta-o no header e grava o seu log na sua estrutura de log com este Correlation ID. Um Gateway de API recebe este Correlation ID e grava o seu log em outra estrutura utilizando o mesmo identificador. O sistema que responde ao produto que está exposto via API recebe o Correlation ID, grava o seu log e chama outro sistema que responde a uma parte da requisição e assim todos os demais envolvidos nesta chamada mantém o mesmo comportamento. 
 No momento em que se faz necessário mapear a chamada de ponta-a-ponta, basta unir os logs vindos de diversos fontes através deste identificador.
 
 Quando se define headers que não são padrões do HTTP, muitos utilizam o formato *X-Nome-Header*, no entanto, esta abordagem não é a mais recomendada desde 2012 ([rfc6648](https://tools.ietf.org/html/rfc6648)). No caso, não se usa mais este "X-".
@@ -543,7 +543,7 @@ Existem também outros verbos como OPTIONS, HEAD e TRACE que raramente são util
 #### Idempotência e Segurança
 
 Os verbos têm características importantes que devem ser conhecidas e respeitadas, são elas segurança e idempotência:
-- **Idempotência** significa que se um cliente realiza um reenvio de uma requisição, o servidor devolve a mesma resposta da vez anterior (salvo se o recurso teve seu estado alterado neste meio tempo). Ou seja, o reenvio da requisição não gera efeito nenhum sobre o recurso.
+- **Idempotência** significa que se um cliente realiza um reenvio de uma requisição, o servidor devolve a mesma resposta da vez anterior (salvo se o recurso teve seu estado alterado neste meio tempo). Ou seja, o reenvio da requisição não gera efeito nenhum sobre o recurso. Ex: (Situação Idempotente com PATCH/PUT) Atualizar a data de nascimento de um usuário 1x ou 10x gera o mesmo efeito sobre o recurso. (Situação Não Idempotente com POST) Fazer uma mesma transferência bancária 1x ou 10x resultará em sucessivos descontos no saldo.
 
 - **Seguros** são todos os verbos que não podem provocam alterações no estado dos recursos. Ou seja, os verbos apenas de consulta (HEAD, GET, OPTIONS). Destes três, somente o GET é mais utilizado.
 
@@ -869,7 +869,6 @@ GET .../pessoas?from-data=2019-06-01
 
 HTTP/1.1 200 Ok
 
-Content-Location: .../pessoas/456
 ```
 {
    "data": [
@@ -981,21 +980,21 @@ Por exemplo, em uma requisição GET .../...?from-id=3&to-id=6, possuindo o banc
 
 #### Response > Body > Paginação > Page e Limit
 
-Quando se utiliza a abordagem de page e limit, a requisição pode ser feita informando a página e o tamanho dela como query string (GET .../...?page=10&limit=50). A API deve recortar do total de respostas apenas as páginas solicitadas conforme solicitação do cliente ou, caso não tenha sido informado, à partir de valores padrões. Por exemplo, em uma requisição GET .../...?page=2&limit=3, possuindo o banco de dados uma coleção de 8 registros, o retorno devem ser os registros 4, 5 e 6 mais o envelope "pagination" com seguinte estrutura:
+Quando se utiliza a abordagem de page e limit, a requisição pode ser feita informando a página e o tamanho dela como query string (GET .../...?page=10&limit=50). A API deve recortar do total de respostas apenas as páginas solicitadas conforme solicitação do cliente ou, caso não tenha sido informado, à partir de valores padrões. Por exemplo, em uma requisição GET .../...?page=2&limit=3, possuindo o banco de dados uma coleção de 8 registros, o retorno deve ser os registros 4, 5 e 6 mais o envelope "pagination" com seguinte estrutura:
 
 ```
 {
 	"data": [
-		{
-			"id": 3,
-			"...": "..."
-		},
 		{
 			"id": 4,
 			"...": "..."
 		},
 		{
 			"id": 5,
+			"...": "..."
+		},
+		{
+			"id": 6,
 			"...": "..."
 		}
 	],
@@ -1018,10 +1017,10 @@ No caso do exemplo, para obtenção da página seguinte, o cliente faria a chama
 
 Também devem ser mantidos (repetidos) os Query Strings (filtros, ordenação etc.) que o cliente passar na requisição, ainda porque, caso o cliente altere o filtro, todo o envelope de paginação pode ter seus valores alterados.
 
-Quando se está na primeira página ou na última, os atributos "previous"e "next" devem ficar vazios.
+Quando se está na primeira página ou na última, os atributos "previous" e "next" devem ficar vazios.
 
 Muitas vezes, criamos APIs para sistemas legados e com isso, precisamos nos ajustar a comportamentos  já existentes, por conta disso, a paginação pode ter alguns variantes, por exemplo:
-- O sistema pode informar a página, não por número, mas através de um ID, nestes casos, basta substituir a informação numérica do  "previous"e "next" por string.
+- O sistema pode informar a página, não por número, mas através de um ID, nestes casos, basta substituir a informação numérica do  "previous" e "next" por string.
 	- Ex: GET .../...?page=fgg12d8bfb4567820c46
 - O sistema pode não ter a informação da quantidade total de registros (ex: totalElements e last),  dessa forma, não temos como devolver todas as propriedades. Neste caso, devolvemos apenas as que são possíveis de serem informadas.
 
@@ -1426,18 +1425,18 @@ Esse grupo informa os erros cometidos pelo cliente durante o request. São eles:
 
 - **401 Unauthorized**: A camada de segurança do recurso solicitado ao servidor, apontou que não está sendo utilizada as credenciais corretas nessa requisição (token, por exemplo). É um erro de [autenticação](#seguran%C3%A7a).
 
-- **403 Forbidden**: As credenciais (token) estão corretos, mas o usuário não tem permissão para acessar aquele recurso. É um erro de [autorização](#seguran%C3%A7a).
+- **403 Forbidden**: As credenciais (token) estão corretas, mas o usuário não tem permissão para acessar aquele recurso. É um erro de [autorização](#seguran%C3%A7a).
 
 - **404 Not Found**: O servidor não encontrou o recurso solicitado pelo cliente. Provavelmente a URL está mau formada ou está sendo feita a busca com um Path Parameter inválido.
 Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não exista.
  
 - **405 Method Not Allowed**: O recurso (URL) existe mas o verbo usado não foi definido para ela.
 
-- **410 Gone**: O recurso (URL) não existe mais e esta condição é permanente. Este status é usado quando um recurso que um dia existiu não existe mais. Ao contrário do 404 que em que o recurso pode nunca ter existido ou ele está temporariamente indisponível.
+- **410 Gone**: O recurso (URL) não existe mais e esta condição é permanente. Este status é usado quando um recurso que um dia existiu não existe mais. Ao contrário do 404 em que o recurso pode nunca ter existido ou ele está temporariamente indisponível.
 
 - **414 URI Too Long**: O tamanho da URL pode ser limitado pelo servidor. Assim, este erro é lançado quando uma URL ultrapassa o tamanho máximo permitido. [+ info](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/414)
 
-- **418 I'm a teapot**: O servidor se recusa a servir um café porque o bule é chá. Código de resposta do Hyper Text Coffee Pot Control Protocol ([HTCPCP/1.0](https://tools.ietf.org/html/rfc2324#section-2.3.2)).  Este código é só uma brincadeira de primeiro de abril. :-) [+ info](https://sitesdoneright.com/blog/2013/03/what-is-418-im-a-teapot-status-code-error)
+- **418 I'm a teapot**: O servidor se recusa a servir um café porque o bule é de chá. Código de resposta do Hyper Text Coffee Pot Control Protocol ([HTCPCP/1.0](https://tools.ietf.org/html/rfc2324#section-2.3.2)).  Este código é só uma brincadeira de primeiro de abril. :-) [+ info](https://sitesdoneright.com/blog/2013/03/what-is-418-im-a-teapot-status-code-error)
 
 - **422 Unprocessable Entity**:	Ocorre quando a requisição está correta ao nível sintático, mas existem erros de negócio na requisição. Por exemplo, se existe regra que o uso de um query parameter está condicionado a outro e eles não foram preenchidos, ou uma data informada é inválida para uma determinada ação, ou uma requisição de transferência financeira é feita e a conta não tem fundo etc.
 
@@ -1508,7 +1507,7 @@ Abaixo, seguem algumas formatações padrões para os tipos de dados:
 
 | Tipo de dado	| Descrição	 | Exemplos |
 | --- | --- | --- |
-| Date | String com formato ISO 8601.<br> - ano (YYYY),<br>- ano e mês (YYYY-MM)<br>- ano, mês e dia (YYYY-MM-DD) | 2016<br>2016-02<br>2016-02-26|
+| Date | String com formato [ISO 8601](https://pt.wikipedia.org/wiki/ISO_8601).<br> - ano (YYYY),<br>- ano e mês (YYYY-MM)<br>- ano, mês e dia (YYYY-MM-DD) | 2016<br>2016-02<br>2016-02-26|
 | Timestamp | String com formato [ISO 8601](https://www.w3.org/TR/NOTE-datetime)<br>(YYYY-MM-DDThh:mm:ss.sTZD)|2019-02-21T19:00:00Z (para UTC)<br>2019-02-21T19:21:32.285Z (com milissegundos)<br>2019-02-21T19:00:00-03:00 (para UTC-3)<br>ou 2019-02-21T19:00:00+01:00 (para UTC+1)<br>|
 | Object | Objetos que definem conjuntos de atributos | {<br>&nbsp;"documento": {<br>&nbsp;&nbsp;"tipo": "rg",<br>&nbsp;&nbsp;"numero": "443335556"<br>&nbsp;}<br>}|
 | String | Cadeia de texto |“texto de exemplo”|
@@ -2056,6 +2055,6 @@ Quase tudo em REST abre discussões sobre estar mais aderente ou menos a um mode
 
 A busca deve ser sempre em buscar o RESTful, no entanto, no meio do caminho vai ser normal entregar algumas APIs "quase REST" que adotam a maioria dos padrões mas abandona alguns em prol de timing de projeto, economia de recursos ou satisfação do cliente.
 
-Alguns destes padrões que abandonamos podem não fazer falta e não fará o desenvolvedor passar vergonha ao dizer que fez uma API REST, mas não implementou o HTTP Status Code A ou B; ou talvez não implementou HATEOAS em todas as APIs; ou não implementou paginação em alguma delas. No entanto, alguns anti-patterns são praticamente inadimissíveis, como usar somente o verbo POST para resolver todos os problemas; ignorar os comportamentos de idempotência e seguro; limitar a resposta a 200 para Ok e 500 para todo o resto sem nenhum detalhe adicional ... enfim, o recado é que busquem sempre entregar o melhor contrato possível.
+Alguns destes padrões que abandonamos podem não fazer falta e não fará o desenvolvedor passar vergonha ao dizer que fez uma API REST, mas não implementou o HTTP Status Code A ou B; ou talvez não implementou HATEOAS em todas as APIs; ou não implementou paginação em alguma delas. No entanto, alguns anti-patterns são praticamente inadimissíveis, como usar somente o verbo POST para resolver todos os problemas; ignorar os comportamentos de idempotência e segurança; limitar a resposta a 200 para Ok e 500 para todo o resto sem nenhum detalhe adicional ... enfim, o recado é que busquem sempre entregar o melhor contrato possível.
 
-E com a prática, percebe-se que tudo isso aqui é muito simples, pois é técnico, é mais "preto no branco". O real desafio estará em modelar o negócio, entender como ele é e representá-lo bem através de URLs e Atributos. Mas isto é assunto pra um outro guia que será entregue em breve.
+E com a prática, percebe-se que tudo isso aqui é muito simples, pois é técnico, é mais "preto no branco". O real desafio estará em modelar o negócio, entender como ele é e representá-lo bem através de URLs e Atributos. Mas isto é assunto pra um outro guia.
