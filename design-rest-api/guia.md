@@ -172,6 +172,9 @@ Observe que algumas URLs têm recursos como artists ou albums que não têm o {i
 Apenas para mais referências, seguem outros exemplos de mercado. Observe como os recursos se "anhinham" através das URLs:
 - Endereço da lista de comentários de uma tarefa específica no jBPM da RedHat: https://{host}/server/containers/{containerId}/tasks/{taskInstanceId}/comments
 - Endereço da representação de um database específico no Azure: https://management.azure.com/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}
+- Endereço de um projeto específico na API de Datastore do Google: https://datastore.googleapis.com/v1/projects/{projectId}
+
+Observe também que, ao contrário do exemplo do Spotify que deu nome apenas de {id} aos IDs, estes outros exemplos nomeiam de forma mais específica cada um dos IDs de cada recurso. Isto é interessante quando temos negócios mais complexos que envolvem muitos recursos.
 
 Quando os recursos forem formados por duas palavras, é boa prática separar com hífen. E assim como no [Base Path](#request--url--base), escreve-se tudo em minúsculo. 
 
