@@ -1433,7 +1433,7 @@ Esse grupo informa os erros cometidos pelo cliente durante o request. São eles:
 - **404 Not Found**: O servidor não encontrou o recurso solicitado pelo cliente. Provavelmente a URL está mau formada ou está sendo feita a busca com um Path Parameter inválido.
 Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não exista.
  
-- **405 Method Not Allowed**: O recurso (URL) existe mas o verbo usado não foi definido para ela.
+- **405 Method Not Allowed**: O recurso (URL) existe mas o verbo usado não foi definido para ela. Em algumas situações em que o sistema usa feature toggle e a API precisa ser desabilitada, pode-se também utilizar o 405 para notificar o cliente de que o método não está disponível.
 
 - **410 Gone**: O recurso (URL) não existe mais e esta condição é permanente. Este status é usado quando um recurso que um dia existiu não existe mais. Ao contrário do 404 em que o recurso pode nunca ter existido ou ele está temporariamente indisponível.
 
