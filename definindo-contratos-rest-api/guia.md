@@ -29,7 +29,7 @@ O contrato é algo evolutivo e pode agregar novas funcionalidades com o passar d
 
 É na definição do contrato que observo que a capacidade de "análise do sistema" parece ter sido colocada em segundo plano por muitos desenvolvedores. Talvez parte por conta de abrirmos mão da documentação conforme manifesto ágil e muitos, das práticas de entendimento do problema e solução conforme o próprio ágil define; talvez porque parar para pensar no sistema sem produzir nenhuma linha de código pode parecer improdutivo para muitos de nós. No entanto, negligenciar esta etapa, traz atrasos, refatorações e posterga alguns tipos de problemas para o momento em que poderíamos estar apenas transformando café em código.
 
-O propósito deste guia é trazer em caráter introdutório como é o processo de entender o negócio e montar um contrato de REST API. Muitos os termos técnicos e conceitos são de domínio público e já existem na internet. Por conta disso, alguns conceitos e termos não serão explicados e outros nem citados neste guia. 
+O propósito deste guia é trazer em caráter introdutório como é o processo de entender o negócio e montar um contrato de REST API.
 
 > Após a leitura deste guia, recomendo a leitura do [Guia de Design REST](https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/guia.md), que aprofunda bem em alguns conceitos e serve como material de referência. 
 
