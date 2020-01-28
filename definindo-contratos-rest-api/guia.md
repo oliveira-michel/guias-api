@@ -87,7 +87,9 @@ O DDD fornece um conjunto de recursos e padrões que ajudam a documentar e model
 
 O Domain Model é uma representação de conceitos do mundo real (do negócio) que são pertinentes ao um ou mais domínios a serem trabalhados em um software. Estes conceitos incluem as entidades e as relações entre elas. No entanto, não faz parte de um Domain Model implementações técnicas como banco de dados ou componentes específicos de software.
 
-TODO Imagem de exemplo simplificado de Domain Model
+![Exemplo de um Domain Model suficiente para começar a definir APIs](https://github.com/oliveira-michel/guias-api/blob/master/definindo-contratos-rest-api/resources/exemplo-domain-model.png?raw=true)
+
+<sub>Exemplo de um Domain Model suficiente para começar a definir APIs</sub>
 
 O Domain Model quando pronto, mesmo com um modelo simplificado como o do exemplo acima, parece simples e deve ser simples, no entanto, a riqueza de se modelar o domínio está mais no processo da criação dele do que no resultado final. Durante o processo de criação do Domain Model, deve-se alinhar o entendimento do time sobre os melhores nomes para representar as entidades de negócio e as relações entre elas. Neste processo muitas divergências ocorrem entre o que é o negócio como a área de negócio entende, o que é o sistema no estado atual e o que algumas pessoas têm em mente como visão futura daquele ambiente. Muitas vezes o analista com mais profundidade nos conceitos do Domain Driven Design precisa orientar o time sobre os conceitos e objetivo do Domain Model.
 
@@ -126,7 +128,9 @@ O que não "tem cara" de ser entidade:
 
 Tendo entendido este conceito de entidade, podemos fazer um primeiro desenho sobre o negócio de cartões representando as principais entidades. Para esse exemplo, usei um caso semelhante ao real em ambiente bancário. As soluções deste guia são para fins didáticos, então vamos chegar em um resultado próximo ao real, mas simplificado.
 
-TODO Domain Model Simplificado de Cartões
+![Domain Model Simplificado de Cartões](https://github.com/oliveira-michel/guias-api/blob/master/definindo-contratos-rest-api/resources/domain-model-1.png?raw=true)
+
+<sub>Domain Model Simplificado de Cartões</sub>
 
 Antes do processo de desenhar as entidades, durante ou depois - a ordem não importa -  é preciso entender também quais são as funções de negócio que serão disponibilizadas. Para usar como exemplo para este guia, vamos inventar algumas necessidades de negócio que são semelhantes às reais:
 
