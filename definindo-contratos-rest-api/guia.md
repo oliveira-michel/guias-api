@@ -153,9 +153,7 @@ Veremos mais detalhes sobre REST nos capítulos posteriores, mas aqui já precis
 
 Apesar de muitas situações não requererem grande esforço criativo por apenas exporem as suas entidades e operações de CRUD, muitas APIs vão além disso e precisam refletir funções de negócio como reservar, comprar, simular, transferir, calcular, ofertar, cancelar, contratar, etc. Na lista de verbos acima existem alguns casos nesta situação: ofertar e contratar. Encaixar estes verbos (funções) dentro das restrições do REST é o segundo grande desafio da modelagem de APIs.
 
-Mais pra frente neste guia vamos detalhar esta transformação dos verbos do negócio em verbos do REST, por agora, precisamos apenas identificar que eles estão associados com “coisas” que normalmente têm um ID, mas podem que em podem não ter. Estas funções de negócio não são entidades porque não têm IDs, mas podem ser representados também no Domain Model, principalmente para entender a relação deles com as entidades. Por vezes, essas funções também envolverão várias outras entidades para executar a função. Chamamos estas funções de serviços e vamos colocar também no modelo:
-
-TODO mostrar o serviço
+Mais pra frente neste guia vamos detalhar esta transformação dos verbos do negócio em verbos do REST, por agora, precisamos apenas identificar que eles estão associados com “coisas” que normalmente têm um ID. Estas funções de negócio não são entidades porque não têm IDs, mas podem ser representados também no Domain Model, principalmente para entender a relação deles com as entidades. Por vezes, essas funções também envolverão várias outras entidades para executar a função. Chamamos estas funções de serviços e podemos colocar também no modelo.
  
 ### Como identificar serviços
 
@@ -164,13 +162,19 @@ O que "tem cara" de ser serviço:
 - Recursos que cuja resposta varia conforme um conjunto de filtros e não são armazenados no banco de dados, como algumas simulações e cálculos.
 - Recursos que retornam resultados que não têm ID, como extratos, francesinha, saldo, posição consolidada, etc.
 
+![Domain Model Simplificado de Cartões](https://github.com/oliveira-michel/guias-api/blob/master/definindo-contratos-rest-api/resources/domain-model-2.png?raw=true)
+
 Agora, precisamos pensar em dividir os assuntos que estamos trabalhando. Mesmo o modelo não estando 100% refinado, já podemos recortar os assuntos semelhantes através de bounded contexts. O Domain Driven Design não define rigidamente os critérios para executar estes recortes, no entanto, uma coisa é regra: o recorte deve ser consensual entre os analistas do negócio. Não sendo, deve-se buscar o alinhamento.
 
 No modelo abaixo, separamos os assuntos de cartões de outros assuntos que fazem parte do banco, mas não diretamente do negócio de cartões. Por vezes, este recorte será relacionado aos domínios, subdomínios e/ou grupos funcionais, outras vezes será um produto específico.
 
-TODO Que modelo é esse?
+![Domain Model Simplificado de Cartões](https://github.com/oliveira-michel/guias-api/blob/master/definindo-contratos-rest-api/resources/domain-model-3.png?raw=true)
 
-Até o ponto que chegamos podemos observar que já temos um diagrama que é facilita a explicação do negócio para qualquer pessoa dentro ou fora do contexto desse negócio. Por ora, faremos uma pausa em Domain Driven Design para absorver mais conceitos novos.
+Até o ponto que chegamos podemos observar que já temos um diagrama que facilita a explicação do negócio para qualquer pessoa dentro ou fora do contexto desse negócio. O principal ponto é que até para que diagramas simples como este muita discussão acontece e com ela alinhamentos e compartilhamento de conhecimento.
+
+Para a apresentação do Domain Model não há um formato rígido pra isso: já trabalhei com times que fizeram em ferramentas de UML, em apresentação de slides, em folha de caderno e a grande maioria foram rabiscados em mesas de vidro e registrados com foto no celular. Isso já foi suficiente para geração de algumas centenas de boas modelagens de contratos de API durante minha carreira.
+
+Por ora, paramos por aqui com Domain Driven Design para absorver outros conceitos novos.
 
 ## Conceitos básicos de REST
  
