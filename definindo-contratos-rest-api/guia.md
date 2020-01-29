@@ -19,19 +19,19 @@
 
 ## Introdução
 
-APIs sejam no padrão REST - que a gente vai explorar melhor neste texto - ou outros quaisquer como os variantes de RPC ou GraphQL, já se provaram faz tempo como boas soluções para comunicação entre sistemas e estão presentes em todos os lugares.
+APIs sejam no padrão REST - que a gente vai explorar melhor neste texto - ou outros quaisquer como os variantes de RPC ou GraphQL, já se provaram faz tempo como boas soluções para comunicação entre sistemas.
 
-É praticamente obrigatório em sistemas modernos e muito útil em sistemas legados, pois ajudam a criar uma camada de desacoplamento e abstração da complexidade do que é considerado legado dando uma "cara" mais aderente com os padrões mais modernos de software.
+É praticamente obrigatória em sistemas modernos e muito útil em sistemas legados, pois ajudam a criar uma camada de desacoplamento e abstração da complexidade do que é considerado legado dando uma "cara" mais aderente com os padrões mais modernos de software.
 
 Nas APIs são definidos contratos (com campos de entrada e saída) que são respeitados pela parte que consome e pela parte que fornece a informação e mesmo que haja alterações internas em qualquer um dos lados, as partes respeitam este contrato não obrigando a outra parte a fazer ajustes no software.
 
-O contrato é algo evolutivo e pode agregar novas funcionalidades com o passar do tempo.
+O contrato é algo evolutivo e pode agregar novas funcionalidades com o passar do tempo, principalmente se adotadas as melhores práticas na sua definição e versionamento.
 
-É na definição do contrato que observo que a capacidade de "análise do sistema" parece ter sido colocada em segundo plano por muitos desenvolvedores. Talvez parte por conta de abrirmos mão da documentação conforme manifesto ágil e muitos, das práticas de entendimento do problema e solução conforme o próprio ágil define; talvez porque parar para pensar no sistema sem produzir nenhuma linha de código pode parecer improdutivo para muitos de nós. No entanto, negligenciar esta etapa, traz atrasos, refatorações e posterga alguns tipos de problemas para o momento em que poderíamos estar apenas transformando café em código.
+E justamente na definição do contrato que observo que a capacidade de "análise do sistema" parece ter sido colocada em segundo plano por muitos desenvolvedores. Talvez parte por conta de abrirmos mão da documentação conforme manifesto ágil e não adotarmos as outras práticas de entendimento do problema conforme o próprio ágil define; talvez porque parar para pensar no sistema sem produzir nenhuma linha de código pode parecer improdutivo para muitos de nós. No entanto, negligenciar esta etapa de análise, traz atrasos, refatorações e posterga alguns tipos de problemas para o momento em que poderíamos estar apenas transformando café em código.
 
 O propósito deste guia é trazer em caráter introdutório como é o processo de entender o negócio e montar um contrato de REST API.
 
-> Após a leitura deste guia, recomendo a leitura do [Guia de Design REST](https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/guia.md), que aprofunda bem em alguns conceitos e serve como material de referência. 
+> Após a leitura deste guia, recomendo a leitura do [Guia de Design REST](https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/guia.md) que aprofunda bem em alguns conceitos e serve como material de referência. 
 
 ## APIs
 
@@ -87,7 +87,9 @@ O DDD fornece um conjunto de recursos e padrões que ajudam a documentar e model
 
 O Domain Model é uma representação de conceitos do mundo real (do negócio) que são pertinentes ao um ou mais domínios a serem trabalhados em um software. Estes conceitos incluem as entidades e as relações entre elas. No entanto, não faz parte de um Domain Model implementações técnicas como banco de dados ou componentes específicos de software.
 
-TODO Imagem de exemplo simplificado de Domain Model
+![Exemplo de um Domain Model suficiente para começar a definir APIs](https://github.com/oliveira-michel/guias-api/blob/master/definindo-contratos-rest-api/resources/exemplo-domain-model.png?raw=true)
+
+<sub>Exemplo de um Domain Model suficiente para começar a definir APIs</sub>
 
 O Domain Model quando pronto, mesmo com um modelo simplificado como o do exemplo acima, parece simples e deve ser simples, no entanto, a riqueza de se modelar o domínio está mais no processo da criação dele do que no resultado final. Durante o processo de criação do Domain Model, deve-se alinhar o entendimento do time sobre os melhores nomes para representar as entidades de negócio e as relações entre elas. Neste processo muitas divergências ocorrem entre o que é o negócio como a área de negócio entende, o que é o sistema no estado atual e o que algumas pessoas têm em mente como visão futura daquele ambiente. Muitas vezes o analista com mais profundidade nos conceitos do Domain Driven Design precisa orientar o time sobre os conceitos e objetivo do Domain Model.
 
@@ -126,7 +128,9 @@ O que não "tem cara" de ser entidade:
 
 Tendo entendido este conceito de entidade, podemos fazer um primeiro desenho sobre o negócio de cartões representando as principais entidades. Para esse exemplo, usei um caso semelhante ao real em ambiente bancário. As soluções deste guia são para fins didáticos, então vamos chegar em um resultado próximo ao real, mas simplificado.
 
-TODO Domain Model Simplificado de Cartões
+![Domain Model Simplificado de Cartões](https://github.com/oliveira-michel/guias-api/blob/master/definindo-contratos-rest-api/resources/domain-model-1.png?raw=true)
+
+<sub>Domain Model Simplificado de Cartões</sub>
 
 Antes do processo de desenhar as entidades, durante ou depois - a ordem não importa -  é preciso entender também quais são as funções de negócio que serão disponibilizadas. Para usar como exemplo para este guia, vamos inventar algumas necessidades de negócio que são semelhantes às reais:
 
