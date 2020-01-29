@@ -99,7 +99,7 @@ Alguns conceitos úteis podem guiar o processo da criação do Domain Model:
 
 - **Linguagem ubíqua**: É o uso da linguagem falada que seja de conhecimento comum entre todos os envolvidos com um conceito de negócio: o jargão. Um conceito de negócio deve ter um nome único e seu significado deve ser claro para todos. Devemos buscar utilizar estes nomes adotados em todo o software, desde o linguajar usado no dia a dia à telas, programação, bancos de dados, etc. Um dos pontos fortes do DDD é o resgate e reforço do uso de uma notação ubíqua entre os domain experts (quem conhece do negócio) e área de TI e o outro é a busca pela simplificação. Alguém sem conhecimento de um determinado negócio, deveria ser capaz de aprender sobre ele apenas lendo o código do sistema. E alguém com conhecimento de negócio deveria ter facilidade em usar e até mesmo entender a estrutura de dados e funções codificadas apenas reconhecendo os termos lá presentes. Um software que não tem suas raízes plantadas profundamente no domínio, não irá se adaptar bem às mudanças com o passar do tempo.
 
-O Domain Driven Design tem muitos e muitos conceitos. Neste guia para definição de contratos de APIs, somente alguns deles já serão suficientes para atingir o objetivo.
+O Domain Driven Design tem muitos conceitos: é como uma grande caixa de ferramentas. Neste guia para definição de contratos de APIs, somente alguns deles já serão suficientes para atingir o objetivo.
 
 ## Vamos à prática - Iniciando o Domain Model
 
