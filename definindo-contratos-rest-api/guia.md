@@ -566,12 +566,12 @@ Response
 
 ***5 - Para cada verbo + URL, quais são os códigos de retorno HTTP a serem utilizados?***
 
-GET http://.../cartoes?upgrade=true
-GET http://.../cartoes/{idCartao}/ofertas-upgrade
-GET http://.../cartoes/{idCartao}/faturas/{idFatura}
-GET http://.../cartoes?elegivelFaturaDigital=true
-GET http://.../cartoes?elegivelParcelamentoFatura=true
-GET http://.../cartoes/{idCartao}/ofertasParcelamentosFatura
+- GET http://.../cartoes?upgrade=true
+- GET http://.../cartoes/{idCartao}/ofertas-upgrade
+- GET http://.../cartoes/{idCartao}/faturas/{idFatura}
+- GET http://.../cartoes?elegivelFaturaDigital=true
+- GET http://.../cartoes?elegivelParcelamentoFatura=true
+- GET http://.../cartoes/{idCartao}/ofertasParcelamentosFatura
 
 Em todos os casos acima temos apenas consultas (GET) e os códigos de retorno seguirão o mesmo padrão:
 
