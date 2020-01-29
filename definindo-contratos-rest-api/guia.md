@@ -124,13 +124,13 @@ O que não "tem cara" de ser entidade:
 
 - Definições de negócio que não têm ID, nem é possível identificá-las unitariamente entre todos.
 - Definições que têm como nome "gravação", "listagem", "detalhes", "dados", "informações" entre outros termos vagos. Esse tipo de nomenclatura provavelmente precisa ser refinada e talvez desse refinamento, surja uma entidade.
-- **Verbos**.
+- Verbos.
 
 Tendo entendido este conceito de entidade, podemos fazer um primeiro desenho sobre o negócio de cartões representando as principais entidades. Para esse exemplo, usei um caso semelhante ao real em ambiente bancário. As soluções deste guia são para fins didáticos, então vamos chegar em um resultado próximo ao real, mas simplificado.
 
 ![Domain Model Simplificado de Cartões](https://github.com/oliveira-michel/guias-api/blob/master/definindo-contratos-rest-api/resources/domain-model-1.png?raw=true)
 
-<sub>Domain Model Simplificado de Cartões</sub>
+<sub>Domain Model Simplificado de Cartões.</sub>
 
 Antes do processo de desenhar as entidades, durante ou depois - a ordem não importa -  é preciso entender também quais são as funções de negócio que serão disponibilizadas. Para usar como exemplo para este guia, vamos inventar algumas necessidades de negócio que são semelhantes às reais:
 
@@ -161,8 +161,17 @@ O que "tem cara" de ser serviço:
 
 - Recursos que cuja resposta varia conforme um conjunto de filtros e não são armazenados no banco de dados, como algumas simulações e cálculos.
 - Recursos que retornam resultados que não têm ID, como extratos, francesinha, saldo, posição consolidada, etc.
+- **Verbos**.
+
+O que "não tem cara" de ser serviço:
+
+- Verbos que representam CRUD, como listar, gravar, apagar etc.
+- Recursos que têm ID e são armazenados em banco de dados.
+- Substantivos.
 
 ![Domain Model Simplificado de Cartões](https://github.com/oliveira-michel/guias-api/blob/master/definindo-contratos-rest-api/resources/domain-model-2.png?raw=true)
+
+<sub>Domain Model de Cartões com alguns serviços.</sub>
 
 Agora, precisamos pensar em dividir os assuntos que estamos trabalhando. Mesmo o modelo não estando 100% refinado, já podemos recortar os assuntos semelhantes através de bounded contexts. O Domain Driven Design não define rigidamente os critérios para executar estes recortes, no entanto, uma coisa é regra: o recorte deve ser consensual entre os analistas do negócio. Não sendo, deve-se buscar o alinhamento.
 
@@ -170,9 +179,11 @@ No modelo abaixo, separamos os assuntos de cartões de outros assuntos que fazem
 
 ![Domain Model Simplificado de Cartões](https://github.com/oliveira-michel/guias-api/blob/master/definindo-contratos-rest-api/resources/domain-model-3.png?raw=true)
 
+<sub>Domain Model de Cartões com bounded contexts.</sub>
+
 Até o ponto que chegamos podemos observar que já temos um diagrama que facilita a explicação do negócio para qualquer pessoa dentro ou fora do contexto desse negócio. O principal ponto é que até para que diagramas simples como este muita discussão acontece e com ela alinhamentos e compartilhamento de conhecimento.
 
-Para a apresentação do Domain Model não há um formato rígido pra isso: já trabalhei com times que fizeram em ferramentas de UML, em apresentação de slides, em folha de caderno e a grande maioria foram rabiscados em mesas de vidro e registrados com foto no celular. Isso já foi suficiente para geração de algumas centenas de boas modelagens de contratos de API durante minha carreira.
+Para a apresentação do Domain Model não há um formato rígido: já trabalhei com times que fizeram em ferramentas de UML, em apresentação de slides, em folha de caderno e a grande maioria foram rabiscados em mesas de vidro e registrados com foto no celular. Isso já foi suficiente para geração de algumas centenas de boas modelagens de contratos de API durante minha carreira.
 
 Por ora, paramos por aqui com Domain Driven Design para absorver outros conceitos novos.
 
@@ -189,13 +200,11 @@ Exemplos de recursos representados por URLs:
 - Representação de um álbum específico do Spotify: https://api.spotify.com/v1/albums/{id}
 - Representação das trilhas de um álbum do Spotify: https://api.spotify.com/v1/albums/{id}/tracks
 
-Estes substantivos representados pelas URLs representam o "S" de "State" do RE**S**T. Isso significa que existe uma representação do estado de um recurso.
-
-TODO (link pro guia falando sobre entidades)
+Estes substantivos representados pelas URLs representam o "S" de "State" do RE**S**T. Isso significa que existe uma representação do estado de um recurso. Estado é como um recurso se encontra em um momento: é a situação atual dos dados de uma entidade em um determinado instante.
 
 ### Ações
 
-Clientes de REST APIs alteram o estado dos recursos, ou seja, alteram suas propriedades através de 5 ações, existem outras, mas essas são as principais:
+Clientes de REST APIs alteram o estado dos recursos, ou seja, alteram suas propriedades através de 5 ações. Existem outras, mas essas são as principais:
 
 - Consultar, que utiliza o verbo GET do HTTP;
 - Criar Novo, que utiliza o verbo POST do HTTP;
@@ -238,15 +247,13 @@ E cada um deles pode se desdobrar em outros mais específicos, por exemplo:
 
 Então, é parte do processo executar uma ação em uma API através de um dos verbos e receber um código de retorno indicando o status daquela requisição. Como os códigos são padrões, a aplicação poderá implementar comportamentos padrões conforme os códigos de retorno.
 
-TODO Quer conhecer mais sobre Métodos (verbos) de REST API aqui no Banco Itaú? Métodos HTTP
-
 ### Representações
 
 Representações é a forma como os clientes da API vêem os recursos. Os clientes de APIs enxergam estas representações do recurso.
 
 Por exemplo, uma pessoa para um sistema está armazenada em uma tabela no banco de dados, mas a representação deste recurso para o cliente se dá através de um JSON com alguns campos, talvez nem todos os campos da tabela e talvez com alguns filtros, mas o acesso direto à tabela (recurso), ele não tem. Nesta mesma linha, a imagem da pessoa pode estar em um file server dentro da empresa, e através da API esta imagem é exposta como JPG. O usuário tem acesso à representação da imagem original, talvez com resolução menor, talvez com restrições de acesso e não tem direto acesso ao recurso original no file server.
 
-Estas representações são o "R" de "representational" do **R**EST.
+Estas representações são o "RE" de "representational" do **RE**ST.
 
 ## O funcionamento de uma chamada em REST
 
@@ -254,20 +261,30 @@ Suponha a existência de uma API que informe o clima. Ela estaria exposta em uma
 
 Em HTTP a comunicação se dá através de um Request com a requisição de alguma informação e um Response com a resposta da requisição. Por se tratar de uma consulta, utiliza-se um dos verbos do HTTP, o GET. Como a requisição foi bem sucedida, foi retornado o HTTP status code 200.
 
+Ex:
+```
+Request
+GET http://conhecasaopaulo.com/temperatura/
+
+Response
+HTTP 200 Ok 
+{"celsius": 14, "fahrenheit": 57}
+```
+
 Para envio desta requisição e recepção da resposta em HTTP, quase todas as linguagens de programação têm funções que permitem fazê-la.
 
 Para transformar a representação em JSON em um objeto a ser manipulado, as linguagens de programação também têm funções que fazem esta conversão de forma automática.
-```
-Request: GET http://conhecasaopaulo.com/temperatura/
-Response: HTTP 200 {"celsius": 14, "fahrenheit": 57}
-```
  
 ## Filtrando Resultados
 Imagine a existência de um recurso que represente os restaurantes de São Paulo. Uma busca por eles seria algo como:
 
 ```
-Request: GET http://conhecasaopaulo.com/restaurantes
-Response: HTTP 200 { 
+Request
+GET http://conhecasaopaulo.com/restaurantes
+
+Response
+HTTP 200 Ok
+{ 
    [ 
       { 
          "id":1,
@@ -297,9 +314,13 @@ Ex: http://.../...?chave1=valor1&chave2=valor2&chave3=valor3
 Logo, caso você queira filtrar a lista de restaurantes por bairro, por exemplo, utilizamos os query parameters para fazer o filtro no recurso.
 
 ```
-Request: GET http://conhecasaopaulo.com/restaurantes?bairro=Pinheiros
-Response: HTTP 200 { 
-[ 
+Request
+GET http://conhecasaopaulo.com/restaurantes?bairro=Pinheiros
+
+Response
+HTTP 200 Ok 
+{ 
+  [ 
       { 
          "id":1,
          "nome":"Restaurante A",
@@ -382,15 +403,15 @@ O recurso a ser retornado são ofertas de cartões. Oferta de cartão não é a 
 
 O recurso a ser retornado são as faturas de um cartão específico ({idCartao}) e existe uma fatura por mês. Cada uma dessas faturas terá o seu ID.
 
-- GET http://.../cartoes?elegivel-fatura-digital=true
+- GET http://.../cartoes?elegivelFaturaDigital=true
 
 O recurso a ser retornado são os cartões que têm uma característica de disponibilizar a fatura apenas online.
 
-- GET http://.../cartoes?elegivel-parcelamento-fatura=true
+- GET http://.../cartoes?elegivelParcelamentoFatura=true
 
 O recurso a ser retornado são os cartões que têm uma característica de permitir o parcelamento da fatura.
 
-- GET http://.../cartoes/{idCartao}/ofertas-parcelamentos-fatura
+- GET http://.../cartoes/{idCartao}/ofertasParcelamentosFatura
 
 O recurso a ser retornado é um serviço que faz ofertas de parcelamentos de faturas pré calculadas. As ofertas são para um cartão específico, por isso o recurso é relacionado com um cartão já existente ({idCartao}).
 
@@ -414,33 +435,33 @@ Assim, precisa identificar quais são esses parâmetros que o consumidor da API 
 }
 ```
 
-***3.1 - Pergunta especial: E o id do usuário?***
+***3.1 - Pergunta especial: E o ID do usuário?***
 
-Talvez você tenha percebido que não é passada identificação do usuário em nenhuma das APIs acima. Isso é porque a identificação do usuário deve vir via token. O uso de token é explicado nas tecnologias OAUTH, Open Id Connect e JWT.
+Talvez você tenha percebido que não é passada identificação do usuário em nenhuma das APIs acima. Isso é porque a identificação do usuário deve vir via token. O uso de token é explicado nas tecnologias [OAUTH](https://oauth.net/2/), [Open Id Connect](https://openid.net/connect/) e [JWT](https://jwt.io).
 
 Basicamente, todas as chamadas de API passam no header um texto que pode ser uma chave de busca para recuperar as informações do usuário em um servidor de autenticação, ou um texto em formato base64 que pode ser convertido para JSON e neste JSON está a identificação do cliente e aplicação que chamou a API. Este texto chama-se token.
 
 Então, podemos considerar as informações do usuário logado (cliente) também é um parâmetro de entrada, mas não precisamos definí-lo na API, pois ele é parte do token. Sendo parte do token, quem recebe a informação tem meios de garantir que ela não foi adulterada e foi gerada por um serviço confiável.
 
-Para conhecer melhor sobre esse assunto, veja estes materiais:
-
-- https://www.youtube.com/watch?v=h4A8HytL5ts
-- https://oauth.net/2/
-- https://jwt.io/
-- https://openid.net/connect/
+> Para conhecer melhor sobre esse assunto, confira estes materiais:
+> - https://www.youtube.com/watch?v=h4A8HytL5ts
+> - https://oauth.net/2/
+> - https://jwt.io/
+> - https://openid.net/connect/
 
 ***4 - Para cada verbo + URL, quais são os parâmetros de saída?***
 
 Neste ponto, a gente pensa em cada entidade a ser exposta por API envolvida no nosso sistema e define o conjunto de atributos que a representa. Vamos representá-la em JSON, pois é o padrão que será utilizado na hora de programar a API. O exercício de definir estes campos já servirá como base para usar de exemplo na documentação (contrato).
 
-Request: GET http://.../cartoes
-Response:
 ```
+Request
+GET http://.../cartoes
 
+Response
 {
-   "idCartao": "44723873284",
-   "numeroCartao": "879879879898798798",
-   "nomeCartao": "Cartão XPTO",
+   "id": "44723873284",
+   "numero": "879879879898798798",
+   "nome": "Cartão XPTO",
    "nomePortador": "José da Silva",
    "dataValidade": "12/25",
    "bandeira": "Mastercard",
@@ -451,13 +472,14 @@ Response:
 }
 ``` 
 
-TODO ajeitar todos os exemplos: _, case e request: e response:
-
-GET http://.../cartoes/{idCartao}/ofertas-upgrade
 ```
+Request
+GET http://.../cartoes/{idCartao}/ofertas-upgrade
+
+Response
 {
-    "idOferta": "90909090909",
-    "nomeProduto": "CARTAOTOP MULTIPLO MATERCARD PLATINUM",
+    "id": "90909090909",
+    "nomeProduto": "CARTAO TOP MULTIPLO MATERCARD PLATINUM",
     "valorAnuidade": 480,
     "quantidadeParcelasAnuidade": 12,
     "valorParcelaAnuidade": 40,
@@ -476,10 +498,14 @@ GET http://.../cartoes/{idCartao}/ofertas-upgrade
 }
 ``` 
 
-GET http://.../cartoes/{idCartao}/faturas
+
 ```
+Request
+GET http://.../cartoes/{idCartao}/faturas
+
+Response
 {
-    "idFatura": "123123123",
+    "id": "123123123",
     "status": "atual",
     "totalFatura": 1000.12,
     "dataVencimento": "2017-01-29",
@@ -504,18 +530,25 @@ GET http://.../cartoes/{idCartao}/faturas
 }
 ``` 
 
-GET http://.../cartoes/{idCartao}/ofertasParcelamentosFatura
+
 ```
+Request
+GET http://.../cartoes/{idCartao}/ofertasParcelamentosFatura
+
+Response
 {
-    "idOferta": "12P1",
+    "id": "12P1",
     "quantidadeParcelas": 12,
     "valorParcela": 230.10,
     "taxaJuros": 1.54
 }
 ```
 
-POST http://.../cartoes/{idCartao}/faturas/{idFatura}/parcelamento
 ```
+Request
+POST http://.../cartoes/{idCartao}/faturas/{idFatura}/parcelamento
+
+Response
 {
     "idConta": "0004321098765432109",
     "valorPagamamentoMinimo": 123456.78,
@@ -557,7 +590,7 @@ Existem algumas linguagens diferentes para declarar contrato de APIs, no entanto
 
 Como a escrita do contrato em si é a parte mais simples do processo e é amplamente documentada na web, vamos fazer apenas um dos casos que levantamos neste guia e sem entrar nos detalhes da linguagem.
 
-O exemplo a ser escrito em OAS será o GET http://.../cartoes?upgrade=true e o POST http://.../cartoes/{idCartao}/faturas/{idFatura}/parcelamento. Com o conhecimento gerado para montar estas duas URLs, você já será capaz de entender como fazer as outras e terá o conhecimento mínimo para explorar os materiais na web e fazer seus próprios contratos. Detalhes como autenticação e OAUTH também não serão trabalhados neste exemplo.
+O exemplo a ser escrito em OAS será o `GET http://.../cartoes?upgrade=true` e o `POST http://.../cartoes/{idCartao}/faturas/{idFatura}/parcelamento`. Com o conhecimento gerado para montar estas duas URLs, você já será capaz de entender como fazer as outras e terá o conhecimento mínimo para explorar os materiais na web e fazer seus próprios contratos. Detalhes como autenticação e OAUTH também não serão trabalhados neste exemplo.
 
 Vamos percorrer cada trecho do contrato e entender a sua estrutura.
 
@@ -629,9 +662,8 @@ paths:
             schema:
               $ref: '#/components/schemas/post-request-parcelamento-fatura'
 ```
-TODO: acrescentar links para o guia em todo lado
 
-Agora vamos definir a entidade (ou no OAS: schema) do cartão para que seja usada na rota GET http://.../cartoes?upgrade=true que nomeei como get-request-cartao. E faremos o mesmo para objeto enviado no POST /cartoes/{idCartao}/faturas/{idFatura}/parcelamento que nomeei como post-request-parcelamento-fatura.
+Agora vamos definir a entidade (ou no OAS: schema) do cartão para que seja usada na rota `GET http://.../cartoes?upgrade=true` que nomeei como get-request-cartao. E faremos o mesmo para objeto enviado no `POST /cartoes/{idCartao}/faturas/{idFatura}/parcelamento` que nomeei como post-request-parcelamento-fatura.
 
 ```
 components:
@@ -641,15 +673,15 @@ components:
       type: object
       description: Cartão de crédito
       properties:
-        idCartao:
+        id:
           type: string
           description: Identificador do cartão
           example: '9784364237'
-        numeroCartao:
+        numero:
           type: string
           description: Numero do cartão mascarado.
           example: '5467********1234'
-        nomeCartao:
+        nome:
           type: string
           description: Nome do cartão
           example: Cartão XPTO
@@ -745,8 +777,8 @@ Note que na definição do post-request-parcelamento-fatura alguns campos foram 
 
 O processo de definir um bom contrato de API envolve conhecer e estudar REST e mais importante ainda, envolve conhecer o seu negócio. Minha experiência com times definindo estes contratos mostra que a maior parte do tempo gasto foi em entender o negócio e identificar cada entidade e como se relacionam. Quanto à escrita do contrato, depois de fazer o primeiro, os analistas tiram de letra.
 
-REST não é apenas uma forma de montar um contrato de API, mas um padrão arquitetural que envolve alguns conceitos e algumas restrições. Nem todas as empresas de partida implementam APIs respeitando todas as restrições. É chamada de RESTfull, uma API que respeita todas estas restrições. É chamada de REST a API que respeita todos ou pelo menos alguns dos padrões e restrições. Podemos resumir que RESTfull seria o estado da arte na implementação de uma API REST.
+REST não é apenas uma forma de montar um contrato de API, mas um padrão arquitetural que envolve alguns conceitos e algumas restrições. Nem todas as empresas de partida implementam APIs respeitando todas as restrições. É chamada de RESTfull uma API que respeita todas estas restrições. É chamada de REST a API que respeita todos ou pelo menos alguns dos padrões e restrições. Podemos resumir que RESTfull seria o estado da arte na implementação de uma API REST.
 
 Com frequência teremos que fazer sistemas para expor funcionalidades de sistemas legados, aí surge uma grande dificuldade: equilibrar o que é entendido como ideal com o que já está construído sem as melhores práticas. Logo, nem sempre vamos conseguir atingir o RESTFull. 
 
-Assim, conhecer REST conceitualmente é muito importante para esta atividade: quando se junta a dificuldade de entender o negócio com a falta de maestria em REST, as coisas ficam um pouco difíceis. Então, deixo como sugestão que busquem bastante conhecimento em REST primeiro e aproveite as oportunidades dos projetos para na prática aprender a entender o negócio.
+Assim, conhecer REST conceitualmente é muito importante: quando se junta a dificuldade de entender o negócio com a falta de maestria em REST, as coisas ficam um pouco difíceis. Então, deixo como sugestão que busquem bastante conhecimento em REST primeiro e aproveite as oportunidades dos projetos para na prática aprender a entender o negócio.
