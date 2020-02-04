@@ -291,7 +291,7 @@ Os filtros aplicados podem tratar diversas situaçoes e é importante convencion
 | ------------ | -------- | --------- |
 |Numérico, Data e Booleano|Igualdade|Retorna aqueles recursos cujo valor do atributo tenha exatamente o valor especificado. Ex: ...?quantidade=5 devolverá aqueles recursos cujo atributo "quantidade" tenha o valor 5.|
 |Numérico, Data e Booleano|Ou|Retorna aqueles recursos cujo valor do atributo esteja contido em uma lista de valores. Ex: ...?quantidade=5&quantidade=9&quantidade=12 retornará aqueles recursos cujo atributo quantidade seja 5, 9 ou 12.|
-|Numérico e Data|Maior ou Igual|Retorna aqueles recursos cujo valor do atributo seja maior ou igual o valor definido em “fromQuantidade” e menor ou igual o valor definido em "to-quantidade". Ex: ...?fromQuantidade=5 retornará os recursos com quantidade maior ou igual a 5. Consulte também [Ranges](#ranges).|
+|Numérico e Data|Maior ou Igual|Retorna aqueles recursos cujo valor do atributo seja maior ou igual o valor definido em “fromQuantidade” e menor ou igual o valor definido em "toQuantidade". Ex: ...?fromQuantidade=5 retornará os recursos com quantidade maior ou igual a 5. Consulte também [Ranges](#ranges).|
 |Texto|Contém|Retorna aqueles recursos cujo valor do atributo contenha o valor especificado. Ex: …?nome=Frederico retornará aqueles recursos que contenham “Frederico” no atributo nome. São retornos válidos válidos: “Frederico Garcia”, “Don Frederico”, “Frederico”.|
 |Texto|Ou Contém|Retorna aqueles recursos cujo valor do atributo contenha um dos valores especificados. Ex: nome=Frederico&nome=Antonio retornará aqueles recursos que contenham “Frederico” ou "Antonio" no atributo nome. São retornos válidos válidos: “Frederico Antonio”, “Don Frederico”, “Frederico”, “Antonio Ramirez”.|
 
@@ -334,7 +334,7 @@ http://api.empresarh.com/candidatos?fromDataNascimento=1985-01-01&toDataNascimen
 
 Para atuar como um cursor e filtrar um range de IDs, a chamada ficaria assim:
 
-http://api.empresarh.com/candidatos?fromId=1000&to-id=1099
+http://api.empresarh.com/candidatos?fromId=1000&toId=1099
 
 É uma boa prática adotar padrões para definir a estrutura do parâmetro que trata ranges, como sugestão:
 - **"from" + nomeDoAtributo**
@@ -647,7 +647,7 @@ Caso a requisição seja em um recurso específico, o recurso será deletado, ca
 
 Ex:
 Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}
-- **DELETE** http://api.exemplo.com/estados/sp/cidades?to-populacao=5000<br>
+- **DELETE** http://api.exemplo.com/estados/sp/cidades?toPopulacao=5000<br>
 Apaga todas as cidades com população até 5000 habitantes.
 - **DELETE** http://api.exemplo.com/estados/sp/cidades<br>
 Apaga todas as cidades do estado de São Paulo.
