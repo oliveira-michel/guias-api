@@ -328,7 +328,7 @@ Existem algumas formas de definir exatamente qual "bloco de informação" consul
 
 ### Request > URL > Query Strings > Paginação > Range
 
-Podemos delimitar a quantidade de resultados à partir da filtragem de um determinado parâmetro, por exemplo, se o parâmetro for **data-nascimento**, a chamada à uma API ficaria assim:
+Podemos delimitar a quantidade de resultados à partir da filtragem de um determinado parâmetro, por exemplo, se o parâmetro for **dataNascimento**, a chamada à uma API ficaria assim:
 
 http://api.empresarh.com/candidatos?fromDataNascimento=1985-01-01&toDataNascimento=2001-12-31
 
@@ -1481,7 +1481,7 @@ Abaixo, seguem alguns dos diversos cenários de requisições e os principais ti
 	- Resposta HTTP 200 Ok com um array com as cidades Santos e São Vicente.
 - **GET .../paises/55/estados/11/cidades?nome=Belo%20Horizonte**
 	- Resposta HTTP 200 Ok com um array com a cidade Belo Horitonte. Repare que o retorno é um array, pois a busca foi feita via query strings, não via ID (path parameter) em que teríamos a certeza de que o retorno é de uma só entidade. Quando a busca vem via query strings, podemos ter cenários em que pode vir mais de um item no retorno e, mesmo que a situação atual da API retorne apenas 1 item, é melhor manter o comportamento de retornar array, pois no futuro é possível adicionar novas query strings que poderão alterar a quantidade de resultados.
-- **GET .../paises/55/estados/11/cidades?from_populacao=30000**
+- **GET .../paises/55/estados/11/cidades?fromPopulacao=30000**
 	- Resposta HTTP 200 Ok com um array com a cidade Belo Horitonte. E o retorno é um array como já explicado acima.
 - **POST .../paises/55/estados/11/cidades**
 	- Resposta HTTP 201 Created, registrando uma nova cidade no banco de dados.
