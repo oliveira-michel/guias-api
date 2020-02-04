@@ -205,7 +205,7 @@ No entanto, existem alguns cenários em que não temos "entidades" de um domíni
 
 Para estes casos, tratamos essas funções como recursos e para facilitar a identificação de que não é uma "entidade", usamos verbos no lugar dos substantivos.
 Ex:
-- GET .../**calcular-distancia**?from-latitude=48,8584&from-longitude=2,2945&to-latitude=-22.951916&to-longitude=-43.2104872
+- GET .../**calcular-distancia**?fromLatitude=48,8584&fromLongitude=2,2945&toLatitude=-22.951916&toLongitude=-43.2104872
 - POST .../**validar-cartao**
 
 ```
@@ -291,7 +291,7 @@ Os filtros aplicados podem tratar diversas situaçoes e é importante convencion
 | ------------ | -------- | --------- |
 |Numérico, Data e Booleano|Igualdade|Retorna aqueles recursos cujo valor do atributo tenha exatamente o valor especificado. Ex: ...?quantidade=5 devolverá aqueles recursos cujo atributo "quantidade" tenha o valor 5.|
 |Numérico, Data e Booleano|Ou|Retorna aqueles recursos cujo valor do atributo esteja contido em uma lista de valores. Ex: ...?quantidade=5&quantidade=9&quantidade=12 retornará aqueles recursos cujo atributo quantidade seja 5, 9 ou 12.|
-|Numérico e Data|Maior ou Igual|Retorna aqueles recursos cujo valor do atributo seja maior ou igual o valor definido em “from-quantidade” e menor ou igual o valor definido em "to-quantidade". Ex: ...?from-quantidade=5 retornará os recursos com quantidade maior ou igual a 5. Consulte também [Ranges](#ranges).|
+|Numérico e Data|Maior ou Igual|Retorna aqueles recursos cujo valor do atributo seja maior ou igual o valor definido em “fromQuantidade” e menor ou igual o valor definido em "to-quantidade". Ex: ...?fromQuantidade=5 retornará os recursos com quantidade maior ou igual a 5. Consulte também [Ranges](#ranges).|
 |Texto|Contém|Retorna aqueles recursos cujo valor do atributo contenha o valor especificado. Ex: …?nome=Frederico retornará aqueles recursos que contenham “Frederico” no atributo nome. São retornos válidos válidos: “Frederico Garcia”, “Don Frederico”, “Frederico”.|
 |Texto|Ou Contém|Retorna aqueles recursos cujo valor do atributo contenha um dos valores especificados. Ex: nome=Frederico&nome=Antonio retornará aqueles recursos que contenham “Frederico” ou "Antonio" no atributo nome. São retornos válidos válidos: “Frederico Antonio”, “Don Frederico”, “Frederico”, “Antonio Ramirez”.|
 
@@ -330,15 +330,15 @@ Existem algumas formas de definir exatamente qual "bloco de informação" consul
 
 Podemos delimitar a quantidade de resultados à partir da filtragem de um determinado parâmetro, por exemplo, se o parâmetro for **data-nascimento**, a chamada à uma API ficaria assim:
 
-http://api.empresarh.com/candidatos?from-dataNascimento=1985-01-01&to-dataNascimento=2001-12-31
+http://api.empresarh.com/candidatos?fromDataNascimento=1985-01-01&toDataNascimento=2001-12-31
 
 Para atuar como um cursor e filtrar um range de IDs, a chamada ficaria assim:
 
-http://api.empresarh.com/candidatos?from-id=1000&to-id=1099
+http://api.empresarh.com/candidatos?fromId=1000&to-id=1099
 
 É uma boa prática adotar padrões para definir a estrutura do parâmetro que trata ranges, como sugestão:
-- **"from-" + nome-do-atributo**
-- **"to-" + nome-do-atributo**
+- **"from" + nomeDoAtributo**
+- **"to" + nomeDoAtributo**
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [response  range](#response--body--pagina%C3%A7%C3%A3o--range)</sub>
 ### Request > URL > Query Strings > Paginação > Page e Limit
@@ -571,7 +571,7 @@ Exemplo de utilização de GET para fazer uma consulta por cidades no estado de 
 
 Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades
 
-**GET** http://api.exemplo.com/estados/sp/cidades?from-populacao=20000
+**GET** http://api.exemplo.com/estados/sp/cidades?fromPopulacao=20000
 
 Exemplo de utilização de GET para fazer uma consulta pela cidade de Santos:
 
@@ -866,7 +866,7 @@ Quando se faz uma requisição sem o ID, filtrando apenas com Query Strings, pod
 
 *Request*
 
-GET .../pessoas?from-data=2019-06-01
+GET .../pessoas?fromData=2019-06-01
 
 *Response*
 
@@ -956,7 +956,7 @@ Existem algumas técnicas diferentes para fazer a paginação. Serão explicadas
 
 Uma das formas de se limitar a quantidade de registros retornados é através de um filtro em algum atributo que represente um intervalo. Assim, quando se recebe um filtro nas Query Strings, deve-se retornar o resultado respeitando os critérios do filtro.
 
-Por exemplo, em uma requisição GET .../...?from-id=3&to-id=6, possuindo o banco de dados uma coleção de 8 registros, e os ids sendo sequenciais, o retorno devem ser os registros 3, 4, 5 e 6:
+Por exemplo, em uma requisição GET .../...?fromId=3&toId=6, possuindo o banco de dados uma coleção de 8 registros, e os ids sendo sequenciais, o retorno devem ser os registros 3, 4, 5 e 6:
 ```
 {
    "data": [
