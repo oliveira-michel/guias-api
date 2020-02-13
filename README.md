@@ -8,6 +8,9 @@ Tutorial sobre modelagem que aborda como entender o negócio e converter em REST
 https://github.com/oliveira-michel/guias-api/blob/master/definindo-contratos-rest-api/guia.md
 
 Guia visual introdutório:
+
+https://github.com/oliveira-michel/guias-api/raw/master/guia-visual/GuiaRapidoRestAPI.pdf
+
 <table><tr>
 <td><img src="https://github.com/oliveira-michel/guias-api/blob/master/guia-visual/00-capa.png?raw=true"/></td>
 <td><img src="https://github.com/oliveira-michel/guias-api/blob/master/guia-visual/01-porque.png?raw=true"/></td>
