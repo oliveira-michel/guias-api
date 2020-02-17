@@ -1,11 +1,4 @@
 # Guias de REST API
-Material de referência para modelagem de serviços expostos via REST API
-
-https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/guia.md
-
-Tutorial sobre modelagem que aborda como entender o negócio e converter em REST.
-
-https://github.com/oliveira-michel/guias-api/blob/master/definindo-contratos-rest-api/guia.md
 
 Guia visual introdutório:
 
@@ -28,3 +21,12 @@ https://github.com/oliveira-michel/guias-api/raw/master/guia-visual/GuiaRapidoRe
 <td><img src="https://github.com/oliveira-michel/guias-api/blob/master/guia-visual/12-versionamento.png?raw=true"/></td>
 <td><img src="https://github.com/oliveira-michel/guias-api/blob/master/guia-visual/13-seguranca.png?raw=true"/></td>
 </tr></table>
+
+Material de referência para modelagem de serviços expostos via REST API
+
+https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/guia.md
+
+Tutorial sobre modelagem que aborda como entender o negócio e converter em REST.
+
+https://github.com/oliveira-michel/guias-api/blob/master/definindo-contratos-rest-api/guia.md
+
