@@ -71,6 +71,7 @@ Este é um documento "vivo" em que o autor está atualizando com a experiência 
 - [Processamento em lotes](#processamento-em-lotes)
 - [Recursividade](#recursividade)
 - [Versionamento](#versionamento)
+- [Transferência de arquivos](#transferencia-de-arquivos)
 - [Segurança](#seguran%C3%A7a)
 - [Performance, Cache e compressão](#performance-cache-e-compress%C3%A3o)
 - [Palavras Finais](#palavras-finais)
@@ -2037,6 +2038,175 @@ Define-se a versão no Path como se fosse um recurso, por exemplo:
 https://api.empresaexemplo.com/v1/clientes
 
 Esta é a minha forma preferencial de versionar pois, fazendo parte da URL você força sempre o cliente a informá-la; a versão está sempre visível; em processo de deploy, é muito mais simples criar uma pasta do que definir um novo host; mantém um visual clean na URL e facilita na definição de contratos para versões novas.
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
+
+## Transferência de arquivos
+
+REST significa **Representational State Transfer**, ou seja transferência de representações do estado em que as entidades de negócio se encontram em determinado momento.
+
+* **Estado** são os valores que, quando juntos, diferenciam uma entidade da outra.
+
+* **Transferência** refere-se à capacidade de alterar estes valores. 
+
+* **Representação** refere-se à capacidade de representar o estado, que provavelmente está na forma de registros em um banco de dados, através de alguma notação padronizada como JSON, XML etc.
+
+No que tange representação, podemos dizer que uma URL que represente o "contrato de prestação de um serviço", por exemplo, pode existir na forma de:
+
+* formulário de papel preenchido à caneta;
+* imagem resultante de uma microfilmagem do formulário;
+* informações armazenadas em um banco de dados;
+* informações em JSON utilizadas para intercâmbio entre sistemas;
+* arquivo PDF etc.
+
+REST APIs são amplamente utilizadas para representação dos recursos via JSON. Para transferência de arquivos, existem protocolos e tecnologias voltadas especialmente para isso, no entanto, dada a popularidade, muitos implementam também em REST para este fim.
+
+Abaixo, vamos explorar alguns cenários diferentes para entregar a capacidade de transferência de arquivos via REST.
+
+## URL (recurso) dedicado para exposição de arquivos
+
+Em algumas arquiteturas, teremos URLs dedicadas a expor arquivos de todos os tipos, independente do tipo de recurso que ele representa.
+
+Podemos dizer que o negócio que essas URLs expõem é a capacidade de gestão de arquivos.
+
+Para se construir APIs de sistema de gestão de arquivos, é como construir uma API para algum tipo de negócio: entender como funciona o sistema onde estão os arquivos, suas entidades, atributos e expor seguindo os padrões REST. Assim, fará parte das entidades informações como md5, permissões, data de criação, última alteração, informações de sequência e segmentação de arquivos, links temporários etc. Por trás do processamento da API provavelmente teremos também recursos de compactação, antivírus, gestão de storage etc.
+
+Sistemas de negócio da empresa usam este sistema de gestão de arquivos (através das duas APIs) e normalmente seguem o fluxo:
+* o sistema de negócio registra metadados do arquivo mais o arquivo no sistema de gestão de arquivos;
+* o sistema de gestão de arquivos armazena o arquivo em um repositório centralizado e devolve um ID do arquivo;
+* o sistema de negócio armazena o ID em seu repositório;
+* o sistema de negócio envia a URL com o identificador do arquivo para o cliente da API (via HATEOAS, por exemplo);
+* o cliente do sistema de negócio acessa o arquivo na URL disponibilizada pelo sistemas de gestão de arquivos.
+
+Exemplos públicos deste tipo de API de gestão de arquivos:
+
+https://docs.microsoft.com/en-us/rest/api/storageservices/file-service-rest-api
+
+https://docs.aws.amazon.com/pt_br/AmazonS3/latest/dev/RESTAPI.html
+
+https://developers.google.com/drive/api/v2/manage-uploads
+
+https://developers.convertio.co/pt/api/docs/
+
+Para a etapa de envio de arquivo, já vi 3 tipos de abordagens:
+
+1 - Enviar os bytes do arquivo como **Base64 mais seus metadados usando JSON**.
+
+Esta é a abordagem menos recomendada e parece ser uma forma simples, pois nada muda em relação à tudo que já passamos neste guia: o arquivo é trafegado em forma de texto dentro de um atributo em um JSON. O Base64 é um método para codificação de dados utilizado para transmitir dados binários por meios de transmissão que lidam apenas com texto. É amplamente utilizado na web. No entanto, o formato Base64 é cerca de 33% maior que o dado original binário. Este payload maior pode impactar toda a pilha de tecnologias associadas à API: equipamento do cliente, gateway, log, armazenamento, tráfego de rede, processamento, memória, compactação HTTP etc. Além da necessidade de conversão do binário em string e vice versa. Assim, é interessante avaliar o quão grande será o volume de dados antes de adotá-la.
+
+2 - Enviar os **bytes do arquivo diretamente em uma URL** e os **metadados em outra URL** usando JSON.
+
+Esta abordagem permite não usar o Base64 e trafegar o arquivo direto como um binário. No entanto, requer que se pense em controles para garantir que um arquivo está presente tanto com seus metadados, como o binário em si, já que são duas URLs diferentes e o cliente pode acabar apenas enviando o arquivo e não enviando o binário.
+
+3 - Usar uma requisição HTTP do tipo **multipart/form-data com os bytes do arquivo mais metadados** em uma só requisição.
+
+Esta abordagem é a tecnicamente mais interessante, pois resolve os dois problemas que as técnicas anteriores apresentam.
+
+O uso varia conforme a linguagem de programação e em HTTP, mas em linhas gerais o funcionamento segue abaixo:
+
+Abaixo temos um comando curl (que é um software cliente HTTP via linha de comando)
+```
+curl --location --request POST 'http://api.empresa.com/gestao-arquivos/v1/arquivos' \
+--form 'descricao=Exemplo de Arquivo' \
+--form 'autor=Fulano de Tal' \
+--form 'arquivo=@/C:/imagem.png'
+```
+O curl ou a linguagem de programação que você tiver utilizando converterá em uma requisição HTTP multipart/form-data. Observe que neste formato, uma mesma requisição transporta tipos de conteúdos diferentes, desde o binário do arquivo aos metadados. Observe também como a boundary atua: é um texto usado para definir a fronteira entre os conteúdos, quando um acaba e o outro começa.
+```
+POST http://api.empresa.com/gestao-arquivos/v1/arquivos HTTP/1.1
+Content-Type: multipart/form-data; boundary=---------------------------7d81b517112482 
+Accept-Encoding: gzip, deflate
+Content-Length: 324
+
+-----------------------------7d81b517112482 
+Content-Disposition: form-data; name="arquivo"; filename="C:/imagem.png"
+Content-Type: image/png
+
+[conteudo_do_arquivo_em_formato_binario]
+-----------------------------7d81b517112482
+Content-Disposition: form-data; name="descricao"
+Content-Type: text/plain
+
+Exemplo de Arquivo
+-----------------------------7d81b517112482
+Content-Disposition: form-data; name="autor"
+Content-Type: text/plain
+
+Fulano de Tal
+-----------------------------7d81b517112482--
+```
+
+O resultado no HTTP é sempre o mesmo, no entanto, cada linguagem tem suas próprias características para receber e transformar os conteúdos nesta mensagem HTTP.
+
+Se quiser ver um exemplo em .NET Core para receber e manipular uma requisição com multipart/form-data, consulte este [gist](https://gist.github.com/oliveira-michel/d677ed4ba726bee05b509824f40b6c11).
+
+Também existe a possibilidade de se utilizar multipart/byteranges em conjunto com HTTP 206 e o header Content-Range, indicando que está sendo trabalhado apenas um subconjunto de um documento inteiro. Se você esbarrou na necessidade de trabalhar com este cenário, entre em contato que exploro mais esta parte do guia.
+
+Já para a etapa de baixar um o arquivo já no servidor, não há nenhum segredo: basta expor em uma URL para o cliente fazer o GET nele. Por exemplo:
+
+GET http://api.empresa.com/gestao-arquivos/v1/arquivos/ac627c5032694a81bba844369bc1b410.png
+
+Neste caso, além do tipo de arquivo definido pela extensão, deve-se preencher o header Content-Type com o mime type, no caso: image/png.
+
+## Disponibilização de arquivos gerados em tempo real
+
+Ao contrário do modelo anterior, existem situações em que o arquivo é gerado em tempo real por um processo de negócio e não precisa ser armazenado em um repositório centralizado como no modelo explicado acima.
+
+Ele apenas precisa entregar uma representação diferente do estado do recurso, por exemplo, em PDF.
+
+> É preciso tomar cuidado com este tipo de abordagem, pois aumenta o tempo de uso e processamentos de serviços, gateways etc. que nem sempre são configurados para requisições síncronas com tempo de processamento mais altos.
+
+Vamos ao REST! Com relação à URL, mantém-se o conceito de que é importante buscar ter uma única URL para representar um determinado recurso, logo, como diferenciar **qual é a representação que o cliente espera receber de um recurso?**
+
+Normalmente em sistemas Microsoft, poderíamos informar a extensão do arquivo, no entanto, nem todos os sistemas utilizam extensão. Também poderíamos informar os [número mágicos](https://en.wikipedia.org/wiki/Magic_number_%28programming%29#Magic_numbers_in_files) que estão presentes em alguns tipos de arquivos. Por exemplo, um PNG começa com o hexadecimal 89 50 4E 47, mas nem todos os arquivos têm este padrão.
+
+Assim, na web a definição de tipo mais comum é feita via MIME Type. MIME Type é um texto padronizado que indica o tipo de documento requerido quando ele não é um dos padrões interpretados automaticamente na web. Veja mais sobre MIME Type no site da [Mozilla](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Basico_sobre_HTTP/MIME_types) e os tipos mais comuns [aqui](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types).
+
+Para se definir qual é o MIME Type esperado como resposta, utiliza-se o header **Accept**.
+
+Para ler qual é o MIME Type recebido como resposta, utiliza-se o header **Content-Type**.
+
+O header [Accept](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Headers/Accept) permite múltiplos tipos com pesos devido à sintaxe [quality value](https://developer.mozilla.org/en-US/docs/Glossary/quality_values). Ex:
+
+Se o cliente prefere receber um PDF e, se não for possível, um .doc ou .docx, o header pode ser especificado assim:
+
+Accept: application/pdf;q=0.9, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document;q=0.8
+
+O servidor, ao receber o header Accept, deve verificar se é capaz de retornar o MIME Type solicitado e se for, retorna o binário do arquivo.
+
+Ex:
+
+*Request*
+
+GET http://api.banco.com/contas/00123456/extrato?fromData=2019-01-01&
+
+Accept: application/json
+
+*Response*
+
+```
+{ 
+  "saldo": 102.36,
+  "lancamentos": [
+    {"data": "2019-01-01T10:26Z", "descricao": "Pagamento Boleto", "valor": -23.78},
+    {"data": "2019-01-02T12:00Z", "descricao": "Salário", "valor": 5275.36}
+  ]
+}
+```
+
+*Request*
+
+GET http://api.banco.com/contas/00123456/extrato?fromData=2019-01-01&
+
+Accept: application/pdf
+
+*Response*
+
+```
+[binary-content]
+```
+
+Se quiser ver um exemplo em .NET Core para responder mais de um tipo de MIME Type, consulte este [gist](https://gist.github.com/oliveira-michel/b3ff3face96202a7ba44d6825ffec1a2).
 
 <sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
