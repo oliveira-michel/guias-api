@@ -2184,6 +2184,7 @@ Accept: application/json
 
 *Response*
 
+Content-Type: application/json
 ```
 { 
   "saldo": 102.36,
@@ -2202,6 +2203,7 @@ Accept: application/pdf
 
 *Response*
 
+Content-Type: application/pdf
 ```
 [binary-content]
 ```
