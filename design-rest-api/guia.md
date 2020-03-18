@@ -2208,7 +2208,7 @@ Content-Type: application/pdf
 [binary-content]
 ```
 
-Se quiser ver um exemplo em .NET Core para responder mais de um tipo de MIME Type, consulte este [gist](https://gist.github.com/oliveira-michel/b3ff3face96202a7ba44d6825ffec1a2).
+Se quiser ver um exemplo em .NET Core para responder mais de um tipo de MIME Type, consulte este [gist](https://gist.github.com/oliveira-michel/b3ff3face96202a7ba44d6825ffec1a2). Para ver como se consome uma API que expõe arquivo binário em .NET Core, consulte este [gist](https://gist.github.com/oliveira-michel/0ac3409e4912b2cff5aa92d9e0e63fc7).
 
 <sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
