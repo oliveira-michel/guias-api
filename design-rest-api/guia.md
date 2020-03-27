@@ -1723,7 +1723,13 @@ O cliente pode optar por não chamar mais a API de processamento para verificar 
 
 ## Processamento em lotes
 
-Hoje existem ferramentas que permitem alta performance para atender grandes volumes de requisições online, sem a necessidade de precisar acumular requisições para processar de uma só vez. Quando se fala em REST API, normalmente busca-se este cenário de processamento em tempo real. No entanto, principalmente em REST APIs de uso interno, existem situações onde o processamento é feito em lotes. Neste cenário, pode-se seguir o seguinte padrão:
+Hoje existem ferramentas que permitem alta performance para atender grandes volumes de requisições online, sem a necessidade de precisar acumular requisições para processar de uma só vez. Quando se fala em REST API, normalmente busca-se este cenário de processamento em tempo real. No entanto, principalmente em REST APIs de uso interno, existem situações onde o processamento é feito em lotes.
+
+### URL genérica /batch
+
+Pode-se definir uma URL genérica /batch que processa as chamadas em lote para qualquer URL da sua API.
+
+Neste cenário, pode-se seguir o seguinte padrão:
 
 1.	O cliente define um array de objetos, sendo cada deles um request HTTP declarado com todos os seus componentes (incluindo URL, verbos e headers);
 2.	O cliente submete o array mensagem para o servidor usando o verbo POST para um recurso de API preparado para receber a requisição do passo 1;
@@ -1732,7 +1738,7 @@ Ex:
 
 *Request*
 
-POST .../batch
+POST /batch
 
 Content-Type: application/json
 ```
@@ -1799,6 +1805,26 @@ Content-Type: application/json
    ]
 }
 ```
+
+### URL específica /batch
+
+A principal característica da abordagem anterior é ser genérica para todo o domínio da API. No entanto, às vezes o processamento em lote é para apenas um conjunto de URLs que representa um determinado recurso.
+
+Neste caso, pode-se criar um sub-recurso /batch aninhado com o recurso desejado para receber este tipo de requisição. Ex:
+
+Requisições em lote:
+* POST http://api.meubanco.com/cobranca/v1/boletos/batch (cria, consulta ou apaga n boletos ao mesmo tempo)
+
+Requisições unitárias:
+* POST http://api.meubanco.com/cobranca/v1/boletos (cria 1 boleto)
+* DELETE http://api.meubanco.com/cobranca/v1/boletos/123 (apaga 1 boleto)
+* GET http://api.meubanco.com/cobranca/v1/boletos?vencimento=2020-04 (consulta alguns boletos com um filtro)
+* GET http://api.meubanco.com/cobranca/v1/boletos/123 (consulta 1 boleto)
+
+O payload da requisição em batch segue igual ao do exemplo anterior. Talvez possa não fazer sentido repetir url, method e headers, caso sua primeira implementação de batch faça apenas criações (verbo POST em uma única URL). No entanto, manter a estrutura com todos os atributos permite que a API evolua e possa acrescentar no futuro capacidade de fazer consultas (verbo GET com n URLs diferentes), apagar (verbo DELETE com n URLs diferentes) e edição (verbo PUT/PATCH com n URLs diferentes).
+
+A vantagem de fazer o batch como sub-recurso de um recurso principal é ter um controle mais fino de acesso, token, cotas, throttling, documentação, tamanho do payload etc.
+
 <sub>ir para: [índice](#conte%C3%BAdo)</sub>
 
 ## Recursividade
