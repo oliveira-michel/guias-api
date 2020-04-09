@@ -30,7 +30,7 @@ Apesar de ter buscado por APIs diversas, nenhuma delas optou pelo versionamento 
 
 #### **Foram utilizadas Major somente, Major.Minor e datas**
 
-Em ordem crescente. as empresas preferiram optar por versionar considerando apenas o Major, o Major.Minor e uma minoria com data.
+Em ordem crescente, as empresas preferiram optar por versionar considerando apenas o Major, o Major.Minor e uma minoria com data.
 
 #### **Adotam uma única forma de versionar**
 
