@@ -30,7 +30,7 @@ Apesar de ter buscado por APIs diversas, nenhuma delas optou pelo versionamento 
 
 #### **Foram utilizadas Major somente, Major.Minor e datas**
 
-Em ordem crescente, as empresas preferiram optar por versionar considerando apenas o Major, o Major.Minor e uma minoria com data.
+Em ordem crescente, as empresas preferiram optar por versionar considerando apenas o Major, Major.Minor e uma minoria com data.
 
 #### **Adotam uma única forma de versionar**
 
@@ -42,7 +42,7 @@ Apesar de menos frequente, algumas strings de versionamento endereçam builds re
 
 ### E o Oscar vai para "versão MAJOR na URL"
 
-Quando falamos [versionamento semântico](https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/guia.md#versionamento), alterações em Minor e Path não devem fazer com que quem já consome a versão tenha qualquer problema por quebra de contrato, ou seja, nenhum campo não obrigatório passa a ser obrigatório e nenhum campo é removido. Neste tipo de alteração, são apenas adicionados novos campos ou feitas alterações em metadados. Assim, pequenas evoluções podem ser feitas na API, notificadas aos desenvolvedores, no entanto, sem demandar que atualizações sejam obrigatoriamente feitas nos seus clientes.
+Quando falamos [versionamento semântico](https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/guia.md#versionamento), alterações em Minor e Path não devem fazer com que quem já consome a versão tenha qualquer problema por quebra de contrato, ou seja, nenhum campo não obrigatório passa a ser obrigatório e nenhum campo é removido. Neste tipo de alteração, são apenas adicionados novos campos ou feitas alterações em metadados. Assim, pequenas evoluções podem ser feitas na API e notificadas aos desenvolvedores, no entanto, sem demandar que atualizações sejam obrigatoriamente feitas nos seus clientes.
 
 Entendo que clientes que venham a "quebrar" por conta da adição de novos campos, provavelmente fizeram o consumo da API de forma atípica, pra não falar errada, talvez, processando manualmente o payload e buscando os campos por posição, por exemplo.  Martin Fawler em [TolerantReader](https://martinfowler.com/bliki/TolerantReader.html) reforça conceitos do comportamento que é esperado de um consumidor de serviços.
 
@@ -53,7 +53,7 @@ Outro ponto a ser considerado é que, por mais que não se quebre diretamente o 
 
 ##### - Abordagem 1: versão MAJOR apenas e flexibilidade timing da migração.
 
-No cenário de open banking, por exemplo, e quem que o contrato é definido por uma entidade externa e os clientes e servidores devem respeitá-lo, também seria possível manter o versionamento apenas com a MAJOR na URL.
+No cenário de Open Banking, por exemplo, e quem que o contrato é definido por uma entidade externa e os clientes e servidores devem respeitá-lo, também seria possível manter o versionamento apenas com a MAJOR na URL.
 
 Imagine o cenário de um contrato como o de baixo:
 | Data | Versão | Campos 
@@ -96,13 +96,13 @@ Neste modelo, podemos ter 3 URLs:
 - /cadastros/v1.1/clientes
 - /cadastros/v1.2/clientes
 
-Neste modelo ofereceríamos flexibilidade aos clientes, dado que ele escolhe se prefere trabalhar com a abordagem 1 ou a 2.
+Assim ofereceríamos flexibilidade aos clientes, dado que ele escolhe se prefere trabalhar com a abordagem 1 ou a 2.
 
 Quando o cliente chamar a URL v1, ele sempre trará a **implementação mais recente existente da versão 1**. Logo, o comportamento seria o mesmo da abordagem 1, no entanto, além da v1, o servidor disponibilizaria as v1.0, v1.1 e v1.2 para aqueles clientes que prefiram a segurança de ter um *contrato congelado no tempo*, mas com o trade-off de esperar o servidor implementar a versão.
 
 
 ### Conclusão
 
-Sobre Open Banking, penso no cliente que é um APP e precisará acessar ao mesmo tempo 'n' implementações de bancos diferentes. Acredito que ele prefira a flexibilidade de implementar uma única vez a capacidade de ler a nova versão e colher os benefícios de novos atributos o quanto antes, independente de os seus vários fornecedores de informação já as estarem disponibilizando. Por isso, gosto da abordagem 3, que me parece atender a qualquer um dos cenários.
+Sobre Open Banking, penso no cliente que é um APP e precisará acessar ao mesmo tempo 'n' implementações de bancos diferentes. Acredito que ele prefira a flexibilidade de implementar uma única vez a capacidade de ler a nova versão e colher os benefícios de novos atributos o quanto antes, independente de os seus vários fornecedores de informação já estarem preparados para disponibilizá-las. Por isso, gosto da abordagem 3, que me parece atender a qualquer um dos cenários. Inclusive daquele que optar por aguardar todos os fornecedores disponibilizarem a versão nova.
 
-Sobre os modelos de versionamento, de forma geral, talvez com um número bem maior de APIs, outros insights poderiam ter aparecido, no entanto, não me surpreendeu que após este pequeno o levantamento, não tenha aparecido nada de muito novo, senão o que já é recorrente em guias de boas práticas. Ou seja, já existe uma convergência no mercado para alguns modelos principais.
+Sobre os modelos de versionamento de forma geral, talvez com um número bem maior de APIs, outros insights poderiam ter aparecido, no entanto, não me surpreendeu que após este pequeno o levantamento, não tenha aparecido nada de muito novo, senão o que já é recorrente em guias de boas práticas. Ou seja, já existe uma convergência no mercado para alguns modelos principais.
