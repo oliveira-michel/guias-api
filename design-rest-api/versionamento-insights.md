@@ -21,6 +21,7 @@ No quadro abaixo, listo algumas APIs independente do segmento, idade, qualidade 
 | [BBVA](www.bbvaapimarket.com/documentation/bbva/customers)<br>apis.bbva.com/customers/**v1**/me/globalposition-basic | path parameter | v1
 | [Vimeo](developer.vimeo.com/api/common-formats)<br>api.vimeo.com/videos/174560759/comments<br>Accept: application/vnd.vimeo.user+json;version=3.0 | header | Accept: application/vnd.vimeo.user+json;version=3.0
 | [Google Cloud Datastore](cloud.google.com/datastore/docs/reference/admin/rest)<br>datastore.googleapis.com/**v1**/projects/{projectId}<br>datastore.googleapis.com/**v1beta1**/projects/{projectId} | path parameter | v1
+| [Instagram](https://www.instagram.com/developer/endpoints/)<br>api.instagram.com/**v1**/self/media/recent | path parameter | v1
 
 Com base no quadro acima, podemos observar alguns pontos:
 
@@ -53,7 +54,7 @@ Outro ponto a ser considerado é que, por mais que não se quebre diretamente o 
 
 ##### - Abordagem 1: versão MAJOR apenas e flexibilidade timing da migração.
 
-No cenário de Open Banking, por exemplo, e quem que o contrato é definido por uma entidade externa e os clientes e servidores devem respeitá-lo, também seria possível manter o versionamento apenas com a MAJOR na URL.
+No cenário de Open Banking, por exemplo, em que o contrato é definido por uma entidade externa e os clientes e servidores devem respeitá-lo, também seria possível manter o versionamento apenas com a MAJOR na URL.
 
 Imagine o cenário de um contrato como o de baixo:
 | Data | Versão | Campos 
@@ -71,11 +72,13 @@ Agora, segue um exercício de cliente e servidor implementando em "tempos" difer
 | 09/2020 | /cadastros/v1/clientes | 1.1<br>Lê os campos<br>"nome", "telefone"<br>e implementa leitura opcional do campo "endereco" | 1.1<br>fornece os campos<br>"nome", "telefone" e "endereco" | Cliente passa a receber o "endereço" no momento que o servidor passou a enviar o dado.
 | 12/2020 | /cadastros/v1/clientes | 1.1<br>Lê os campos<br>"nome", "telefone"<br>e implementa leitura opcional do campo "endereco" | 1.2<br>fornece os campos<br>"nome", "telefone", "endereco" e "email" | Servidor fornece todos os campos da nova versão, mas cliente ignora existência do campo "email".
 
-A vantagem desta abordagem é que permite que tanto cliente, quanto servidor possam implementar as versões definidas pela entidade externa, cada um no seu tempo, independentemente se a outra parte da comunicação já o fez.
+A vantagem desta abordagem é que permite que tanto o cliente, quanto servidor possam implementar as versões definidas pela entidade externa, cada um no seu tempo, independentemente se a outra parte da comunicação já o fez.
 
-O que garantirá que as peças "se encaixem" será  o **contrato bem especificado** com **tamanho** máximo, mínimo e **tipo de dado**, **expressão regular** e exemplos, de forma que a implementação em ambos os lados não tragam elementos **surpresa** quando estiver em produção.
+Imagina um app de financiamento de veículos que integraria com centenas de fornecedores bancários, seria desejável esse app poder atualizar a versão do seu software uma única vez quando o Open Banking definir uma nova versão, independentemente to timing de cada um dos fornecedores.
 
-O que garantirá a aderência aos contratos são as ferramentas já fornecidas pelas **disciplinas de testes** e **qualidade de software** já conhecidas pelo mercado.
+O que garantirá que as peças "se encaixem" será  o **contrato bem especificado** com **tamanho** máximo, mínimo, **tipo de dado**, **expressão regular**, exemplos e boas descrições, de forma que a implementação em ambos os lados não tragam elementos **surpresa** quando estiver em produção.
+
+O que garantirá a aderência do software aos contratos são as ferramentas já fornecidas pelas **disciplinas de testes** e **qualidade de software** conhecidas pelo mercado.
 
 ##### - Abordagem 2: versão MAJOR.MINOR e inflexibilidade no timing da migração.
 
@@ -85,11 +88,11 @@ As URLs, neste caso ficariam assim:
 
 - /cadastros/v1.0/clientes
 - /cadastros/v1.1/clientes
-- /cadastros/v.2.1/clientes
+- /cadastros/v2.1/clientes
 
 ##### - Abordagem 3: versão MAJOR ou MAJOR.MINOR e flexibilidade no timing da migração.
 
-Neste modelo, podemos ter 3 URLs:
+Neste modelo, podemos ter 4 URLs:
 
 - /cadastros/v1/clientes
 - /cadastros/v1.0/clientes
