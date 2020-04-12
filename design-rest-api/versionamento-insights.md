@@ -1,6 +1,10 @@
+[//]: # (data-criacao:2020-04-08)
+[//]: # (resumo:Levantamento como as APIs de mercado versionam e reflexão sobre a melhor forma de fazer isso.)
+[//]: # (hashtags:rest)
+[//]: # (#imagem:header-rest-preto.jpg)
 # Insights sobre versionamento de APIs
 
-Neste artigo, faço uma pesquisa sobre como algumas das principais APIs do mercado tratam o assunto versionamento. Para conhecer alguns conceitos básicos sobre versionamento, recomendo primeiro a leitura do capítulo sobre versionamento no [Guia de Design REST](https://github.com/oliveira-michel/guias-api/blob/master/design-rest-api/guia.md#versionamento).
+Neste artigo, faço uma pesquisa sobre como algumas das principais APIs do mercado tratam o assunto versionamento. Para conhecer alguns conceitos básicos sobre versionamento, recomendo primeiro a leitura do capítulo sobre versionamento no [Guia de Design REST](https://oliveira-michel.github.io/artigos/2019/07/11/guia-de-design-rest.htm).
 
 No quadro abaixo, listo algumas APIs independente do segmento, idade, qualidade da modelagem ou aderência ao REST. Observe como cada uma das empresas optou por versionar suas APIs.
 
@@ -57,8 +61,9 @@ Outro ponto a ser considerado é que, por mais que não se quebre diretamente o 
 No cenário de Open Banking, por exemplo, em que o contrato é definido por uma entidade externa e os clientes e servidores devem respeitá-lo, também seria possível manter o versionamento apenas com a MAJOR na URL.
 
 Imagine o cenário de um contrato como o de baixo:
+
 | Data | Versão | Campos 
-| --- | --- | --- 
+| :-- | :-- | :-- 
 | 01/2020 | 1.0 | "nome", "telefone" 
 | 06/2020 | 1.1 | "nome", "telefone", "endereco" 
 | 11/2020 | 1.2 | "nome", "telefone", "endereco", "email"
