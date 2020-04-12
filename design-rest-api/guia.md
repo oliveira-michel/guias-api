@@ -1,4 +1,7 @@
-
+[//]: # (data-criacao:2019-07-11)
+[//]: # (resumo:Guia de referência completo sobre REST APIs com boas práticas de mercado e cenários especiais.)
+[//]: # (hashtags:rest)
+[//]: # (#imagem:header-rest-branco.jpg)
 # Guia de Design REST
 
 ## _Abstract_

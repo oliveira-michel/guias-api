@@ -1,3 +1,7 @@
+[//]: # (data-criacao:2020-01-28)
+[//]: # (resumo:Tutorial ensinando a ir de requisitos de negócio à modelagem básica de REST APIs.)
+[//]: # (hashtags:rest)
+[//]: # (#imagem:header.jpg)
 # Definindo contratos de REST APIs
 
 - [Introdução](#introdução)
