@@ -1,7 +1,7 @@
-[//]: # (data-criacao:2019-07-11)
-[//]: # (resumo:Guia de referência completo sobre REST APIs com boas práticas de mercado e cenários especiais.)
+[//]: # (data-criacao:2020-02-10)
+[//]: # (resumo:Guia Visual com visão geral dos conceitos de REST APIs.)
 [//]: # (hashtags:rest)
-[//]: # (#imagem:header-rest-branco.jpg)
+[//]: # (#imagem:00-capa.png)
 # Rest API Básico - Guia Visual
 
 Até agora já escrevi dois guias sobre REST APIs e ambos focados no contrato e modelagem das APIs:
