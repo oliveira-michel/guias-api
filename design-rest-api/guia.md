@@ -47,6 +47,9 @@ Este é um documento "vivo" em que o autor está atualizando com a experiência 
 		- [PUT](#request--verbs--put)
 		- [PATCH](#request--verbs--patch)
 		- [DELETE](#request--verbs--delete)
+		- [HEAD](#request--verbs--head)
+		- [OPTIONS](#request--verbs--options)
+		- [TRACE](#request--verbs--trace)
 	- [Body](#request--body)
 - [Response](#response)
 	- [Headers](#response--headers)
@@ -543,9 +546,14 @@ Existem vários verbos HTTP ([rfc2616](https://tools.ietf.org/html/rfc2616)), ma
 - PUT: para atualizações completas de um recurso.
 - PATCH: para atualizações parciais de um recurso.
 
-Os verbos são usados na requisição em conjunto com a URL e às vezes com um [Body](#request--body), como nos casos de inserção ou atualização.
+Os verbos são usados na requisição em conjunto com a URL e às vezes com um [Body](#request-body), como nos casos de inserção ou atualização.
 
-Existem também outros verbos como OPTIONS, HEAD e TRACE que raramente são utilizados. Vale a leitura da função desses métodos [aqui](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Methods).
+Existem também outros verbos que são usados com menos frequência. São eles:
+- HEAD: para obtenção dos headers de um recurso sem o body.
+- OPTIONS: para obtenção da lista de verbos permitidos em um recurso.
+- TRACE: funciona como loopback, retornando a mensagem recebida, útil para debug.
+
+Vale a leitura da função completa desses métodos do HTTP [aqui](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Methods).
 
 #### Idempotência e Segurança
 
@@ -556,13 +564,18 @@ Os verbos têm características importantes que devem ser conhecidas e respeitad
 
 A tabela abaixo exibe a relação entre Verbo HTTP e os conceitos de Idempotência e método Seguro:
  
-| Verbo | Idempotente | Seguro |
-| --- | --- | --- |
-|GET|Sim|Sim|
-|PUT|Sim|Não|
-|DELETE|Sim|Não|
-|POST|Não|Não|
-|PATCH|Sim|Não|
+| Verbo | Idempotente | Seguro | Body na Requisição | Body na Resposta com Sucesso |
+| --- | --- | --- | --- | --- |
+|GET|Sim|Sim|Não|Sim|
+|PUT|Sim|Não|Sim/Opcional|Sim/Opcional|
+|DELETE|Sim|Não|Sim/Opcional|Sim/Opcional|
+|POST|Não|Não|Sim/Opcional|Sim/Opcional|
+|PATCH|Sim|Não|Sim|Sim/Opcional|
+|HEAD|Sim|Sim|Não|Não|
+|OPTIONS|Sim|Sim|Não|Não¹|
+|TRACE|Sim|Sim¹|Não|Não|
+
+*¹ Algumas características, foram ajustadas em relação às [RFC](https://tools.ietf.org/html/rfc7231#section-4.3) do HTTP para refletir comportamentos que façam sentido no REST.*
 
 É importante escolher o verbo correto conforme estas características ao definir uma API, assim como codificar a API respeitando estas regras. Parta do princípio que o cliente da sua API sabe que, por exemplo, o GET é idempotente e seguro. Por isso, ele não vai hesitar em implementar re-tentativas em caso de insucesso na chamada.
 Se ao codificar a API, o desenvolvedor da API codificar um GET que não seja seguro ou idempotente, o cliente não terá o comportamento esperado.
@@ -659,6 +672,67 @@ Apaga todas as cidades do estado de São Paulo.
 Apaga a cidade de Sorocaba.
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [response body](#response--body)</sub>
+
+### Request > Verbs > HEAD
+
+O verbo **HEAD** trabalha como um GET, no entanto, o retorno não traz o body. Pode ser usado para apenas verificar a existência de um recurso que tenha um payload muito grande e economizar largura de banda, por exemplo.
+
+Ex:
+Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}
+- **HEAD** http://api.exemplo.com/estados/sp/cidades/sorocaba<br>
+Retorna um HTTP 200 sem body, caso a cidade Sorocaba exista; retorna um 404, caso a cidade Sorocaba não exista; assim como seria o retorno de um GET nesta rota.
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [response body](#response-body)</sub>
+
+### Request > Verbs > OPTIONS
+
+O verbo **OPTIONS** retorna um header `Allow` contendo a listagem de verbos disponíveis para interagir com um determinado recurso.
+
+Ex:
+Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade} e supondo que estão implementados o OPTIONS, GET e POST.
+- **OPTIONS** http://api.exemplo.com/estados/sp/cidades/sorocaba<br>
+Retorna o header `Allow: OPTIONS, GET, POST`.
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [response body](#response-body)</sub>
+
+### Request > Verbs > TRACE
+
+O verbo **TRACE** é utilizado para DEBUG, pois retorna o mesmo conteúdo que foi enviado na requisição. Desta forma, podemos verificar se da requisição até a resposta alguma camada alterou alguma coisa que pode estar causando mau funcionamento.
+
+Por exemplo, parâmetros como querystrings podem mudar de posição, headers podem ser adicionados ou removidos etc.
+
+O servidor deve responder à requisição de um TRACE com um HTTP 200 Ok, um `Content-Type: message/http` e repetir de volta os parâmetros recebidos.
+
+O servidor que recebe a requisição não deve agregar novos headers na resposta como tokens, por exemplo, e por segurança deve remover headers com informações sensíveis que possam ter sido adicionados por outras camadas da comunicação.
+
+O cliente pode enviar um header `Max-Forwards` e cada camada que recebe este header deve subtrair 1 do valor do header até que se chegue a zero. Quando isso acontecer, o servidor deve responder com um HTTP 483 Too Many Hops. Esta abordagem é útil para identificar, por exemplo, loops infinitos na cadeia de chamadas em uma requisição.
+
+Ex:
+Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades
+
+*Request*
+
+**TRACE** http://api.exemplo.com/estados/sp/cidades<br>
+`x-header-Teste: 123`
+```
+{"nome": "Guarulhos"}
+```
+
+*Response*
+
+HTTP 200 Ok
+
+`Content-Type: message/http`
+
+`x-header-Teste: 123`
+
+```
+{"nome": "Guarulhos"}
+```
+
+Retorna o header `Allow: OPTIONS, GET, POST`.
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [response body](#response-body)</sub>
 
 ### Request > Body
 
@@ -1450,6 +1524,8 @@ Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não ex
 - **428 Precondition Required**: O servidor exige que a requisição seja condicional usando um dos headers disponíveis para isso. Caso o a condição falhe, devolve-se um **412 Precondition Failed**. Conheça mais sobre este tipo de requisição [aqui](https://developer.mozilla.org/en-US/docs/Web/HTTP/Conditional_requests) e [aqui](#performance-cache-e-compress%C3%A3o).
 
 - **429 Too Many Requests**: Informa ao cliente que ele excedeu o limite permitido de requisições. Leia sobre [segurança](#seguran%C3%A7a) para entender mais sobre este código de retorno.
+
+- **483 Too Many Hops**: Ao se fazer uma requisição com um verbo TRACE, por exemplo, e informar o header `Max-Forwards` espera-se que a requisição seja encaminhada na cadeia de camadas de comunicação até o limite máximo definido no 'Max-Forwards'. Quando este limite é atingido, o erro 483 é lançado como resposta.
 
 **Grupo 5xx**
 
