@@ -18,66 +18,84 @@ Este é um documento "vivo" em que o autor está atualizando com a experiência 
 
 ## Conteúdo
 
-- [Introdução e conceitos básicos](#introdução-e-conceitos-básicos)
-- [Request](#request)
-	- [URL](#request--url)
-		- [Base](#request--url--base)
-		- [Resources](#request--url--resources)
-			- [Funções que não são CRUD](#request--url--resources--fun%C3%A7%C3%B5es-que-n%C3%A3o-s%C3%A3o-crud)
-		- [Domínios Funcionais](#request--url--resources--dom%C3%ADnios-funcionais)
-		- [Path Parameters](#request--url--resources--path-parameters)
-		- [Query Strings](#request--url--query-strings)
-			- [Full text search](#request--url--query-strings--full-text-search)
-			- [Paginação](#request--url--query-strings--pagina%C3%A7%C3%A3o)
-				- [Range](#request--url--query-strings--pagina%C3%A7%C3%A3o--range)
-				- [Page e Limit](#request--url--query-strings--pagina%C3%A7%C3%A3o--page-e-limit)
-				- [Top](#request--url--query-strings--pagina%C3%A7%C3%A3o--top)
-			- [Ordenação](#request--url--query-strings--ordena%C3%A7%C3%A3o)
-			- [Fields](#request--url--query-strings--fields)
-			- [Views](#request--url--query-strings--views)
-			- [Expand](#request--url--query-strings--expand)
-		- [Alias](#request--url--alias)
-	- [Headers](#request--headers)
-		- [Content-Type](#request--headers--content-type)
-		- [Accept](#request--headers--accept)
-		- [Correlation ID](#request--headers--correlation-id)
-	- [Verbs](#request--verbs)
-		- [GET](#request--verbs--get)
-		- [POST](#request--verbs--post)
-		- [PUT](#request--verbs--put)
-		- [PATCH](#request--verbs--patch)
-		- [DELETE](#request--verbs--delete)
-	- [Body](#request--body)
-- [Response](#response)
-	- [Headers](#response--headers)
-		- [Content-Type](#response--headers--content-type)
-		- [Content-Location](#response--headers--content-location)
-		- [Location](#response--headers--location)
-	- [Body](#response--body)
-		- [Envelope "Data"](#response--body--envelope-data)
-		- [Recurso unitário, array ou nenhum](#response--body--recurso-unit%C3%A1rio-array-ou-nenhum)
-		- [Full text search](#response--body--full-text-search)
-		- [Paginação](#response--body--pagina%C3%A7%C3%A3o)
-			- [Range](#response--body--pagina%C3%A7%C3%A3o--range)
-			- [Page e Limit](#response--body--pagina%C3%A7%C3%A3o--page-e-limit)
-			- [Top](#response--body--pagina%C3%A7%C3%A3o--top)
-		- [Ordenação](#response--body--ordena%C3%A7%C3%A3o)
-		- [Fields](#response--body--fields)
-		- [Views](#response--body--views)
-		- [Expand](#response--body--expand)
-		- [Errors e Warnings](#response--body--errors-e-warnings)
-		- [HATEOAS](#response--body--hateoas)
-	- [HTTP Status Code](#response--http-status-codes)
-	- [Exemplos de uso dos HTTP Status Codes](#response--exemplos-de-uso-dos-http-status-codes)
-- [Tipos de dados](#tipos-de-dados)
-- [Processamento assíncrono](#processamento-ass%C3%ADncrono)
-- [Processamento em lotes](#processamento-em-lotes)
-- [Recursividade](#recursividade)
-- [Versionamento](#versionamento)
-- [Transferência de arquivos](#transfer%C3%AAncia-de-arquivos)
-- [Segurança](#seguran%C3%A7a)
-- [Performance, Cache e compressão](#performance-cache-e-compress%C3%A3o)
-- [Palavras Finais](#palavras-finais)
+- [Guia de Design REST](#guia-de-design-rest)
+  - [_Abstract_](#abstract)
+  - [_Status of this document_](#status-of-this-document)
+  - [Conteúdo](#conteúdo)
+  - [Introdução e conceitos básicos](#introdução-e-conceitos-básicos)
+  - [Request](#request)
+    - [Request > URL](#request--url)
+    - [Request > URL > Base](#request--url--base)
+    - [Request > URL > Resources](#request--url--resources)
+    - [Request > URL > Resources > Funções que não são CRUD](#request--url--resources--funções-que-não-são-crud)
+    - [Request > URL > Resources > Domínios Funcionais](#request--url--resources--domínios-funcionais)
+    - [Request > URL > Resources > Path Parameters](#request--url--resources--path-parameters)
+    - [Request > URL > Query Strings](#request--url--query-strings)
+    - [Request > URL > Query Strings > Full text search](#request--url--query-strings--full-text-search)
+    - [Request > URL > Query Strings > Paginação](#request--url--query-strings--paginação)
+    - [Request > URL > Query Strings > Paginação > Range](#request--url--query-strings--paginação--range)
+    - [Request > URL > Query Strings > Paginação > Page e Limit](#request--url--query-strings--paginação--page-e-limit)
+    - [Request > URL > Query Strings > Paginação > Top](#request--url--query-strings--paginação--top)
+    - [Request > URL > Query Strings > Ordenação](#request--url--query-strings--ordenação)
+    - [Request > URL > Query Strings > Fields](#request--url--query-strings--fields)
+    - [Request > URL > Query Strings > Views](#request--url--query-strings--views)
+    - [Request > URL > Query Strings > Expand](#request--url--query-strings--expand)
+    - [Request > URL > Alias](#request--url--alias)
+    - [Request > Headers](#request--headers)
+    - [Request > Headers > Content-Type](#request--headers--content-type)
+    - [Request > Headers > Accept](#request--headers--accept)
+    - [Request > Headers > Correlation ID](#request--headers--correlation-id)
+    - [Request > Verbs](#request--verbs)
+      - [Idempotência e Segurança](#idempotência-e-segurança)
+    - [Request > Verbs > GET](#request--verbs--get)
+    - [Request > Verbs > POST](#request--verbs--post)
+    - [Request > Verbs > PUT](#request--verbs--put)
+    - [Request > Verbs > PATCH](#request--verbs--patch)
+    - [Request > Verbs > DELETE](#request--verbs--delete)
+    - [Request > Body](#request--body)
+  - [Response](#response)
+    - [Response > Headers](#response--headers)
+    - [Response > Headers > Content-Type](#response--headers--content-type)
+    - [Response > Headers > Content-Location](#response--headers--content-location)
+    - [Response > Headers > Location](#response--headers--location)
+    - [Response > Body](#response--body)
+    - [Response > Body > Envelope "Data"](#response--body--envelope-data)
+    - [Response > Body > Recurso unitário, array ou nenhum](#response--body--recurso-unitário-array-ou-nenhum)
+    - [Response > Body > Full text search](#response--body--full-text-search)
+    - [Response > Body > Paginação](#response--body--paginação)
+      - [Response > Body > Paginação > Range](#response--body--paginação--range)
+      - [Response > Body > Paginação > Page e Limit](#response--body--paginação--page-e-limit)
+      - [Response > Body > Paginação > Top](#response--body--paginação--top)
+    - [Response > Body > Ordenação](#response--body--ordenação)
+    - [Response > Body > Fields](#response--body--fields)
+    - [Response > Body > Views](#response--body--views)
+    - [Response > Body > Expand](#response--body--expand)
+    - [Response > Body > Errors e Warnings](#response--body--errors-e-warnings)
+      - [Errors](#errors)
+      - [Warnings](#warnings)
+    - [Response > Body > HATEOAS](#response--body--hateoas)
+    - [Response > HTTP Status Codes](#response--http-status-codes)
+    - [Response > Exemplos de uso dos HTTP Status Codes](#response--exemplos-de-uso-dos-http-status-codes)
+  - [Tipos de dados](#tipos-de-dados)
+  - [Processamento Assíncrono](#processamento-assíncrono)
+      - [Callbacks (Webhooks)](#callbacks-webhooks)
+  - [Processamento em lotes](#processamento-em-lotes)
+    - [URL genérica /batch](#url-genérica-batch)
+    - [URL específica /batch](#url-específica-batch)
+  - [Recursividade](#recursividade)
+    - [Solução](#solução)
+  - [Versionamento](#versionamento)
+      - [Versionamento pelo host](#versionamento-pelo-host)
+      - [Versionamento pela query string](#versionamento-pela-query-string)
+      - [Versionamento pelo Content-Type (com o header Accept)](#versionamento-pelo-content-type-com-o-header-accept)
+      - [Versionamento por header customizado](#versionamento-por-header-customizado)
+      - [Versionamento pelo Path (Resources)](#versionamento-pelo-path-resources)
+  - [Transferência de arquivos](#transferência-de-arquivos)
+  - [URL (recurso) dedicado para exposição de arquivos](#url-recurso-dedicado-para-exposição-de-arquivos)
+  - [Disponibilização de arquivos gerados em tempo real](#disponibilização-de-arquivos-gerados-em-tempo-real)
+  - [Segurança](#segurança)
+  - [Performance, Cache e compressão](#performance-cache-e-compressão)
+  - [Palavras finais](#palavras-finais)
 
 ## Introdução e conceitos básicos
 
@@ -753,9 +771,17 @@ Obs: Este header não é utilizado no DELETE, pois não é enviado no body de re
 
 ### Response > Headers > Content-Location
 
-O header **Content-Location** expõe a URL relativa (somente dos recursos para frente) ou absoluta (desde o início incluindo o Base Path) que expõe um determinado recurso.
+O header **Content-Location** expõe a URL relativa (somente dos recursos para frente) ou absoluta (desde o início incluindo o Base Path) que expõe um determinado recurso. Na maioria das vezes informa o própria URL que está sendo chamada.
 
-Quando uma requisição é feita com o verbo POST, por exemplo, o cliente ainda não sabe o Id do recurso que ele está criando: muitas vezes são identificadores gerados no momento da gravação. Assim, quando o servidor retorna a resposta, além de preencher a propriedade id no body da requisição, deve-se preencher o header Content-Location.
+Ex: **Content-Location**: http://api.exemplo.com/contas/v1/tarefas/1
+
+Obs: Não é utilizado em DELETE de um recurso com ID, pois depois de um DELETE com sucesso, não existe mais o conteúdo.
+
+<sub>ir para: [índice](#conte%C3%BAdo)</sub>
+
+### Response > Headers > Location 
+
+O header Location expõe a URL relativa (somente dos recursos para frente) ou absoluta (desde o início incluindo o Base Path) que expõe **outra** localização para um determinado recurso. Normalmente é utilizado em processamento assíncrono ou como retorno de um POST quando um novo recurso foi criado. Quando uma requisição é feita com o verbo POST, por exemplo, o cliente ainda não sabe o Id do recurso que ele está criando porque muitas vezes são identificadores gerados no momento da gravação. Assim, quando o servidor retorna a resposta, além de preencher a propriedade id no body da requisição, deve-se preencher o header Location.
 
 Ex:
 
@@ -774,7 +800,7 @@ POST http://api.exemplo.com/estados/sp/cidades/
 
 HTTP/1.1 201 Created
 
-**Content-Location**: http://api.exemplo.com/estados/sp/cidades/saovic001
+**Location**: http://api.exemplo.com/estados/sp/cidades/saovic001
 ```
 {
    "id": "saovic001",
@@ -784,15 +810,6 @@ HTTP/1.1 201 Created
    "populacao": 355542
 }
 ```
-Obs: Não utilizado no DELETE, pois depois de um DELETE com sucesso, não existe mais o conteúdo.
-
-<sub>ir para: [índice](#conte%C3%BAdo)</sub>
-
-### Response > Headers > Location 
-
-O header Location expõe a URL relativa (somente dos recursos para frente) ou absoluta (desde o início incluindo o Base Path) que expõe **outra** localização para um determinado recurso. Normalmente é utilizado em processamento assíncrono.
-
-Ex: **Location**: http://api.exemplo.com/contas/v1/tarefas/1
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [processamento assíncrono](#processamento-ass%C3%ADncrono)</sub>
 
