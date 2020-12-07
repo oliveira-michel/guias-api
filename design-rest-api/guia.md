@@ -52,6 +52,9 @@ Este é um documento "vivo" em que o autor está atualizando com a experiência 
     - [Request > Verbs > PUT](#request--verbs--put)
     - [Request > Verbs > PATCH](#request--verbs--patch)
     - [Request > Verbs > DELETE](#request--verbs--delete)
+    - [Request > Verbs > HEAD](#request--verbs--head)
+    - [Request > Verbs > OPTIONS](#request--verbs--options)
+    - [Request > Verbs > TRACE](#request--verbs--trace)
     - [Request > Body](#request--body)
   - [Response](#response)
     - [Response > Headers](#response--headers)
@@ -227,7 +230,7 @@ No entanto, existem alguns cenários em que não temos "entidades" de um domíni
 
 Para estes casos, tratamos essas funções como recursos e para facilitar a identificação de que não é uma "entidade", usamos verbos no lugar dos substantivos.
 Ex:
-- GET .../**calcular-distancia**?fromLatitude=48,8584&fromLongitude=2,2945&toLatitude=-22.951916&toLongitude=-43.2104872
+- GET .../**calcular-distancia**?latitude.gte=48,8584&longitude.gte=2,2945&latitude.lte=-22.951916&longitude.lte=-43.2104872
 - POST .../**validar-cartao**
 
 ```
@@ -313,7 +316,7 @@ Os filtros aplicados podem tratar diversas situaçoes e é importante convencion
 | ------------ | -------- | --------- |
 |Numérico, Data e Booleano|Igualdade|Retorna aqueles recursos cujo valor do atributo tenha exatamente o valor especificado. Ex: ...?quantidade=5 devolverá aqueles recursos cujo atributo "quantidade" tenha o valor 5.|
 |Numérico, Data e Booleano|Ou|Retorna aqueles recursos cujo valor do atributo esteja contido em uma lista de valores. Ex: ...?quantidade=5&quantidade=9&quantidade=12 retornará aqueles recursos cujo atributo quantidade seja 5, 9 ou 12.|
-|Numérico e Data|Maior ou Igual|Retorna aqueles recursos cujo valor do atributo seja maior ou igual o valor definido em “fromQuantidade” e menor ou igual o valor definido em "toQuantidade". Ex: ...?fromQuantidade=5 retornará os recursos com quantidade maior ou igual a 5. Consulte também [Ranges](#ranges).|
+|Numérico e Data|Maior ou Igual|Retorna aqueles recursos cujo valor do atributo seja maior ou igual o valor definido em “quantidade.gte” e menor ou igual o valor definido em "quantidade.lte". Ex: ...?quantidade.gte=5 retornará os recursos com quantidade maior ou igual a 5. Consulte também [Ranges](#request--url--query-strings--pagina%C3%A7%C3%A3o--range).|
 |Texto|Contém|Retorna aqueles recursos cujo valor do atributo contenha o valor especificado. Ex: …?nome=Frederico retornará aqueles recursos que contenham “Frederico” no atributo nome. São retornos válidos válidos: “Frederico Garcia”, “Don Frederico”, “Frederico”.|
 |Texto|Ou Contém|Retorna aqueles recursos cujo valor do atributo contenha um dos valores especificados. Ex: nome=Frederico&nome=Antonio retornará aqueles recursos que contenham “Frederico” ou "Antonio" no atributo nome. São retornos válidos válidos: “Frederico Antonio”, “Don Frederico”, “Frederico”, “Antonio Ramirez”.|
 
@@ -352,15 +355,15 @@ Existem algumas formas de definir exatamente qual "bloco de informação" consul
 
 Podemos delimitar a quantidade de resultados à partir da filtragem de um determinado parâmetro, por exemplo, se o parâmetro for **dataNascimento**, a chamada à uma API ficaria assim:
 
-http://api.empresarh.com/candidatos?fromDataNascimento=1985-01-01&toDataNascimento=2001-12-31
+http://api.empresarh.com/candidatos?dataNascimento.gte=1985-01-01&dataNascimento.lte=2001-12-31
 
 Para atuar como um cursor e filtrar um range de IDs, a chamada ficaria assim:
 
-http://api.empresarh.com/candidatos?fromId=1000&toId=1099
+http://api.empresarh.com/candidatos?id.gte=1000&id.lte=1099
 
 É uma boa prática adotar padrões para definir a estrutura do parâmetro que trata ranges, como sugestão:
-- **"from" + nomeDoAtributo**
-- **"to" + nomeDoAtributo**
+- **nomeDoAtributo + "." + gte | gt** (greater then or equal | greater than )
+- **nomeDoAtributo + "." + lte | lt** (less then or equal | less than)
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [response  range](#response--body--pagina%C3%A7%C3%A3o--range)</sub>
 ### Request > URL > Query Strings > Paginação > Page e Limit
@@ -561,9 +564,14 @@ Existem vários verbos HTTP ([rfc2616](https://tools.ietf.org/html/rfc2616)), ma
 - PUT: para atualizações completas de um recurso.
 - PATCH: para atualizações parciais de um recurso.
 
-Os verbos são usados na requisição em conjunto com a URL e às vezes com um [Body](#request--body), como nos casos de inserção ou atualização.
+Os verbos são usados na requisição em conjunto com a URL e às vezes com um [Body](#request-body), como nos casos de inserção ou atualização.
 
-Existem também outros verbos como OPTIONS, HEAD e TRACE que raramente são utilizados. Vale a leitura da função desses métodos [aqui](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Methods).
+Existem também outros verbos que são usados com menos frequência. São eles:
+- HEAD: para obtenção dos headers de um recurso sem o body.
+- OPTIONS: para obtenção da lista de verbos permitidos em um recurso.
+- TRACE: funciona como loopback, retornando a mensagem recebida, útil para debug.
+
+Vale a leitura da função completa desses métodos do HTTP [aqui](https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Methods).
 
 #### Idempotência e Segurança
 
@@ -574,13 +582,18 @@ Os verbos têm características importantes que devem ser conhecidas e respeitad
 
 A tabela abaixo exibe a relação entre Verbo HTTP e os conceitos de Idempotência e método Seguro:
  
-| Verbo | Idempotente | Seguro |
-| --- | --- | --- |
-|GET|Sim|Sim|
-|PUT|Sim|Não|
-|DELETE|Sim|Não|
-|POST|Não|Não|
-|PATCH|Sim|Não|
+| Verbo | Idempotente | Seguro | Body na Requisição | Body na Resposta com Sucesso |
+| --- | --- | --- | --- | --- |
+|GET|Sim|Sim|Não|Sim|
+|PUT|Sim|Não|Sim/Opcional|Sim/Opcional|
+|DELETE|Sim|Não|Sim/Opcional|Sim/Opcional|
+|POST|Não|Não|Sim/Opcional|Sim/Opcional|
+|PATCH|Sim|Não|Sim|Sim/Opcional|
+|HEAD|Sim|Sim|Não|Não|
+|OPTIONS|Sim|Sim|Não|Não¹|
+|TRACE|Sim|Sim¹|Não|Não|
+
+*¹ Algumas características, foram ajustadas em relação às [RFC](https://tools.ietf.org/html/rfc7231#section-4.3) do HTTP para refletir comportamentos que façam sentido no REST.*
 
 É importante escolher o verbo correto conforme estas características ao definir uma API, assim como codificar a API respeitando estas regras. Parta do princípio que o cliente da sua API sabe que, por exemplo, o GET é idempotente e seguro. Por isso, ele não vai hesitar em implementar re-tentativas em caso de insucesso na chamada.
 Se ao codificar a API, o desenvolvedor da API codificar um GET que não seja seguro ou idempotente, o cliente não terá o comportamento esperado.
@@ -593,7 +606,7 @@ Exemplo de utilização de GET para fazer uma consulta por cidades no estado de 
 
 Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades
 
-**GET** http://api.exemplo.com/estados/sp/cidades?fromPopulacao=20000
+**GET** http://api.exemplo.com/estados/sp/cidades?populacao.gte=20000
 
 Exemplo de utilização de GET para fazer uma consulta pela cidade de Santos:
 
@@ -669,7 +682,7 @@ Caso a requisição seja em um recurso específico, o recurso será deletado, ca
 
 Ex:
 Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}
-- **DELETE** http://api.exemplo.com/estados/sp/cidades?toPopulacao=5000<br>
+- **DELETE** http://api.exemplo.com/estados/sp/cidades?populacao.lte=5000<br>
 Apaga todas as cidades com população até 5000 habitantes.
 - **DELETE** http://api.exemplo.com/estados/sp/cidades<br>
 Apaga todas as cidades do estado de São Paulo.
@@ -677,6 +690,67 @@ Apaga todas as cidades do estado de São Paulo.
 Apaga a cidade de Sorocaba.
 
 <sub>ir para: [índice](#conte%C3%BAdo) | [response body](#response--body)</sub>
+
+### Request > Verbs > HEAD
+
+O verbo **HEAD** trabalha como um GET, no entanto, o retorno não traz o body. Pode ser usado para apenas verificar a existência de um recurso que tenha um payload muito grande e economizar largura de banda, por exemplo.
+
+Ex:
+Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade}
+- **HEAD** http://api.exemplo.com/estados/sp/cidades/sorocaba<br>
+Retorna um HTTP 200 sem body, caso a cidade Sorocaba exista; retorna um 404, caso a cidade Sorocaba não exista; assim como seria o retorno de um GET nesta rota.
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [response body](#response-body)</sub>
+
+### Request > Verbs > OPTIONS
+
+O verbo **OPTIONS** retorna um header `Allow` contendo a listagem de verbos disponíveis para interagir com um determinado recurso.
+
+Ex:
+Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades/{idCidade} e supondo que estão implementados o OPTIONS, GET e POST.
+- **OPTIONS** http://api.exemplo.com/estados/sp/cidades/sorocaba<br>
+Retorna o header `Allow: OPTIONS, GET, POST`.
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [response body](#response-body)</sub>
+
+### Request > Verbs > TRACE
+
+O verbo **TRACE** é utilizado para DEBUG, pois retorna o mesmo conteúdo que foi enviado na requisição. Desta forma, podemos verificar se da requisição até a resposta alguma camada alterou alguma coisa que pode estar causando mau funcionamento.
+
+Por exemplo, parâmetros como querystrings podem mudar de posição, headers podem ser adicionados ou removidos etc.
+
+O servidor deve responder à requisição de um TRACE com um HTTP 200 Ok, um `Content-Type: message/http` e repetir de volta os parâmetros recebidos.
+
+O servidor que recebe a requisição não deve agregar novos headers na resposta como tokens, por exemplo, e por segurança deve remover headers com informações sensíveis que possam ter sido adicionados por outras camadas da comunicação.
+
+O cliente pode enviar um header `Max-Forwards` e cada camada que recebe este header deve subtrair 1 do valor do header até que se chegue a zero. Quando isso acontecer, o servidor deve responder com um HTTP 483 Too Many Hops. Esta abordagem é útil para identificar, por exemplo, loops infinitos na cadeia de chamadas em uma requisição.
+
+Ex:
+Com a URL com o formato http://api.exemplo.com/estados/{idEstado}/cidades
+
+*Request*
+
+**TRACE** http://api.exemplo.com/estados/sp/cidades<br>
+`x-header-Teste: 123`
+```
+{"nome": "Guarulhos"}
+```
+
+*Response*
+
+HTTP 200 Ok
+
+`Content-Type: message/http`
+
+`x-header-Teste: 123`
+
+```
+{"nome": "Guarulhos"}
+```
+
+Retorna o header `Allow: OPTIONS, GET, POST`.
+
+<sub>ir para: [índice](#conte%C3%BAdo) | [response body](#response-body)</sub>
 
 ### Request > Body
 
@@ -887,7 +961,7 @@ Quando se faz uma requisição sem o ID, filtrando apenas com Query Strings, pod
 
 *Request*
 
-GET .../pessoas?fromData=2019-06-01
+GET .../pessoas?data.gte=2019-06-01
 
 *Response*
 
@@ -977,7 +1051,7 @@ Existem algumas técnicas diferentes para fazer a paginação. Serão explicadas
 
 Uma das formas de se limitar a quantidade de registros retornados é através de um filtro em algum atributo que represente um intervalo. Assim, quando se recebe um filtro nas Query Strings, deve-se retornar o resultado respeitando os critérios do filtro.
 
-Por exemplo, em uma requisição GET .../...?fromId=3&toId=6, possuindo o banco de dados uma coleção de 8 registros, e os ids sendo sequenciais, o retorno devem ser os registros 3, 4, 5 e 6:
+Por exemplo, em uma requisição GET .../...?id.gte=3&id.lte=6, possuindo o banco de dados uma coleção de 8 registros, e os ids sendo sequenciais, o retorno devem ser os registros 3, 4, 5 e 6:
 ```
 {
    "data": [
@@ -1468,6 +1542,8 @@ Ex: PUT .../cartoes/123 devolve 404, caso o recurso cartão com id = 123 não ex
 
 - **429 Too Many Requests**: Informa ao cliente que ele excedeu o limite permitido de requisições. Leia sobre [segurança](#seguran%C3%A7a) para entender mais sobre este código de retorno.
 
+- **483 Too Many Hops**: Ao se fazer uma requisição com um verbo TRACE, por exemplo, e informar o header `Max-Forwards` espera-se que a requisição seja encaminhada na cadeia de camadas de comunicação até o limite máximo definido no 'Max-Forwards'. Quando este limite é atingido, o erro 483 é lançado como resposta.
+
 **Grupo 5xx**
 
 São códigos que retornam erros que aconteceram por culpa do servidor. Ou seja, a requisição foi feita corretamente pelo cliente, porém ocorreu um erro no servidor. São eles:
@@ -1502,7 +1578,7 @@ Abaixo, seguem alguns dos diversos cenários de requisições e os principais ti
 	- Resposta HTTP 200 Ok com um array com as cidades Santos e São Vicente.
 - **GET .../paises/55/estados/11/cidades?nome=Belo%20Horizonte**
 	- Resposta HTTP 200 Ok com um array com a cidade Belo Horitonte. Repare que o retorno é um array, pois a busca foi feita via query strings, não via ID (path parameter) em que teríamos a certeza de que o retorno é de uma só entidade. Quando a busca vem via query strings, podemos ter cenários em que pode vir mais de um item no retorno e, mesmo que a situação atual da API retorne apenas 1 item, é melhor manter o comportamento de retornar array, pois no futuro é possível adicionar novas query strings que poderão alterar a quantidade de resultados.
-- **GET .../paises/55/estados/11/cidades?fromPopulacao=30000**
+- **GET .../paises/55/estados/11/cidades?populacao.gte=30000**
 	- Resposta HTTP 200 Ok com um array com a cidade Belo Horitonte. E o retorno é um array como já explicado acima.
 - **POST .../paises/55/estados/11/cidades**
 	- Resposta HTTP 201 Created, registrando uma nova cidade no banco de dados.
@@ -2270,7 +2346,7 @@ Ex:
 
 *Request*
 
-GET http://api.banco.com/contas/00123456/extrato?fromData=2019-01-01&
+GET http://api.banco.com/contas/00123456/extrato?data.gte=2019-01-01
 
 Accept: application/json
 
@@ -2289,7 +2365,7 @@ Content-Type: application/json
 
 *Request*
 
-GET http://api.banco.com/contas/00123456/extrato?fromData=2019-01-01&
+GET http://api.banco.com/contas/00123456/extrato?data.gte=2019-01-01
 
 Accept: application/pdf
 
