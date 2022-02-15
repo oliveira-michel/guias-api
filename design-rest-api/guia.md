@@ -270,7 +270,7 @@ Nos caso acima, o Banco BBVA agrupa todos os recursos referentes ao assunto "car
 
 A mesma abordagem de agrupamento provavelmente será útil para APIs expostas apenas internamente nas empresas para integrações entre diferentes sistemas. Isso porque definir um recurso na URL envolve menos mudanças na implantação do que criar um host para cada um dos produtos/assuntos da empresa. 
 
-Em algumas empresas, esses grandes assuntos são conhecidos como domínios funcionais. Eles agrupam entidades relacionadas por um contexto funcional como produtos (cartões, contas etc.), processos (contratações, on-boarding etc.) ou serviços (comunicações, chat etc.). É boa prática usar nomes em minúsculo e, se composto, separar com hífen. Os domínios funcionais na maioria dos casos serão substantivos no plural. Normalmente, de 1 até 3 termos são suficientes para criar agrupamentos, até mesmo para empresas com muitos sistemas. Por exemplo: htts:// (WIP)
+Em algumas empresas, esses grandes assuntos são conhecidos como domínios funcionais. Eles agrupam entidades relacionadas por um contexto funcional como produtos (cartões, contas etc.), processos (contratações, on-boarding etc.) ou serviços (comunicações, chat etc.). É boa prática usar nomes em minúsculo e, se composto, separar com hífen. Os domínios funcionais na maioria dos casos serão substantivos no plural. Normalmente, de 1 até 3 termos são suficientes para criar agrupamentos, até mesmo para empresas com muitos sistemas. Por exemplo: htts://api.empresa.com/vendas/veiculos/parcerias/v1
 
 Também é interessante manter os contratos de cada domínio separados para dar independência para os times que cuidam de cada um deles, além de permitir gerir o ciclo de vida de cada um deles de forma separada.
 
@@ -285,7 +285,7 @@ Ex:
 
 Os path parameters são destinados exclusivamente para identificar os recursos dentro das coleções mediante seu identificador único.
 
-É boa prática, usar nomes em minúsculo e se composto, separar com hífen. Os Path Parameters na maioria dos casos serão compostos por "id" + nome do recurso no singular em camelCase.
+É boa prática usar nomes em camelCase, pois esse termo não vai virar um termo na URL, apenas como indicação no contrato de que ali se trata de uma variável. E em boa parte das linguagens, variáveis se define dessa forma. Os Path Parameters na maioria dos casos serão compostos por "id" + nome do recurso no singular em camelCase.
 
 Ex:
 - http://api.exemploempresa.com/cartoes/v1/cartoes/{idCartao}/faturas/{idFatura}/lancamentos/{idLancamento}
