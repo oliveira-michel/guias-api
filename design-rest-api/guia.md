@@ -104,11 +104,7 @@ Este é um documento "vivo" em que o autor está atualizando com a experiência 
 
 Os conteúdos abaixo cobrem alguns conceitos aliados às boas práticas no design de RESTful APIs. Quando falamos em design de RESTful APIs, estamos abordando como definir um contrato de API que expõe as entidades e funções de um determinado sistema respeitando as restrições do REST.
 
-> Para fazer o entendimento das necessidades de negócio e definição das entidades, recomendamos o uso de Domain Driven Design.
-> TO DO: Em breve será disponibilizado um guia explorando toda a fase de entendimento e transformação dos conceitos de negócio em entidades para serem expostas como recursos via REST API.
-
-> O conteúdo deste material contempla os conceitos para especificação do contrato de REST APIs de forma genérica, não abordando necessariamente nenhuma linguagem específica de definição de contrato: como RAML, Open API etc.
-> TO DO: Em breve serão disponibilizados exemplos dos conceitos deste guia em uma destas linguagens.
+> O conteúdo deste material contempla os conceitos para especificação do contrato de REST APIs de forma genérica, não abordando necessariamente nenhuma linguagem específica de definição de contrato: como RAML, Open API Specification etc.
 
 **API** (**A**pplication **P**rogramming **I**nterface) é um software que permite comunicação entre sistemas onde há um fornecedor e um ou mais consumidores de informação, serviços etc.  Para consumir uma API respeita-se um contrato que deve incluir o protocolo de comunicação, as operações (consultas e atualizações) e os formatos de dados para entradas, saídas e erros.
 A maioria dos softwares nos quais nós interagimos são construídos para atender às necessidades humanas e normalmente referenciam as "coisas" reais das quais esses softwares tratam. Por exemplo, um software de biblioteca vai representar livros, seções, autores etc. e, através de alguma interface, permitir que um usuário interaja com estas representações. Uma API difere-se deste tipo de software no que tange o usuário: quem interage com o software é outro software, não diretamente o usuário final. No entanto, quem desenvolve o software que interage com a API é um programador - e até a data deste documento, a maioria ainda são humanos - e para que a experiência deste usuário programador e do usuário do software que ele desenvolve seja a melhor possível, princípios de design devem ser respeitados. 
@@ -207,13 +203,13 @@ Os recursos na maioria dos casos serão substantivos no plural, pois geralmente 
 Ex:
 http://api.empresaexemplo.com/creditos/v1/ofertas-credito-consignado
 
-Recursos criados no singular são menos frequentes e pode acontecer quando:
-- Houver requerimentos de segurança ou permissão específicos para um atributo. Neste caso, o atributo se torna um recurso na URL, podendo ser aplicadas políticas específicas de segurança naquela rota.
-- No recurso existir um [atributo](#request--body) complexo com um número elevado de "sub-atributos". Por conta da complexidade, pode-se optar por tornar este atributo um recurso.
-- Houver recursos que não existam no plural, como saldo, extrato etc.
+Recursos criados no singular são menos frequentes e podem acontecer quando:
+- Houver requerimentos de segurança ou permissão específicos para um atributo da API (propriedade que faz parte do body). Neste caso, o atributo se torna um recurso na URL, podendo ser aplicadas políticas específicas de segurança naquela rota. Se o atributo for singular, ele vai para a URL como singular.
+- No recurso existir um [atributo](#request--body) complexo com um número elevado de "sub-atributos". Por conta da complexidade, pode-se optar por tornar este atributo um recurso. Se o atributo for singular, ele vai para a URL como singular.
+- Houver recursos que não existam no plural, como saldo, extrato, posicao-consolidada etc.
 
 Quando definir os recursos a serem expostos, deve-se **evitar**:
-- Utilizar termos que não façam parte do nome da entidade de negócio, por exemplo: <s>detalhes_</s>lancamentos-cheque. A entidade de negócio se chama lancamentos_cheque, exibir todos os atributos ou não, fica a cargo de filtros na [query string](#request--url--query-strings), não na exposição como um recurso.
+- Utilizar termos que não façam parte do nome da entidade de negócio, por exemplo: <s>detalhes-</s>lancamentos-cheque. A entidade de negócio se chama lancamentos-cheque, exibir todos os atributos ou não, fica a cargo de filtros na [query string](#request--url--query-strings), não na exposição como um recurso.
 - Utilizar termos que representam as ações básicas do CRUD (consultar, gravar, atualizar, apagar etc). Por exemplo: <s>consultar-</s>fatura. As ações básicas do CRUD são representadas pelos [verbos HTTP](#request--verbs) (GET, POST, PUT, PATCH e DELETE).
 - Expor representações de detalhes do backend na entidade, por exemplo: /<s>servico-</s>transferencias. O termo "servico" neste caso está representando, por exemplo, o "serviço" do sistema que processa uma transferência. Este tipo de informação deve ser abstraída no nome do recurso. Nomeie-o apenas como .../transferencias. Ou um exemplo pior, chamar um recurso de .../X0PSD0054, sendo X0PSD0054 o nome interno de um serviço que processa boletos. Nomeie-o apenas como /boletos.
 
@@ -223,31 +219,29 @@ Quando definir os recursos a serem expostos, deve-se **evitar**:
 
 Uma das restrições do REST é que ele se aplica a recursos que representam as "entidades" de um [Domínio Funcional](#request--url--resources--dom%C3%ADnios-funcionais). Para alterar o estado dessas entidades, usamos os verbos GET, POST, PATCH, PUT e DELETE, que basicamente fazem o CRUD.
  
-No entanto, existem alguns cenários em que não temos "entidades" de um domínio, mas sim, ações e que não fazem parte do conjunto restrito de [verbos](#request--verbs) do HTTP. Aqui estão alguns exemplos:
+No entanto, existem alguns cenários em que não temos "entidades" de um domínio, mas sim, ações e que não fazem parte do conjunto restrito de [verbos](#request--verbs) do HTTP, ou seja, não tem característica de CRUD (Create, Recover, Update e Delete). Aqui estão alguns exemplos:
 - Distância entre dois pontos (via coordenadas de GPS, CEP etc.)
 - Validação de dados de cartão de crédito
+- Simulações de financiamento
 - Cálculos em geral
 
-Para estes casos, tratamos essas funções como recursos e para facilitar a identificação de que não é uma "entidade", usamos verbos no lugar dos substantivos.
+Para estes casos, tratamos essas funções como recursos e para facilitar a identificação de que não é uma "entidade", usamos o nome do recurso sobre o que aquela ação se trata como substantivo + "/" + verbo representando a ação.
 Ex:
-- GET .../**calcular-distancia**?latitude.gte=48,8584&longitude.gte=2,2945&latitude.lte=-22.951916&longitude.lte=-43.2104872
-- POST .../**validar-cartao**
+- GET .../**distancias/calcular**?latitude.gte=48,8584&longitude.gte=2,2945&latitude.lte=-22.951916&longitude.lte=-43.2104872
+- POST .../**senhas/redefinir**
+- POST .../**financiamentos/simular**
+- GET .../**calculadoras/somar**?primeiroValor=72&segundoValor=28
+- POST .../**cartoes/validar**
 
-```
-{
-	"numero": "5346931596124410",
-	"nomeTitular": "JOSE A OLIVEIRA",
-	"dataValidade": "2024-05-23",
-	"CVV": 996
-}
-```
-- GET .../**somar**?primeiro-valor=72&segundo-valor=28
-  
-Observe que algumas chamadas representam consultas seguras (que não alteram o estado do recurso) e idempotentes (que podem ser repetidas retornando o mesmo resultado). Portanto, o verbo HTTP utilizado nelas foi o GET. Repare que o GET trafega a requisição via Query Strings: que são visíveis a todos. Os dados das Query Strings ou dos Path Parameters não são encriptados em uma conexão HTTPS.
+A ideia de colocar o recurso como substantivo antes do verbo que representa a função ou serviço é deixar a estrutura da URL preparada para caso aquele recurso venha ganhar capacidades no futuro.
+
+A ideia de definir a ação como um verbo é para diferenciar do resto dos endpoints. Os endpoints representados por URLs formadas por substantivos serão claramente boas implementações de REST seguindo os melhores padrões possíveis. Os endpoints representados por URLs formadas por verbos serão implementações que provavelmente não seguirão à risca os padrões do REST.
+
+Observe que algumas chamadas às funções (serviços) representam consultas seguras (que não alteram o estado do recurso) e idempotentes (que podem ser repetidas retornando o mesmo resultado). Portanto, o verbo HTTP utilizado nelas foi o GET. Repare que o GET trafega a requisição via Query Strings: que são visíveis a todos. Os dados das Query Strings ou dos Path Parameters não são encriptados em uma conexão HTTPS.
 
 Nos casos em que a chamada não é segura, nem idempotente (por exemplo, em uma API de login, em que depois de algumas tentativas o login será bloqueado) devemos usar verbos como o POST. 
 
-No exemplo da validação de cartão, trafegamos **dados sensíveis**. Mesmo sendo uma consulta segura (sem alterações de estado) e idempotente, por questões de segurança da informação, o tráfego de dados sensíveis é feito sempre via POST, pois no POST os dados são trafegados no Body e o Body pode ser encriptado.
+No exemplo da validação de cartão, em que provavelmente trafegamos **dados sensíveis**. Mesmo sendo uma consulta segura (sem alterações de estado) e idempotente, por questões de segurança da informação, o tráfego de dados sensíveis é feito sempre via POST, pois no POST os dados são trafegados no Body e o Body pode ser encriptado.
 
 Para saber mais sobre idempotência, leia sobre os [verbos](#request--verbs) HTTP.
 
@@ -255,7 +249,7 @@ Para saber mais sobre idempotência, leia sobre os [verbos](#request--verbs) HTT
 
 ###  Request > URL > Resources > Domínios Funcionais
 
-Em algumas empresas, pode ser que não exista um Base Path para cada produto e uma mesma empresa forneça recursos de vários produtos diferentes através de API. Neste caso, pode-se criar um recurso que serve para agrupar os recursos de cada um dos produtos.
+Em algumas empresas, pode ser que não exista um host para cada produto e uma mesma empresa forneça recursos de vários produtos diferentes através de API. Neste caso, pode-se criar um recurso que serve para agrupar os recursos de cada um dos produtos.
 Ex:
 - https://apis.bbva.com/customers/v1
 - https://apis.bbva.com/accounts/v1
@@ -271,9 +265,9 @@ Nos caso acima, o Banco BBVA agrupa todos os recursos referentes ao assunto "car
 
 > Para mais detalhes sobre essas APIs veja: https://www.bbvaapimarket.com/products
 
-A mesma abordagem de agrupamento provavelmente será útil para APIs expostas apenas internamente nas empresas para integrações entre diferentes sistemas. Isso porque definir um recurso na URL envolve menos mudanças na implantação do que criar um Base Path para cada um dos produtos/assuntos da empresa. 
+A mesma abordagem de agrupamento provavelmente será útil para APIs expostas apenas internamente nas empresas para integrações entre diferentes sistemas. Isso porque definir um recurso na URL envolve menos mudanças na implantação do que criar um host para cada um dos produtos/assuntos da empresa. 
 
-Em algumas empresas, esses grandes assuntos são conhecidos como domínios funcionais. Eles agrupam entidades relacionadas por um contexto funcional como produtos (cartões, contas etc.), processos (contratações, on-boarding etc.) ou serviços (comunicações, chat etc.). É boa prática usar nomes em minúsculo e, se composto, separar com hífen. Os domínios funcionais na maioria dos casos serão substantivos no plural.
+Em algumas empresas, esses grandes assuntos são conhecidos como domínios funcionais. Eles agrupam entidades relacionadas por um contexto funcional como produtos (cartões, contas etc.), processos (contratações, on-boarding etc.) ou serviços (comunicações, chat etc.). É boa prática usar nomes em minúsculo e, se composto, separar com hífen. Os domínios funcionais na maioria dos casos serão substantivos no plural. Normalmente, de 1 até 3 termos são suficientes para criar agrupamentos, até mesmo para empresas com muitos sistemas. Por exemplo: htts://api.empresa.com/vendas/veiculos/parcerias/v1
 
 Também é interessante manter os contratos de cada domínio separados para dar independência para os times que cuidam de cada um deles, além de permitir gerir o ciclo de vida de cada um deles de forma separada.
 
@@ -288,7 +282,7 @@ Ex:
 
 Os path parameters são destinados exclusivamente para identificar os recursos dentro das coleções mediante seu identificador único.
 
-É boa prática, usar nomes em minúsculo e se composto, separar com hífen. Os Path Parameters na maioria dos casos serão compostos por "id" + nome do recurso no singular em camelCase.
+É boa prática usar nomes em camelCase, pois esse termo não vai virar um termo na URL, apenas como indicação no contrato de que ali se trata de uma variável. E em boa parte das linguagens, variáveis se define dessa forma. Os Path Parameters na maioria dos casos serão compostos por "id" + nome do recurso no singular em camelCase.
 
 Ex:
 - http://api.exemploempresa.com/cartoes/v1/cartoes/{idCartao}/faturas/{idFatura}/lancamentos/{idLancamento}
